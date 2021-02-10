@@ -1,35 +1,4 @@
 {
-	"Hannaford": {
-		"name": "Hannaford",
-		"website": "https://hannafordsched.rxtouch.com/rbssched/program/covid19/Patient/Advisory",
-		"locations": [
-			{
-				"street": "158 No. Main St. Suite 3",
-				"city": "Uxbridge",
-				"zip": "01569"
-			},
-			{
-				"street": "8 Merchants Way",
-				"city": "Middleborough",
-				"zip": "01569"
-			},
-			{
-				"street": "255 Joseph E. Warner Blvd.",
-				"city": "Taunton",
-				"zip": "02780"
-			},
-			{
-				"street": "55 Russell St.",
-				"city": "Waltham",
-				"zip": "02453"
-			},
-			{
-				"street": "118 Lancaster St.",
-				"city": "Leominster",
-				"zip": "01453"
-			}
-		]
-	},
 	"MAImmunizations": {
 		"website": "https://www.maimmunizations.org/clinic/search",
 		"baseWebsite": "https://www.maimmunizations.org"
@@ -40,18 +9,6 @@
 		"city": "Amherst",
 		"zip": "01003",
 		"website": "https://uma.force.com/covidtesting/s/first-responders"
-	},
-	"Curative": {
-		"website": "https://labtools.curativeinc.com/api/v1/testing_sites/",
-		"linkWebsite": "https://curative.com/sites/",
-		"locations": [
-			{
-				"id": 24181
-			},
-			{
-				"id": 24182
-			}
-		]
 	},
 	"Family Practice Group": {
 		"name": "Family Practice Group",

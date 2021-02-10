@@ -58,15 +58,29 @@ async function execute() {
 			}
 		}
 
+		const responseJson = {
+			results: finalResultsArray,
+		};
+
 		if (process.env.DEVELOPMENT) {
 			console.log("The following data would be published:");
-			console.dir({ results: finalResultsArray }, { depth: null });
+			console.dir(responseJson, { depth: null });
+			fs = require("fs");
+			await new Promise((resolve, reject) => {
+				fs.writeFile("out.json", JSON.stringify(responseJson), (err) => {
+					if (err) {
+						reject(err);
+					} else {
+						resolve();
+					}
+				});
+			});
 			return;
 		} else {
 			const params = {
 				Bucket: process.env.AWSS3BUCKETNAME,
 				Key: "data.json",
-				Body: JSON.stringify({ results: finalResultsArray }),
+				Body: JSON.stringify(responseJson),
 			};
 
 			// Uploading files to the bucket
