@@ -23,21 +23,25 @@ async function ScrapeWebsiteData(browser) {
 			await page.goto(sites.MAImmunizations.website + "?page=" + pageNumber);
 		}
 
-		//each entry in div.field-fullwidth
-		const entries = await page.$$("div.field-fullwidth");
+		const entries = await page.$$("div.justify-between.border-b");
 		for (const entry of entries) {
-			//h1.title has [LOCATION] on [DATE]
-			const title = await (await entry.$("h1.title")).evaluate(
-				(node) => node.innerText
-			);
+			//each p has label: information
+			//TODO: add "special instructions" inside div.w-6/12
+			//UPDATE: ignoring "special instructions" since they all just say to get the same brand vaccine for both doses
+			const rawDataElements = await entry.$$("p:not(.my-3)");
+			const rawData = [];
+			for (const element of rawDataElements) {
+				const text = await element.evaluate((node) => node.innerText);
+				rawData.push(text);
+			}
+			const [title, address, ...rawExtraData] = rawData;
+
+			//title has [LOCATION] on [DATE]
 			const onIndex = title.indexOf(" on ");
 			const locationName = title.substring(0, onIndex);
 			const date = title.substring(onIndex + 4);
 
-			//h4 has address like [STREET], [CITY] MA, [ZIP]
-			const address = await (await entry.$("h4")).evaluate(
-				(node) => node.innerText
-			);
+			//address like [STREET], [CITY] MA, [ZIP]
 			const firstCommaIndex = address.indexOf(", ");
 			const street = address.substring(0, firstCommaIndex);
 			let stateIndex = address.indexOf(" MA");
@@ -49,15 +53,6 @@ async function ScrapeWebsiteData(browser) {
 
 			const extraData = {};
 			let availableAppointments = 0;
-			//each p has label: information
-			//TODO: add "special instructions" inside div.w-6/12
-			//UPDATE: ignoring "special instructions" since they all just say to get the same brand vaccine for both doses
-			const rawExtraDataElements = await entry.$$("p:not(.my-3)");
-			const rawExtraData = [];
-			for (const element of rawExtraDataElements) {
-				const text = await element.evaluate((node) => node.innerText);
-				rawExtraData.push(text);
-			}
 			rawExtraData.forEach((text) => {
 				if (text.indexOf("Available Appointments") !== -1) {
 					availableAppointments = parseInt(text.match(/\d+/)[0]);

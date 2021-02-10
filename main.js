@@ -66,7 +66,7 @@ async function execute() {
 			const params = {
 				Bucket: process.env.AWSS3BUCKETNAME,
 				Key: "data.json",
-				Body: JSON.stringify({ results: resultsArray }),
+				Body: JSON.stringify({ results: finalResultsArray }),
 			};
 
 			// Uploading files to the bucket
