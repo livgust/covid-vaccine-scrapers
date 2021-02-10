@@ -9,8 +9,8 @@ This is the open-source portion of the back-end, website scraping software that 
 1.  Download chromium version 843427 locally.
 1.  Create a .env file with the following:
 
-        DEVELOPMENT=true \
-        CHROMEPATH="path/to/chrome/that/you/downloaded" \
+        DEVELOPMENT=true
+        CHROMEPATH="path/to/chrome/that/you/downloaded"
         PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
 
 ## Using this code
