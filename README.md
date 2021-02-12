@@ -7,8 +7,6 @@ This is the open-source portion of the back-end, website scraping software that 
 ## Setup
 
 1.  Download a recent version of Chromium locally: https://download-chromium.appspot.com/
-    - Optional: move to `/Applications` if you want:
-        `mv ~/Downloads/chrome-mac/Chromium.app /Applications`
 1.  Create a `.env` file with the following:
 
         DEVELOPMENT=true
