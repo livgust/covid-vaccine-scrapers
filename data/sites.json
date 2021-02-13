@@ -1,20 +1,71 @@
 {
-	"MAImmunizations": {
-		"website": "https://www.maimmunizations.org/clinic/search",
-		"baseWebsite": "https://www.maimmunizations.org"
-	},
-	"UMassAmherst": {
-		"name": "UMass Amherst Campus Center",
-		"street": "1 Campus Center Way",
-		"city": "Amherst",
-		"zip": "01003",
-		"website": "https://uma.force.com/covidtesting/s/first-responders"
-	},
-	"Family Practice Group": {
-		"name": "Family Practice Group",
-		"street": "11 Water Street, Suite 1-A",
-		"city": "Arlington",
-		"zip": "02476",
-		"website": "https://bookfpg.timetap.com/#/"
-	}
+    "MAImmunizations": {
+        "website": "https://www.maimmunizations.org/clinic/search",
+        "baseWebsite": "https://www.maimmunizations.org"
+    },
+    "UMassAmherst": {
+        "name": "UMass Amherst Campus Center",
+        "street": "1 Campus Center Way",
+        "city": "Amherst",
+        "zip": "01003",
+        "website": "https://uma.force.com/covidtesting/s/first-responders"
+    },
+    "Family Practice Group": {
+        "name": "Family Practice Group",
+        "street": "11 Water Street, Suite 1-A",
+        "city": "Arlington",
+        "zip": "02476",
+        "website": "https://bookfpg.timetap.com/#/"
+    },
+    "Hannaford": {
+        "name": "Hannaford",
+        "website": "https://hannafordsched.rxtouch.com/rbssched/program/covid19/Patient/Advisory",
+        "locations": [
+            {
+                "street": "158 No. Main St. Suite 3",
+                "city": "Uxbridge",
+                "zip": "01569"
+            },
+            {
+                "street": "8 Merchants Way",
+                "city": "Middleborough",
+                "zip": "01569"
+            },
+            {
+                "street": "255 Joseph E. Warner Blvd.",
+                "city": "Taunton",
+                "zip": "02780"
+            },
+            {
+                "street": "55 Russell St.",
+                "city": "Waltham",
+                "zip": "02453"
+            },
+            {
+                "street": "118 Lancaster St.",
+                "city": "Leominster",
+                "zip": "01453"
+            }
+        ]
+    },
+    "Curative": {
+        "website": "https://labtools.curativeinc.com/api/v1/testing_sites/",
+        "linkWebsite": "https://curative.com/sites/",
+        "locations": [
+            {
+                "id": 24181
+            },
+            {
+                "id": 24182
+            }
+        ]
+    },
+    "Harrington": {
+        "name": "Southbridge Community Center",
+        "street": "153 Chestnut Street",
+        "city": "Southbridge",
+        "zip": "01550",
+        "website": "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438&startdate=2020%2F12%2F16",
+        "signUpLink": "https://forms.gle/tMDnRLcXzZnPUxqP9"
+    }
 }
