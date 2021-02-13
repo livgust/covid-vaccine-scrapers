@@ -67,5 +67,15 @@
         "zip": "01550",
         "website": "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438&startdate=2020%2F12%2F16",
         "signUpLink": "https://forms.gle/tMDnRLcXzZnPUxqP9"
+    },
+    "Atrius": {
+        "name": "Atrius Health",
+        "street": "100 Second Avenue ",
+        "city": "Needham",
+        "zip": "02494",
+        "website": "https://myhealth.atriushealth.org/fr/",
+        "dphLink": "https://myhealth.atriushealth.org/DPH?",
+        "signUpLink": "https://myhealth.atriushealth.org/fr/"
+
     }
 }
