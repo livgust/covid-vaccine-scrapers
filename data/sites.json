@@ -67,5 +67,21 @@
         "zip": "01550",
         "website": "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438&startdate=2020%2F12%2F16",
         "signUpLink": "https://forms.gle/tMDnRLcXzZnPUxqP9"
+    },
+    "PriceChopper": {
+        "name": "Price Chopper",
+        "street": "153 Chestnut Street",
+        "city": "Southbridge",
+        "zip": "01440",
+        "websiteRoot": "https://scrcxp.pdhi.com/ScreeningEvent",
+        "signUpLink": "https://www.pricechopper.com/covidvaccine/massachusetts/",
+        "locations": [{
+            "id": "1",
+            "street": "555 Hubbard Ave.",
+            "city": "Pittsfield",
+            "zip": "01201",
+            "eventId": "e047c75c-a431-41a8-8383-81613f39dd55",
+            "state": "MA"
+        }]
     }
 }
