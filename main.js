@@ -84,7 +84,7 @@ async function execute() {
 			};
 
 			// Uploading files to the bucket
-			return await new Promise((resolve, reject) => {
+			const results = await new Promise((resolve, reject) => {
 				s3.upload(params, function (err, data) {
 					if (err) {
 						reject(err);
@@ -93,6 +93,23 @@ async function execute() {
 					resolve(data);
 				});
 			});
+		        // Timestamped upload
+		  	var params2 = params;
+		  	const now = new Date();
+		  	const timestamp = now.toISOString().substring(0,16)+'Z';
+		  	// timestamp form: "2021-02-12T18:38Z" (we omit seconds for predictability)
+		  	params2.Key = "data-"+timestamp+".json";
+		  	// Do the reupload
+		  	const results2 = await new Promise((resolve, reject) => {
+		  			s3.upload(params2, function (err, data) {
+		  				if (err) {
+		  					reject(err);
+		  				}
+		  				console.log(`Timestamped file uploaded successfully. ${data.Location}`);
+		  				resolve(data);
+		  			});
+		  		});
+		  	return results;
 		}
 	};
 	await gatherData();
