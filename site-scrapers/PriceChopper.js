@@ -14,7 +14,7 @@ module.exports = async function GetAvailableAppointments(browser) {
         return {
             name: `PriceChopper (${loc.city})`,
             hasAvailability,
-            signUpLink: sites.PriceChopper.website,
+            signUpLink: sites.PriceChopper.signUpLink,
             ...loc,
         };
     });
@@ -28,8 +28,6 @@ async function ScrapeWebsiteData(browser) {
 
         let url = [
             sites.PriceChopper.websiteRoot,
-            loc.eventId,
-            'GetLocations',
             loc.zip
         ].join('/') + '?state=' + loc.state;
         
