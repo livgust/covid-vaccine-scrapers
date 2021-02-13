@@ -6,12 +6,12 @@ const Harrington = require("./Harrington.js");
 const Curative = require("./Curative.js");
 
 let scrapers = [
-    FamilyPracticeGroup,
-    MAImmunizations,
-    UMassAmherst,
+    //FamilyPracticeGroup,
+    //MAImmunizations,
+    //UMassAmherst,
     Hannaford,
-    Harrington,
-    Curative,
+    //Harrington,
+    //Curative,
 ];
 
 if (process.env.PROPRIETARY_SITE_SCRAPERS_PATH) {
