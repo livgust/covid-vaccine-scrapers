@@ -1,8 +1,6 @@
 const sites = require("../data/sites.json");
 const https = require("https");
 
-const noAppointmentMatchString = "no locations with available appointments";
-
 module.exports = async function GetAvailableAppointments(browser) {
     console.log("PriceChopper starting.");
     const webData = await ScrapeWebsiteData(browser);

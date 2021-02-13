@@ -7,13 +7,13 @@ const Curative = require("./Curative.js");
 const PriceChopper = require("./PriceChopper.js");
 
 let scrapers = [
-    //FamilyPracticeGroup,
-    //MAImmunizations,
-    //UMassAmherst,
-    //Hannaford,
+    FamilyPracticeGroup,
+    MAImmunizations,
+    UMassAmherst,
+    Hannaford,
     PriceChopper,
-    //Harrington,
-    //Curative,
+    Harrington,
+    Curative,
 ];
 
 if (process.env.PROPRIETARY_SITE_SCRAPERS_PATH) {
