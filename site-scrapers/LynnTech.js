@@ -12,9 +12,9 @@ module.exports = async function GetAvailableAppointments() {
     };
 };
 
-let siteId = "13300632";
-let vt = "1089";
-let dept = "133001025";
+const siteId = "13300632";
+const vt = "1089";
+const dept = "133001025";
 
 async function ScrapeWebsiteData() {
     // We need to go through the flow and use a request verification token
