@@ -5,6 +5,7 @@ const Hannaford = require("./Hannaford.js");
 const Harrington = require("./Harrington.js");
 const Curative = require("./Curative.js");
 const Atrius = require("./Atrius.js");
+const LynnTech = require("./LynnTech.js");
 
 let scrapers = [
     FamilyPracticeGroup,
@@ -13,7 +14,8 @@ let scrapers = [
     Hannaford,
     Harrington,
     Curative,
-    Atrius
+    Atrius,
+    LynnTech
 ];
 
 if (process.env.PROPRIETARY_SITE_SCRAPERS_PATH) {
