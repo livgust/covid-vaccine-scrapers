@@ -98,8 +98,8 @@ async function execute() {
 		        // Timestamped upload
 		  	var params2 = params;
 		  	const now = new Date();
-		  	const timestamp = now.toISOString().substring(0,16)+'Z';
-		  	// timestamp form: "2021-02-12T18:38Z" (we omit seconds for predictability)
+		        const timestamp = now.toISOString().substring(0,16).replace(':','')+'Z';
+		  	// timestamp form: "2021-02-12T1838Z" (we omit seconds for predictability)
 		  	params2.Key = "data-"+timestamp+".json";
 		  	// Do the reupload
 		  	const results2 = await new Promise((resolve, reject) => {
