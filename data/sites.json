@@ -8,7 +8,8 @@
         "street": "1 Campus Center Way",
         "city": "Amherst",
         "zip": "01003",
-        "website": "https://uma.force.com/covidtesting/s/first-responders"
+        "website": "https://uma.force.com/covidtesting/s/first-responders",
+        "restrictions": "Eligible populations in Western MA"
     },
     "Family Practice Group": {
         "name": "Family Practice Group",
@@ -82,7 +83,7 @@
         "street": "80 Neptune Blvd",
         "city": "Lynn",
         "zip": "01902",
-        "signUpLink": "https://www.lchcnet.org/covid-19-vaccine-scheduling#vaccine-screening"
+        "signUpLink": "https://www.lchcnet.org/covid-19-vaccine-scheduling#vaccine-screening",
+        "restrictions": "Eligible populations in Lynn and Nahant"
     }
-
 }
