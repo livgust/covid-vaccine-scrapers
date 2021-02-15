@@ -76,6 +76,13 @@
         "website": "https://myhealth.atriushealth.org/fr/",
         "dphLink": "https://myhealth.atriushealth.org/DPH",
         "signUpLink": "https://myhealth.atriushealth.org/fr/"
-
+    },
+    "LynnTech": {
+        "name": "Lynn Tech High School Field House",
+        "street": "80 Neptune Blvd",
+        "city": "Lynn",
+        "zip": "01902",
+        "signUpLink": "https://www.lchcnet.org/covid-19-vaccine-scheduling#vaccine-screening"
     }
+
 }
