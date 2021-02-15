@@ -27,6 +27,8 @@ async function execute() {
 	const browser = process.env.DEVELOPMENT
 		? await Puppeteer.launch({
 				executablePath: process.env.CHROMEPATH,
+				headless: false,
+				slowMo: 50
 		  })
 		: await Puppeteer.launch({
 				args: chromium.args,
