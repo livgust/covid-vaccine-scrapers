@@ -6,6 +6,7 @@ const Harrington = require("./Harrington.js");
 const Curative = require("./Curative.js");
 const Atrius = require("./Atrius.js");
 const LynnTech = require("./LynnTech.js");
+const PriceChopper = require("./PriceChopper.js");
 const UmassMercantile = require("./UmassMercantile.js")
 
 let scrapers = [
@@ -17,6 +18,7 @@ let scrapers = [
     Curative,
     Atrius,
     LynnTech,
+    PriceChopper,
     UmassMercantile
 ];
 
