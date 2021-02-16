@@ -28,8 +28,11 @@ async function ScrapeWebsiteData() {
     const data = await p;
     const results = { availability: {}, hasAvailability: false };
     for (const dateEntry of data) {
-        const date = new Date(dateEntry.edate);
-        if (date >= new Date()) {
+        //force midnight local time zone to avoid UTC dateline issues
+        const date = new Date(`${dateEntry.edate}T00:00`);
+        let midnightToday = new Date();
+        midnightToday.setHours(0, 0, 0, 0);
+        if (date >= midnightToday) {
             const slotsAvailable =
                 dateEntry.jobstotal - dateEntry.jobstotalassignments;
             results.availability[
