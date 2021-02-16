@@ -126,3 +126,43 @@ module.exports.UpdateResults = function UpdateResults(results, postResponse) {
         }
     }
 };
+
+/**
+ * Adds the weekCount number of weeks to the results object
+ */
+module.exports.AddFutureWeeks = async function AddFutureWeeks( scheduleHost, schedulePath, results, cookie, verificationToken, weekCount, postDataCallback) {
+    // Setup the post data to answer the survey questions
+    let startDate = new Date();
+    startDate.setDate(startDate.getDate());
+    // The data can only be returned for one week. Check the calendar for 10 future weeks.
+    for (const i of Array(weekCount).keys()) {
+        // Format the date as 'YYYY-MM-dd'
+        let startDateFormatted = `${startDate.getFullYear()}-${(
+            "0" +
+            (startDate.getMonth() + 1)
+        ).slice(-2)}-${("0" + startDate.getDate()).slice(-2)}`;
+
+        // Generate the postdata with the formatted startDate.
+        let postData = postDataCallback(startDateFormatted);
+
+        // Get the schedule
+        let postResponse = await this.GetSchedule(
+            cookie,
+            verificationToken,
+            scheduleHost,
+            schedulePath,
+            postData
+        );
+        if (postResponse) {
+            //Add the details from the postResponse to the results.
+            this.UpdateResults(results, postResponse);
+        } else {
+            console.error("Null response returned from scheduling request");
+        }
+        // Increment the date another week.
+        startDate.setDate(startDate.getDate() + 7);
+    }
+    return results;
+
+}
+
