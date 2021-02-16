@@ -28,7 +28,7 @@ module.exports.GetCookieAndVerificationToken = async function GetCookieAndVerifi
             })
             .on("error", e => {
                 console.error(
-                    "Error making mychart request for LynnTech: " + e
+                    "Error making mychart request for verification request " + e
                 );
             })
             .end();

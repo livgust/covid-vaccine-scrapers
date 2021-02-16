@@ -1,6 +1,4 @@
 const sites = require("../data/sites.json");
-const https = require("https");
-const html_parser = require("node-html-parser");
 const mychart = require("./MyChartAPI");
 
 module.exports = async function GetAvailableAppointments() {
