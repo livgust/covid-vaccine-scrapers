@@ -10,16 +10,16 @@ const PriceChopper = require("./PriceChopper.js");
 const UmassMercantile = require("./UmassMercantile.js")
 
 let scrapers = [
-    // FamilyPracticeGroup,
-    // MAImmunizations,
-    // UMassAmherst,
-    // Hannaford,
-    // Harrington,
-    // Curative,
-    Atrius
-    // LynnTech,
-    // PriceChopper,
-    // UmassMercantile
+    FamilyPracticeGroup,
+    MAImmunizations,
+    UMassAmherst,
+    Hannaford,
+    Harrington,
+    Curative,
+    Atrius,
+    LynnTech,
+    PriceChopper,
+    UmassMercantile
 ];
 
 if (process.env.PROPRIETARY_SITE_SCRAPERS_PATH) {
