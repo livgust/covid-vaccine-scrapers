@@ -2,7 +2,7 @@ const sites = require("../data/sites.json");
 const mychart = require("./MyChartAPI");
 
 module.exports = async function GetAvailableAppointments() {
-    console.log("UmmassMercantile starting.");
+    console.log("UmassMercantile starting.");
     const webData = await ScrapeWebsiteData();
     console.log("UmassMercantile done.");
     return {
@@ -19,12 +19,9 @@ async function ScrapeWebsiteData() {
     ] = await mychart.GetCookieAndVerificationToken(
         "https://mychartonline.umassmemorial.org/mychart/openscheduling?specialty=15&hidespecialtysection=1"
     );
-    // Setup the return object.
-    const results = { availability: {}, hasAvailability: false };
     return mychart.AddFutureWeeks(
         "mychartonline.umassmemorial.org",
         "/MyChart/OpenScheduling/OpenScheduling/GetScheduleDays",
-        results,
         cookie,
         verificationToken,
         10,

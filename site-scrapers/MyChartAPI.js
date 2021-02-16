@@ -10,7 +10,6 @@ module.exports.GetCookieAndVerificationToken = async function GetCookieAndVerifi
 ) {
     let cookie = "";
     const tokenPromise = new Promise(resolve => {
-        let response = "";
         https
             .get(requestVerificationUrl, res => {
                 let body = "";
@@ -80,8 +79,10 @@ module.exports.GetSchedule = async function GetSchedule(
                 if (res.statusCode >= 200 && res.statusCode < 300) {
                     resolve(JSON.parse(body));
                 } else {
-                    console.error("Error status code returned from " + res.url);
-                    resolve();
+                    msg = console.error(
+                        `Error status code [${res.statusCode}] returned from schedule request: ${res.statusMessage}`
+                    );
+                    throw new Error("Response Not OK");
                 }
             });
         });
@@ -125,12 +126,21 @@ module.exports.UpdateResults = function UpdateResults(results, postResponse) {
             }
         }
     }
+    return results;
 };
 
 /**
  * Adds the weekCount number of weeks to the results object
  */
-module.exports.AddFutureWeeks = async function AddFutureWeeks( scheduleHost, schedulePath, results, cookie, verificationToken, weekCount, postDataCallback) {
+module.exports.AddFutureWeeks = async function AddFutureWeeks(
+    scheduleHost,
+    schedulePath,
+    cookie,
+    verificationToken,
+    weekCount,
+    postDataCallback
+) {
+    const results = { availability: {}, hasAvailability: false };
     // Setup the post data to answer the survey questions
     let startDate = new Date();
     startDate.setDate(startDate.getDate());
@@ -163,6 +173,4 @@ module.exports.AddFutureWeeks = async function AddFutureWeeks( scheduleHost, sch
         startDate.setDate(startDate.getDate() + 7);
     }
     return results;
-
-}
-
+};

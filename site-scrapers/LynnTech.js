@@ -24,18 +24,14 @@ async function ScrapeWebsiteData() {
         `https://mychartos.ochin.org/mychart/SignupAndSchedule/EmbeddedSchedule?id=${siteId}&vt=${vt}&dept=${dept}&view=plain&public=1&payor=-1,-2,-3,4655,4660,1292,4661,5369,5257,1624,4883&lang=english1089`
     );
 
-    // Setup the return object.
-    const results = { availability: {}, hasAvailability: false };
     return mychart.AddFutureWeeks(
         "mychartos.ochin.org",
         "/mychart/OpenScheduling/OpenScheduling/GetOpeningsForProvider",
-        results,
         cookie,
         verificationToken,
         10,
         PostDataCallback
     );
-    return results;
 }
 
 /**
