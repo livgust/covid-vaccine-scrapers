@@ -82,7 +82,7 @@ module.exports.GetSchedule = async function GetSchedule(
                     msg = console.error(
                         `Error status code [${res.statusCode}] returned from schedule request: ${res.statusMessage}`
                     );
-                    throw new Error("Response Not OK");
+                    resolve();
                 }
             });
         });
