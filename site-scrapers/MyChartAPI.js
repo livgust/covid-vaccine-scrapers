@@ -9,14 +9,14 @@ module.exports.GetCookieAndVerificationToken = async function GetCookieAndVerifi
     requestVerificationUrl
 ) {
     let cookie = "";
-    const tokenPromise = new Promise(resolve => {
+    const tokenPromise = new Promise((resolve) => {
         https
-            .get(requestVerificationUrl, res => {
+            .get(requestVerificationUrl, (res) => {
                 let body = "";
                 // Collect the headers and cookies
                 let responseHeaders = res.headers;
                 cookie = responseHeaders["set-cookie"];
-                res.on("data", chunk => {
+                res.on("data", (chunk) => {
                     body += chunk;
                 });
                 res.on("end", () => {
@@ -25,7 +25,7 @@ module.exports.GetCookieAndVerificationToken = async function GetCookieAndVerifi
                     resolve([body, cookie]);
                 });
             })
-            .on("error", e => {
+            .on("error", (e) => {
                 console.error(
                     "Error making mychart request for verification request " + e
                 );
@@ -68,11 +68,11 @@ module.exports.GetSchedule = async function GetSchedule(
     };
 
     // now request the schedule
-    return new Promise(resolve => {
-        const req = https.request(options, res => {
+    return new Promise((resolve) => {
+        const req = https.request(options, (res) => {
             let body = "";
             responseHeaders = res.headers;
-            res.on("data", chunk => {
+            res.on("data", (chunk) => {
                 body += chunk;
             });
             res.on("end", () => {
@@ -87,7 +87,7 @@ module.exports.GetSchedule = async function GetSchedule(
             });
         });
         req.write(postData);
-        req.on("error", e => {
+        req.on("error", (e) => {
             console.error("Error making scheduling request : " + e);
         });
         req.end();
@@ -108,14 +108,17 @@ module.exports.UpdateResults = function UpdateResults(results, postResponse) {
     for (const dayEntryProperty in allDays) {
         if (Object.prototype.hasOwnProperty.call(allDays, dayEntryProperty)) {
             dayEntry = allDays[dayEntryProperty];
-            const date = new Date(dayEntry.DateISO);
+            //force midnight local time zone to avoid UTC dateline issues
+            const date = new Date(`${dayEntry.DateISO}T00:00`);
             const slots = dayEntry.Slots;
             const slotsAvailable = slots.length || 0;
-
-            if (date >= new Date()) {
+            let midnightToday = new Date();
+            midnightToday.setHours(0, 0, 0, 0);
+            if (date >= midnightToday) {
                 results.availability[
-                    `${date.getMonth() + 1}/${date.getDate() +
-                        1}/${date.getFullYear()}`
+                    `${
+                        date.getMonth() + 1
+                    }/${date.getDate()}/${date.getFullYear()}`
                 ] = {
                     numberAvailableAppointments: slotsAvailable,
                     hasAvailability: !!slotsAvailable,

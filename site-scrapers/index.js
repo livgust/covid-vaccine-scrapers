@@ -7,7 +7,7 @@ const Curative = require("./Curative.js");
 const Atrius = require("./Atrius.js");
 const LynnTech = require("./LynnTech.js");
 const PriceChopper = require("./PriceChopper.js");
-const UmassMercantile = require("./UmassMercantile.js")
+const UmassMercantile = require("./UMassMercantile.js");
 
 let scrapers = [
     FamilyPracticeGroup,
@@ -19,7 +19,7 @@ let scrapers = [
     Atrius,
     LynnTech,
     PriceChopper,
-    UmassMercantile
+    UmassMercantile,
 ];
 
 if (process.env.PROPRIETARY_SITE_SCRAPERS_PATH) {
