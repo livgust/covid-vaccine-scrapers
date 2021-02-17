@@ -84,6 +84,13 @@
         "zip": "01902",
         "signUpLink": "https://www.lchcnet.org/covid-19-vaccine-scheduling#vaccine-screening"
     },
+    "SouthBostonCHC": {
+        "name": "South Boston Community Health Center",
+        "street": "409 W Broadway",
+        "city": "South Boston",
+        "zip": "02127",
+        "signUpLink": "https://forms.office.com/Pages/ResponsePage.aspx?id=J8HP3h4Z8U-yP8ih3jOCukT-1W6NpnVIp4kp5MOEapVUOTNIUVZLODVSMlNSSVc2RlVMQ1o1RjNFUy4u"
+    },
     "Price Chopper": {
         "name": "Price Chopper",
         "websiteRoot": "https://scrcxp.pdhi.com/ScreeningEvent/e047c75c-a431-41a8-8383-81613f39dd55/GetLocations",
