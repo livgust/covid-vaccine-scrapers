@@ -1,28 +1,26 @@
-const FamilyPracticeGroup = require("./FamilyPracticeGroup.js");
-const MAImmunizations = require("./MAImmunizations.js");
-const UMassAmherst = require("./UMassAmherst.js");
-const Hannaford = require("./Hannaford.js");
-const Harrington = require("./Harrington.js");
-const Curative = require("./Curative.js");
-const Atrius = require("./Atrius.js");
-const LynnTech = require("./LynnTech.js");
-const SouthBostonCHC = require("./SouthBostonCHC.js")
-const PriceChopper = require("./PriceChopper.js");
-const UmassMercantile = require("./UMassMercantile.js");
+const fs = require("fs");
 
-let scrapers = [
-    FamilyPracticeGroup,
-    MAImmunizations,
-    UMassAmherst,
-    Hannaford,
-    Harrington,
-    Curative,
-    Atrius,
-    LynnTech,
-    SouthBostonCHC,
-    PriceChopper,
-    UmassMercantile,
-];
+let scrapers = [];
+
+const ls = fs
+    .readdirSync("./site-scrapers", { withFileTypes: true })
+    .filter((item) => !item.isDirectory())
+    .filter((item) => item.name !== "index.js")
+    .map((item) => item.name);
+
+ls.map((fileName) => {
+    scraper = require(`./${fileName}`);
+    scrapers.push(scraper);
+});
+
+if (process.argv.length > 2) {
+    scrapers = []; // args override directory list allowing single site runs
+    let scraper;
+    for (let i = 2; i < process.argv.length; i++) {
+        scraper = require(`./${process.argv[i]}.js`);
+        scrapers.push(scraper);
+    }
+}
 
 if (process.env.PROPRIETARY_SITE_SCRAPERS_PATH) {
     const otherScrapers = require(process.env.PROPRIETARY_SITE_SCRAPERS_PATH);
