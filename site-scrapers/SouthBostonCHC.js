@@ -39,5 +39,5 @@ async function ScrapeWebsiteData() {
  * The string was retrieved from the Form Data found in a GetOpeningsForProvider request.
  */
 function PostDataCallback(startDateFormatted) {
-    return `id=${siteId}&vt=${1089}&dept=${dept}&view=grouped&start=${startDateFormatted}&filters=%7B%22Providers%22%3A%7B%221900119%22%3Atrue%7D%2C%22Departments%22%3A%7B%22150001007%22%3Atrue%7D%2C%22DaysOfWeek%22%3A%7B%220%22%3Atrue%2C%221%22%3Atrue%2C%222%22%3Atrue%2C%223%22%3Atrue%2C%224%22%3Atrue%2C%225%22%3Atrue%2C%226%22%3Atrue%7D%2C%22TimesOfDay%22%3A%22both%22%7D`;
+    return `id=${siteId}&vt=${vt}&dept=${dept}&view=grouped&start=${startDateFormatted}&filters=%7B%22Providers%22%3A%7B%221900119%22%3Atrue%7D%2C%22Departments%22%3A%7B%22150001007%22%3Atrue%7D%2C%22DaysOfWeek%22%3A%7B%220%22%3Atrue%2C%221%22%3Atrue%2C%222%22%3Atrue%2C%223%22%3Atrue%2C%224%22%3Atrue%2C%225%22%3Atrue%2C%226%22%3Atrue%7D%2C%22TimesOfDay%22%3A%22both%22%7D`;
 }
