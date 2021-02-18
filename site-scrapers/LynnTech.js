@@ -1,5 +1,5 @@
 const sites = require("../data/sites.json");
-const mychart = require("./MyChartAPI");
+const mychart = require("../lib/MyChartAPI");
 
 module.exports = async function GetAvailableAppointments() {
     console.log("LynnTech starting.");
