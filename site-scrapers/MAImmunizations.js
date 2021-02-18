@@ -9,6 +9,7 @@ module.exports = async function GetAvailableAppointments(browser) {
 
 async function ScrapeWebsiteData(browser) {
 	const page = await browser.newPage();
+	await page.setDefaultNavigationTimeout(3*60*1000);
 	await page.goto(sites.MAImmunizations.website);
 	const pages = await page.$$("nav.pagination span.page:not(.prev):not(.next)");
 	const maxPage = await pages[pages.length - 1].evaluate(

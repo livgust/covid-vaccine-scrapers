@@ -1,5 +1,5 @@
 const sites = require("../data/sites.json");
-const mychart = require("./MyChartAPI.js");
+const mychart = require("../lib/MyChartAPI.js");
 
 module.exports = async function GetAvailableAppointments() {
     console.log("Atrius starting.");
