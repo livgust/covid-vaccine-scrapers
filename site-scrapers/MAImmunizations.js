@@ -43,11 +43,13 @@ async function ScrapeWebsiteData(browser) {
 			const date = title.substring(onIndex + 4);
 
 			//address like [STREET], [CITY] MA, [ZIP]
+			//address like [STREET], [CITY] Ma, [ZIP]
+			//address like [STREET], [CITY] Massachusetts, [ZIP]
 			const firstCommaIndex = address.indexOf(", ");
 			const street = address.substring(0, firstCommaIndex);
-			let stateIndex = address.indexOf(" MA");
+			let stateIndex = address.toUpperCase().indexOf(" MA,");
 			if (stateIndex == -1) {
-				stateIndex = address.indexOf(" Massachusetts");
+				stateIndex = address.toUpperCase().indexOf(" MASSACHUSETTS");
 			}
 			const city = address.substring(firstCommaIndex + 2, stateIndex);
 			const [zip] = address.substring(stateIndex).match(/\d+/);
