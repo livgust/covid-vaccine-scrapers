@@ -17,7 +17,7 @@ This is the open-source portion of the back-end, website scraping software that 
 1. In your terminal, install dependencies with `npm install`
 1. To run all scrapers: `node main.js`
 To run an individual scraper, specify the base filename from site-scrapers, e.g.:
-`node main.js MAImmuizations`
+`node main.js MAImmunizations`
 to run `site-scrapers/MAImmunizations.js`
 1. If you have your own scrapers you want to add, mimic the structure of `./site-scrapers/` inside a folder structure named `proprietary/site-scrapers`. In your .env file, have the field `PROPRIETARY_SITE_SCRAPERS_PATH` set `./../proprietary/site-scrapers`. This naming is recommended since the `.gitignore` lists the folder `proprietary`.
 1. When you're ready to deploy via AWS Lambda, run `npm run predeploy` which will generate `lambda.zip` for you. This needs to stay under 50 MB for you to upload it manually.
