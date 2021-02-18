@@ -71,7 +71,8 @@ async function execute() {
             //only add default data if we're not testing individual scrapers
             finalResultsArray = dataDefaulter.addDefaultsToResults(
                 scrapedResultsArray,
-                cachedResults
+                cachedResults,
+                15 * 60 //15 minutes allowance for cached data
             );
         } else {
             finalResultsArray = scrapedResultsArray;
