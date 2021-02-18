@@ -1,6 +1,7 @@
 {
     "MAImmunizations": {
-        "website": "https://www.maimmunizations.org/clinic/search",
+        "xwebsite": "https://www.maimmunizations.org/clinic/search",
+      "website": "https://www.maimmunizations.org/clinic/search?location=&search_radius=All&q%5Bvenue_search_name_or_venue_name_i_cont%5D=&q%5Bclinic_date_gteq%5D=&q%5Bvaccinations_name_i_cont%5D=&commit=Search#search_results",
         "baseWebsite": "https://www.maimmunizations.org"
     },
     "UMassAmherst": {
