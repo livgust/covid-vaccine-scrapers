@@ -12,6 +12,15 @@ async function ScrapeWebsiteData(browser) {
 	await page.setDefaultNavigationTimeout(3*60*1000);
 	await page.goto(sites.MAImmunizations.website);
 	const pages = await page.$$("nav.pagination span.page:not(.prev):not(.next)");
+	if ((await page.title())==="Application Error") {
+		console.log("Got the Mass. Heroku error page, giving up.");
+		return false;
+	}
+	if (pages.length < 1) {
+		console.log("No content matching our CSS selector (looking for nav.pagination)!");
+		console.log("Here's the page:");
+		console.log(await page.content());
+	}
 	const maxPage = await pages[pages.length - 1].evaluate(
 		(node) => node.innerText
 	);
