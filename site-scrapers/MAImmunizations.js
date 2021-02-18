@@ -91,6 +91,7 @@ async function ScrapeWebsiteData(browser) {
                     availability: {}, // added below
                     hasAvailability: false, //possibly updated below - represents global availability
                     extraData: extraData,
+                    timestamp: new Date(),
                 };
             }
 

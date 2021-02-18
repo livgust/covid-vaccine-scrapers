@@ -40,6 +40,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             availability,
             signUpLink: site.signUpLink,
             ...loc,
+            timestamp: new Date(),
         };
     });
 };
