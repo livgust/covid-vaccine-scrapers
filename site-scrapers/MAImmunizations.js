@@ -20,6 +20,7 @@ async function ScrapeWebsiteData(browser) {
 		console.log("No content matching our CSS selector (looking for nav.pagination)!");
 		console.log("Here's the page:");
 		console.log(await page.content());
+		return false;
 	}
 	const maxPage = await pages[pages.length - 1].evaluate(
 		(node) => node.innerText
