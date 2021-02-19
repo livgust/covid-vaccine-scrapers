@@ -39,6 +39,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             signUpLink: sites.Curative.linkWebsite + loc.id,
             hasAvailability: false,
             availability: {}, //date (MM/DD/YYYY) => hasAvailability, numberAvailableAppointments
+            timestamp: new Date(),
         };
         data.appointment_windows.forEach((appointment) => {
             const dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;

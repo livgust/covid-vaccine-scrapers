@@ -8,6 +8,7 @@ module.exports = async function GetAvailableAppointments() {
     return {
         ...sites.SouthBostonCHC,
         ...webData,
+        timestamp: new Date(),
     };
 };
 
@@ -35,7 +36,7 @@ async function ScrapeWebsiteData() {
 }
 
 /**
- * This is the callback function. 
+ * This is the callback function.
  * The string was retrieved from the Form Data found in a GetOpeningsForProvider request.
  */
 function PostDataCallback(startDateFormatted) {
