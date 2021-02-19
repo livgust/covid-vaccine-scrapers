@@ -11,12 +11,14 @@ module.exports = async function GetAvailableAppointments(browser) {
         let hasAvailability = parseInt(responseLocation.totalAvailable)
             ? true
             : false;
-        let availability = parseInt(responseLocation.totalAvailable);
+        let totalAvailability = parseInt(responseLocation.totalAvailable);
+        let availability = {};
         responseLocation.city = toTitleCase(responseLocation.city);
         return {
             name: `${siteName} (${responseLocation.city})`,
             hasAvailability,
             availability,
+            totalAvailability,
             timestamp: webData.responsePayloadData.currentTime,
             signUpLink: site.website,
             ...responseLocation,
