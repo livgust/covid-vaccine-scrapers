@@ -23,8 +23,6 @@ async function ScrapeWebsiteData() {
                     body += chunk;
                 });
                 res.on("end", () => {
-                    response = body;
-
                     resolve(body);
                 });
             })
@@ -47,8 +45,6 @@ async function ScrapeWebsiteData() {
                     body += chunk;
                 });
                 res.on("end", () => {
-                    response = body;
-
                     resolve(body);
                 });
             })
