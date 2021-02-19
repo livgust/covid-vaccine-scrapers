@@ -148,5 +148,9 @@
         "city": "Worcester",
         "zip": "01608",
         "signUpLink": "https://bit.ly/39Q1esH"
+    },
+    "CVS": {
+        "website": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine",
+        "massJson": "https://www.cvs.com/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo"
     }
 }
