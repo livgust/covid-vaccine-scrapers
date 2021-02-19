@@ -1,9 +1,9 @@
 const sites = require("../data/sites.json");
 
 module.exports = async function GetAvailableAppointments(browser) {
-	console.log("MA starting.");
+	console.log("MAImmunizations starting.");
 	const webData = await ScrapeWebsiteData(browser);
-	console.log("MA done.");
+	console.log("MAImmunizations done.");
 	return Object.values(webData);
 };
 
@@ -21,7 +21,7 @@ async function ScrapeWebsiteData(browser) {
 	//for each page, scrape locations and available appointments.
 	for (let pageNumber = 1; pageNumber <= maxPage; pageNumber++) {
 		if (pageNumber != 1) {
-			await page.goto(sites.MAImmunizations.website + "?page=" + pageNumber);
+			await page.goto(sites.MAImmunizations.website.replace("page=1", "page="+pageNumber));
 		}
 
 		const entries = await page.$$("div.justify-between.border-b");
@@ -43,17 +43,14 @@ async function ScrapeWebsiteData(browser) {
 			const date = title.substring(onIndex + 4);
 
 			//address like [STREET], [CITY] MA, [ZIP]
+			//address like [STREET], [CITY] MA [ZIP]
 			//address like [STREET], [CITY] Ma, [ZIP]
 			//address like [STREET], [CITY] Massachusetts, [ZIP]
 			const firstCommaIndex = address.indexOf(", ");
 			const street = address.substring(0, firstCommaIndex);
-			let stateIndex = address.toUpperCase().indexOf(" MA,");
-			if (stateIndex == -1) {
-				stateIndex = address.toUpperCase().indexOf(" MASSACHUSETTS");
-			}
+			let stateIndex = address.toUpperCase().lastIndexOf(" MA");
 			const city = address.substring(firstCommaIndex + 2, stateIndex);
 			const [zip] = address.substring(stateIndex).match(/\d+/);
-
 			const extraData = {};
 			let availableAppointments = 0;
 			rawExtraData.forEach((text) => {
