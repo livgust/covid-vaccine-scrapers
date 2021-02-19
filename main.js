@@ -68,11 +68,12 @@ async function execute() {
 
         let finalResultsArray = [];
         if (process.argv.length <= 2) {
-            //only add default data if we're not testing individual scrapers
-            finalResultsArray = dataDefaulter.addDefaultsToResults(
+            // Only add default data if we're not testing individual scrapers.
+            // We are not passing in the optional 3rd arg of mergeResults;
+            // this means that there is no time limit on stale data being merged in.
+            finalResultsArray = dataDefaulter.mergeResults(
                 scrapedResultsArray,
-                cachedResults,
-                15 * 60 //15 minutes allowance for cached data
+                cachedResults
             );
         } else {
             finalResultsArray = scrapedResultsArray;

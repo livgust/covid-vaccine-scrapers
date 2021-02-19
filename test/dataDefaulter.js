@@ -16,7 +16,7 @@ const realisticTestData = [
     {
         id: 24181,
         name: "DoubleTree Hotel - Danvers",
-        street: "50 Ferncroft Rd",
+        street: "50 Ferncroft Rd.",
         city: "Danvers",
         zip: "01923",
         signUpLink: "https://curative.com/sites/24181",
@@ -38,7 +38,7 @@ const realisticDefaultData = [
     {
         id: 24181,
         name: "DoubleTree Hotel - Danvers",
-        street: "50 Ferncroft Rd",
+        street: "50 Ferncroft Rd.",
         city: "Danvers",
         zip: "01923",
         signUpLink: "https://curative.com/sites/24181",
@@ -68,20 +68,20 @@ const realisticDefaultData = [
 describe("Simple behavior", () => {
     it("should return scraped results when no cache values are present", () => {
         assert.deepStrictEqual(
-            dataDefaulter.addDefaultsToResults(realisticTestData, []),
+            dataDefaulter.mergeResults(realisticTestData, []),
             realisticTestData
         );
     });
     it("should return cached results when no scraped results are present", () => {
         assert.deepStrictEqual(
-            dataDefaulter.addDefaultsToResults([], realisticDefaultData),
+            dataDefaulter.mergeResults([], realisticDefaultData),
             realisticDefaultData
         );
     });
 });
 
 describe("Conditionally inserting defaults", () => {
-    const finalResults = dataDefaulter.addDefaultsToResults(
+    const finalResults = dataDefaulter.mergeResults(
         realisticTestData,
         realisticDefaultData
     );
@@ -108,7 +108,7 @@ describe("Tolerance for stale data", () => {
             timestamp: new Date() - (secondsOfTolerance + 1) * 1000,
         };
         assert.deepStrictEqual(
-            dataDefaulter.addDefaultsToResults(
+            dataDefaulter.mergeResults(
                 [],
                 [timestampedDefault],
                 secondsOfTolerance
@@ -123,7 +123,7 @@ describe("Tolerance for stale data", () => {
             timestamp: new Date() - (secondsOfTolerance - 1) * 1000,
         };
         assert.deepStrictEqual(
-            dataDefaulter.addDefaultsToResults(
+            dataDefaulter.mergeResults(
                 [],
                 [timestampedDefault],
                 secondsOfTolerance
@@ -137,7 +137,7 @@ describe("Key generator", () => {
     it("generates the expected key", () => {
         assert.strictEqual(
             dataDefaulter.generateKey(realisticTestData[1]),
-            "doubletreehoteldanvers;50ferncroftrd;danvers;01923;"
+            "doubletreehoteldanvers|50ferncroftrd|danvers|01923|"
         );
     });
 });
