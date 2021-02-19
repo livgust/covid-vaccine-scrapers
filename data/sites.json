@@ -152,5 +152,12 @@
     "CVS": {
         "website": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine",
         "massJson": "https://www.cvs.com/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo"
+    },
+    "NatickMall": {
+        "name": "Natick Mall",
+        "street": "1235 Worcester St.",
+        "city": "Natick",
+        "zip": "01760",
+        "signUpLink": "https://home.color.com/vaccine/register/natickmall"
     }
 }

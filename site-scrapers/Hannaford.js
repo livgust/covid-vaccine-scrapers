@@ -17,6 +17,7 @@ module.exports = async function GetAvailableAppointments(browser) {
                 : response, //take out extra quotes
             signUpLink: sites.Hannaford.website,
             ...loc,
+            timestamp: new Date(),
         };
     });
 };

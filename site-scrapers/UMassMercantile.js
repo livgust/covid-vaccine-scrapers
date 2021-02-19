@@ -8,6 +8,7 @@ module.exports = async function GetAvailableAppointments() {
     return {
         ...sites.UmassMercantile,
         ...webData,
+        timestamp: new Date(),
     };
 };
 
