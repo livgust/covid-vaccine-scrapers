@@ -2,9 +2,9 @@ const sites = require("../data/sites.json");
 const fetch = require("node-fetch");
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log("MA starting.");
+    console.log("MAImmunizations starting.");
     const webData = await ScrapeWebsiteData(browser);
-    console.log("MA done.");
+    console.log("MAImmunizations done.");
     return Object.values(webData);
 };
 
@@ -25,6 +25,7 @@ async function ScrapeWebsiteData(browser) {
             "No content matching our CSS selector (looking for nav.pagination)!"
         );
     }
+
     const maxPage = await pages[pages.length - 1].evaluate(
         (node) => node.innerText
     );
@@ -35,7 +36,10 @@ async function ScrapeWebsiteData(browser) {
     for (let pageNumber = 1; pageNumber <= maxPage; pageNumber++) {
         if (pageNumber != 1) {
             await page.goto(
-                sites.MAImmunizations.website + "?page=" + pageNumber
+                sites.MAImmunizations.website.replace(
+                    "page=1",
+                    "page=" + pageNumber
+                )
             );
         }
 
@@ -56,17 +60,15 @@ async function ScrapeWebsiteData(browser) {
             const onIndex = title.indexOf(" on ");
             const locationName = title.substring(0, onIndex);
             const date = title.substring(onIndex + 4);
-
             //address like [STREET], [CITY] MA, [ZIP]
+            //address like [STREET], [CITY] MA [ZIP]
+            //address like [STREET], [CITY] Ma, [ZIP]
+            //address like [STREET], [CITY] Massachusetts, [ZIP]
             const firstCommaIndex = address.indexOf(", ");
             const street = address.substring(0, firstCommaIndex);
-            let stateIndex = address.indexOf(" MA");
-            if (stateIndex == -1) {
-                stateIndex = address.indexOf(" Massachusetts");
-            }
+            let stateIndex = address.toUpperCase().lastIndexOf(" MA");
             const city = address.substring(firstCommaIndex + 2, stateIndex);
             const [zip] = address.substring(stateIndex).match(/\d+/);
-
             const extraData = {};
             let availableAppointments = 0;
             rawExtraData.forEach((text) => {
