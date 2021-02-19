@@ -149,5 +149,12 @@
         "city": "Worcester",
         "zip": "01608",
         "signUpLink": "https://bit.ly/39Q1esH"
+    },
+    "NatickMall": {
+        "name": "Natick Mall",
+        "street": "1235 Worcester St.",
+        "city": "Natick",
+        "zip": "01760",
+        "signUpLink": "https://home.color.com/vaccine/register/natickmall"
     }
 }
