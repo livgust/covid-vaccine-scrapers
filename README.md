@@ -13,6 +13,8 @@ This is the open-source portion of the back-end, website scraping software that 
         CHROMEPATH="path/to/chromium/that/you/downloaded"
         # e.g. /Applications/Chromium.app/Contents/MacOS/Chromium
         PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
+
+1. Install `prettier` and `eslint`; make sure you run them before making any commits.
 ## Using this code
 1. In your terminal, install dependencies with `npm install`
 1. To run: `node main.js`
