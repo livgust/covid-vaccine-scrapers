@@ -14,12 +14,18 @@ module.exports = async function GetAvailableAppointments(browser) {
         let totalAvailability = parseInt(responseLocation.totalAvailable);
         let availability = {};
         responseLocation.city = toTitleCase(responseLocation.city);
+        let timestamp = new Date(webData.responsePayloadData.currentTime);
+        timestamp = new Date(
+            //TODO: fix this better
+            timestamp.getTime() + 7 * 60 * 60 * 1000 //add 7 hrs to go from UTC to Eastern
+        );
+        console.log(timestamp);
         return {
             name: `${siteName} (${responseLocation.city})`,
             hasAvailability,
             availability,
             totalAvailability,
-            timestamp: webData.responsePayloadData.currentTime,
+            timestamp: timestamp,
             signUpLink: site.website,
             ...responseLocation,
         };
