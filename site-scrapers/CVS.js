@@ -8,14 +8,15 @@ module.exports = async function GetAvailableAppointments(browser) {
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${siteName} done.`);
     // Javascript is not good at timezones. CVS's timestamp arrives in
-    // US/Mountain time, and we need to convert it to UTC. Since the offset
-    // changes twice a year, we need to calculate the current offset, and then
-    // parse CVS's currentTime using it.
+    // Mountain time ("America/Denver"), and we need to convert it to
+    // UTC. Since the offset changes twice a year, we need to
+    // calculate the current offset, and then parse CVS's currentTime
+    // using it.
     // The best we can do is render the time in two timezones, parse those as dates
     // and subtract them, and convert them from milliseconds to hours.
     const now = new Date(); // 2021-02-20T04:52:15.444Z
     const offsetMountain =
-        ["US/Mountain", "UTC"]
+        ["America/Denver", "UTC"]
             .map((z) =>
                 Date.parse(now.toLocaleString("en-US", { timeZone: z }))
             )
