@@ -19,7 +19,6 @@ module.exports = async function GetAvailableAppointments(browser) {
             //TODO: fix this better
             timestamp.getTime() + 7 * 60 * 60 * 1000 //add 7 hrs to go from UTC to Eastern
         );
-        console.log(timestamp);
         return {
             name: `${siteName} (${responseLocation.city})`,
             hasAvailability,
