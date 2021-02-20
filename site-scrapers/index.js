@@ -16,7 +16,7 @@ if (process.argv.length > 2) {
         .map((item) => item.name);
 
     ls.map((fileName) => {
-        scraper = require(`./${fileName}`);
+        let scraper = require(`./${fileName}`);
         scrapers.push(scraper);
     });
 }
