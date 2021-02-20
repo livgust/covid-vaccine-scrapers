@@ -48,7 +48,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             ).groups;
             const date = `${month}/${day}/${year}`;
             let newNumberAvailable = 0;
-            if (mappedData.availability[date] && appointment.status != "Disabled") {
+            if (mappedData.availability[date] && appointment.status !== "Disabled") {
                 newNumberAvailable =
                     mappedData.availability[date].numberAvailableAppointments +
                     appointment.slots_available;
