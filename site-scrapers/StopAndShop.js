@@ -35,6 +35,8 @@ async function ScrapeWebsiteData(browser) {
 
     for (const loc of [...new Set(sites.StopAndShop.locations)]) {
         if (!results[loc.zip]) {
+            // Delete this cookie to avoid rate limiting after checking zip code 10 times.
+            await page.deleteCookie({ name: "ASP.NET_SessionId" });
             await page.evaluate(
                 () => (document.getElementById("zip-input").value = "")
             );
@@ -42,7 +44,6 @@ async function ScrapeWebsiteData(browser) {
             const [searchResponse, ...rest] = await Promise.all([
                 Promise.race([
                     page.waitForResponse(
-                        // TODO - this link doesn't work for me... fix? 
                         "https://stopandshopsched.rxtouch.com/rbssched/program/covid19/Patient/CheckZipCode"
                     ),
                     page.waitForNavigation(),
