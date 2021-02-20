@@ -12,10 +12,11 @@
     },
     "devDependencies": {
         "aws-sdk": "^2.840.0",
+        "cross-env": "^7.0.3",
         "mocha": "^8.3.0"
     },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",
-        "test": "mocha"
+        "test": "cross-env NODE_ENV=test mocha"
     }
 }

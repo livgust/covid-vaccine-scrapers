@@ -84,23 +84,25 @@ async function execute() {
         };
 
         if (process.env.DEVELOPMENT) {
-            console.log("The following data would be published:");
-            console.dir(responseJson, { depth: null });
-            fs = require("fs");
-            await new Promise((resolve, reject) => {
-                fs.writeFile(
-                    "out.json",
-                    JSON.stringify(responseJson),
-                    (err) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve();
+            if (process.env.NODE_ENV !== "test") {
+                console.log("The following data would be published:");
+                console.dir(responseJson, { depth: null });
+                fs = require("fs");
+                await new Promise((resolve, reject) => {
+                    fs.writeFile(
+                        "out.json",
+                        JSON.stringify(responseJson),
+                        (err) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve();
+                            }
                         }
-                    }
-                );
-            });
-            return;
+                    );
+                });
+            }
+            return finalResultsArray;
         } else {
             const params = {
                 Bucket: process.env.AWSS3BUCKETNAME,
@@ -137,15 +139,15 @@ async function execute() {
                     resolve(data);
                 });
             });
-            return results;
+            return finalResultsArray;
         }
     };
-    await gatherData();
+    return await gatherData();
 }
 
 exports.handler = execute;
 
-if (process.env.DEVELOPMENT) {
+if (process.env.DEVELOPMENT && process.env.NODE_ENV !== "test") {
     (async () => {
         console.log("DEV MODE");
         await execute();

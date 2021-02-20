@@ -5,8 +5,9 @@ module.exports = async function GetAvailableAppointments() {
     console.log("Atrius starting.");
     const webData = await ScrapeWebsiteData();
     console.log("Atrius done.");
+    const { dphLink, ...atriusSubObject } = sites.Atrius;
     return {
-        ...sites.Atrius,
+        ...atriusSubObject,
         ...webData,
         timestamp: new Date(),
     };

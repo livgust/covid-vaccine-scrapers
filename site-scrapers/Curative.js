@@ -27,7 +27,6 @@ module.exports = async function GetAvailableAppointments(browser) {
     return sites.Curative.locations.map((loc) => {
         const data = rawData[loc.id];
         const mappedData = {
-            id: loc.id,
             name: data.name,
             street: (
                 data.street_address_1 +
