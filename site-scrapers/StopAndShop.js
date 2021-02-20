@@ -16,6 +16,7 @@ module.exports = async function GetAvailableAppointments(browser) {
                 : response, //take out extra quotes
             signUpLink: sites.StopAndShop.website,
             ...loc,
+            timestamp: new Date(),
         };
     });
 };
