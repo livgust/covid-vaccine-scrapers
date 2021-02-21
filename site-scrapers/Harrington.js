@@ -1,21 +1,50 @@
-const sites = require("../data/sites.json");
 const https = require("https");
+const moment = require("moment");
+const sites = require("../data/sites.json");
 
 module.exports = async function GetAvailableAppointments() {
     console.log("Harrington starting.");
-    const webData = await ScrapeWebsiteData();
+    const {
+        name,
+        website,
+        signUpLink,
+        restrictedWebsite,
+        restrictedSignUpLink,
+        ...restHarrington
+    } = sites.Harrington;
+    const webData = await ScrapeWebsiteData(website);
+    const restrictedWebData = await ScrapeWebsiteData(restrictedWebsite);
     console.log("Harrington done.");
-    return {
-        ...sites.Harrington,
-        ...webData,
-        timestamp: new Date(),
-    };
+
+    return [
+        {
+            ...restHarrington,
+            ...webData,
+            name: `${name} (All MA residents)`,
+            signUpLink: signUpLink,
+            timestamp: moment().format(),
+        },
+        {
+            ...restHarrington,
+            ...restrictedWebData,
+            name: `${name} (Local residents)`,
+            signUpLink: restrictedSignUpLink,
+            timestamp: moment().format(),
+            restrictions:
+                "Residents of the following towns, no exceptions: Auburn, Leicester, Southbridge, Sturbridge, Charlton, Spencer, Brookfield (North, East, West), Brimfield, Wales, Holland, Warren, Dudley, Webster, Oxford, and Sutton",
+        },
+    ];
 };
 
-async function ScrapeWebsiteData() {
+async function ScrapeWebsiteData(website) {
     const p = new Promise((resolve) => {
         let response = "";
-        https.get(sites.Harrington.website, (res) => {
+        //todayDate looks like "2020%2F12%2F16"
+        let todayDate = moment().local().format();
+        todayDate = todayDate
+            .substring(0, todayDate.indexOf("T"))
+            .replace(/-/g, "%2F");
+        https.get(`${website}&startdate=${todayDate}`, (res) => {
             let body = "";
             res.on("data", (chunk) => {
                 body += chunk;
@@ -30,21 +59,17 @@ async function ScrapeWebsiteData() {
     const results = { availability: {}, hasAvailability: false };
     for (const dateEntry of data) {
         //force midnight local time zone to avoid UTC dateline issues
-        const date = new Date(`${dateEntry.edate}T00:00`);
-        let midnightToday = new Date();
-        midnightToday.setHours(0, 0, 0, 0);
-        if (date >= midnightToday) {
-            const slotsAvailable =
-                dateEntry.jobstotal - dateEntry.jobstotalassignments;
-            results.availability[
-                `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
-            ] = {
-                numberAvailableAppointments: slotsAvailable,
-                hasAvailability: !!slotsAvailable,
-            };
-            if (slotsAvailable) {
-                results.hasAvailability = true;
-            }
+        const date = moment(dateEntry.edate).local();
+        const slotsAvailable =
+            dateEntry.jobstotal - dateEntry.jobstotalassignments;
+        results.availability[
+            `${date.month() + 1}/${date.date()}/${date.year()}`
+        ] = {
+            numberAvailableAppointments: slotsAvailable,
+            hasAvailability: !!slotsAvailable,
+        };
+        if (slotsAvailable) {
+            results.hasAvailability = true;
         }
     }
     return results;
