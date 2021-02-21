@@ -54,28 +54,22 @@ function toTitleCase(str) {
         .join(" ");
 }
 
+function urlContent(url, options) {
+    return new Promise((resolve) => {
+        let response = "";
+        https.get(url, options, (res) => {
+            let body = "";
+            res.on("data", (chunk) => (body += chunk));
+            res.on("end", () => {
+                response = body;
+                resolve(response);
+            });
+        });
+    });
+}
+
 async function ScrapeWebsiteData(browser) {
     const url = site.massJson;
-    const getUrl = new Promise((resolve) => {
-        let response = "";
-        https.get(
-            url,
-            {
-                headers: {
-                    Referer:
-                        "https://www.cvs.com/immunizations/covid-19-vaccine",
-                },
-            },
-            (res) => {
-                let body = "";
-                res.on("data", (chunk) => (body += chunk));
-                res.on("end", () => {
-                    response = JSON.parse(body);
-                    resolve(response);
-                });
-            }
-        );
-    });
-    const responseJson = await getUrl;
-    return responseJson;
+    const options = { headers: { Referer: site.website } };
+    return JSON.parse(await urlContent(url, options));
 }
