@@ -1,3 +1,4 @@
+const https = require("https");
 const sites = require("../data/sites.json");
 
 const siteName = "CVS";
@@ -54,14 +55,27 @@ function toTitleCase(str) {
 }
 
 async function ScrapeWebsiteData(browser) {
-    const page = await browser.newPage();
-    await page.goto(site.website, { waitUntil: "domcontentloaded" });
-    const massLinkSelector = "a[data-modal='vaccineinfo-MA']";
-    await page.waitForSelector(massLinkSelector);
-    const [searchResponse, ...rest] = await Promise.all([
-        page.waitForResponse(site.massJson),
-        page.click(massLinkSelector),
-    ]);
-    const response = (await searchResponse.buffer()).toString();
-    return JSON.parse(response);
+    const url = site.massJson;
+    const getUrl = new Promise((resolve) => {
+        let response = "";
+        https.get(
+            url,
+            {
+                headers: {
+                    Referer:
+                        "https://www.cvs.com/immunizations/covid-19-vaccine",
+                },
+            },
+            (res) => {
+                let body = "";
+                res.on("data", (chunk) => (body += chunk));
+                res.on("end", () => {
+                    response = JSON.parse(body);
+                    resolve(response);
+                });
+            }
+        );
+    });
+    const responseJson = await getUrl;
+    return responseJson;
 }
