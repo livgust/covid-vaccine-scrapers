@@ -51,21 +51,35 @@ async function ScrapeWebsiteData(browser) {
                 ]),
                 page.click("#btnGo"),
             ]);
-            const result = (await searchResponse.buffer()).toString();
-            //if there's something available, log it with a unique name so we can check it out l8r g8r
-            if (result.indexOf(noAppointmentMatchString) == -1) {
-                let today = new Date();
-                today =
-                    today.getFullYear() +
-                    "-" +
-                    (today.getMonth() + 1) +
-                    "-" +
-                    today.getDate();
-                const filename =
-                    "stopandshop-zip-" + loc.zip + "-date-" + today + ".png";
-                await page.screenshot({ path: filename });
+            try {
+                const result = (await searchResponse.buffer()).toString();
+                //if there's something available, log it with a unique name so we can check it out l8r g8r
+                if (result.indexOf(noAppointmentMatchString) == -1) {
+                    let today = new Date();
+                    today =
+                        today.getFullYear() +
+                        "-" +
+                        (today.getMonth() + 1) +
+                        "-" +
+                        today.getDate();
+                    const filename =
+                        "stopandshop-zip-" +
+                        loc.zip +
+                        "-date-" +
+                        today +
+                        ".png";
+                    await page.screenshot({ path: filename });
+                }
+                results[loc.zip] = result;
+                console.log(`Done with ${loc.zip} ${loc.city}`);
+            } catch (e) {
+                if (e.toString().includes("Protocol error")) {
+                    console.log(
+                        "Got a protocol error. Run chromium with headless=false to debug."
+                    );
+                }
+                throw e;
             }
-            results[loc.zip] = result;
         }
     }
 
