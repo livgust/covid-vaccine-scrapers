@@ -69,7 +69,13 @@ function urlContent(url, options) {
 }
 
 async function ScrapeWebsiteData(browser) {
-    const url = site.massJson;
+    // Simply retrieving
+    //   https://www.cvs.com/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo
+    // returns potentially stale data that varies based on the Akamai Edgekey server that you access.
+    // Append a cachebusting
+    //   &nonce=&nonce=1613934207668
+    // to bypass Akamai caching.
+    const url = `${site.massJson}&nonce=${new Date().valueOf()}`;
     const options = { headers: { Referer: site.website } };
     return JSON.parse(await urlContent(url, options));
 }
