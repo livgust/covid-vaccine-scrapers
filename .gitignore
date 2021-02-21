@@ -5,3 +5,4 @@ proprietary/
 lambda/
 out.json
 .eslintrc.json
+.vscode/
