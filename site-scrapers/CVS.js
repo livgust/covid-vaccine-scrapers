@@ -1,3 +1,4 @@
+const https = require("https");
 const sites = require("../data/sites.json");
 
 const siteName = "CVS";
@@ -53,15 +54,28 @@ function toTitleCase(str) {
         .join(" ");
 }
 
+function urlContent(url, options) {
+    return new Promise((resolve) => {
+        let response = "";
+        https.get(url, options, (res) => {
+            let body = "";
+            res.on("data", (chunk) => (body += chunk));
+            res.on("end", () => {
+                response = body;
+                resolve(response);
+            });
+        });
+    });
+}
+
 async function ScrapeWebsiteData(browser) {
-    const page = await browser.newPage();
-    await page.goto(site.website, { waitUntil: "domcontentloaded" });
-    const massLinkSelector = "a[data-modal='vaccineinfo-MA']";
-    await page.waitForSelector(massLinkSelector);
-    const [searchResponse, ...rest] = await Promise.all([
-        page.waitForResponse(site.massJson),
-        page.click(massLinkSelector),
-    ]);
-    const response = (await searchResponse.buffer()).toString();
-    return JSON.parse(response);
+    // Simply retrieving
+    //   https://www.cvs.com/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo
+    // returns potentially stale data that varies based on the Akamai Edgekey server that you access.
+    // Append a cachebusting
+    //   &nonce=&nonce=1613934207668
+    // to bypass Akamai caching.
+    const url = `${site.massJson}&nonce=${new Date().valueOf()}`;
+    const options = { headers: { Referer: site.website } };
+    return JSON.parse(await urlContent(url, options));
 }
