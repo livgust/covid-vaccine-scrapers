@@ -58,7 +58,12 @@ async function ScrapeWebsiteData() {
 
     const availabilityResponse = await availabilityPromise;
     const availability = JSON.parse(availabilityResponse);
-    const results = { availability: {}, hasAvailability: false };
+    const results = {
+        availability: {},
+        hasAvailability: false,
+        timestamp: new Date(),
+    };
+
     // Collect availability count by date
     availability.reduce((memo, currentValue) => {
         /* The availability returns and array of appointments like this:
