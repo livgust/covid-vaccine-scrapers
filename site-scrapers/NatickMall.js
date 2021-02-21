@@ -8,6 +8,7 @@ module.exports = async function GetAvailableAppointments() {
     return {
         ...sites.NatickMall,
         ...webData,
+        timestamp: new Date(),
     };
 };
 
@@ -58,12 +59,7 @@ async function ScrapeWebsiteData() {
 
     const availabilityResponse = await availabilityPromise;
     const availability = JSON.parse(availabilityResponse);
-    const results = {
-        availability: {},
-        hasAvailability: false,
-        timestamp: new Date(),
-    };
-
+    const results = { availability: {}, hasAvailability: false };
     // Collect availability count by date
     availability.reduce((memo, currentValue) => {
         /* The availability returns and array of appointments like this:
