@@ -3,7 +3,6 @@ const natickmall = require("./../site-scrapers/NatickMall");
 const nock = require("nock");
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
-chai.use(require("chai-json"));
 const expect = chai.expect;
 
 describe("Transformations", () => {
