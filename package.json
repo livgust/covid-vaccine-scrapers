@@ -1,7 +1,7 @@
 {
     "dependencies": {
         "bestzip": "^2.1.7",
-        "chrome-aws-lambda": "^5.5.0",
+        "chrome-aws-lambda": "^7.0.0",
         "dotenv": "^8.2.0",
         "moment": "^2.29.1",
         "node-fetch": "^2.6.1",
