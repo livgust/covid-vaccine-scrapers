@@ -13,7 +13,10 @@
     },
     "devDependencies": {
         "aws-sdk": "^2.840.0",
-        "mocha": "^8.3.0"
+        "chai": "^4.3.0",
+        "chai-as-promised": "^7.1.1",
+        "mocha": "^8.3.0",
+        "nock": "^13.0.7"
     },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",
