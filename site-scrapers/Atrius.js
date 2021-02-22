@@ -20,7 +20,7 @@ function urlRedirect(url, options) {
             let body = "";
             res.on("data", (chunk) => (body += chunk));
             res.on("end", () => {
-                response = res.headers?.location;
+                response = res.headers ? res.headers.location : null;
                 resolve(response);
             });
         });
