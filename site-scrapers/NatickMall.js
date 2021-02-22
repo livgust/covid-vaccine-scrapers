@@ -88,7 +88,7 @@ async function ScrapeWebsiteData() {
                 };
                 memo["availability"][appointmentDateET] = dateAvailability;
             }
-            dateAvailability["availability"] += remainingSpaces;
+            dateAvailability["numberAvailableAppointments"] += remainingSpaces;
             dateAvailability["hasAvailability"] = true;
             memo["hasAvailability"] = true;
         }
