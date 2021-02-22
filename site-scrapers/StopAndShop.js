@@ -71,7 +71,6 @@ async function ScrapeWebsiteData(browser) {
                     await page.screenshot({ path: filename });
                 }
                 results[loc.zip] = result;
-                console.log(`Done with ${loc.zip} ${loc.city}`);
             } catch (e) {
                 if (e.toString().includes("Protocol error")) {
                     console.log(
