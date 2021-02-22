@@ -29,7 +29,7 @@ function urlRedirect(url, options) {
 
 async function ScrapeWebsiteData() {
     const checkSlots = await urlRedirect(sites.Atrius.website, {});
-    if (checkSlots.match("No_Slots")) {
+    if (checkSlots && checkSlots.match("No_Slots")) {
         console.log(
             `Atrius redirecting to no slots, ${checkSlots}, assuming failure!`
         );
