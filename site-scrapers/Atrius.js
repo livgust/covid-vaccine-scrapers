@@ -33,7 +33,10 @@ async function ScrapeWebsiteData() {
         console.log(
             `Atrius redirecting to no slots, ${checkSlots}, assuming failure!`
         );
-        return false;
+        return {
+            hasAvailability: false,
+            availability: {}, //this line is optional
+        };
     }
 
     // We need to go through the flow and use a request verification token
