@@ -30,7 +30,7 @@
             {
                 "street": "8 Merchants Way",
                 "city": "Middleborough",
-                "zip": "01569"
+                "zip": "02346"
             },
             {
                 "street": "255 Joseph E. Warner Blvd.",
@@ -46,6 +46,11 @@
                 "street": "118 Lancaster St.",
                 "city": "Leominster",
                 "zip": "01453"
+            },
+            {
+                "street": "301 Pleasant St.",
+                "city": "Dracut",
+                "zip": "01826"
             }
         ]
     },
