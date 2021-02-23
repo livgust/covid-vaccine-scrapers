@@ -45,7 +45,7 @@ const keys = {
 
 function keyAndChildrenAreValid(object, key, shapeObject) {
     //verify the key is legal
-    assert.ok(shapeObject[key]);
+    assert.ok(shapeObject[key], `${key} is not valid!`);
 
     //if there is an object within this key, evaluate it
     if (shapeObject[key].subObject) {
