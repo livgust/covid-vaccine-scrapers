@@ -5,7 +5,7 @@ dotenv.config();
 const chromium = require("chrome-aws-lambda");
 const { addExtra } = require("puppeteer-extra");
 const Puppeteer = addExtra(chromium.puppeteer);
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const scrapers = require("./site-scrapers");
 const fetch = require("node-fetch");
