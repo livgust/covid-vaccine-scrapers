@@ -46,6 +46,11 @@
                 "street": "118 Lancaster St.",
                 "city": "Leominster",
                 "zip": "01453"
+            },
+            {
+                "street": "301 Pleasant St.",
+                "city": "Dracut",
+                "zip": "01826"
             }
         ]
     },
