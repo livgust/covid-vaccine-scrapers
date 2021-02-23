@@ -2,10 +2,10 @@ const fs = require("fs");
 
 let scrapers = [];
 
+// args override directory list allowing single site runs, e.g. `node main.js LynnTech` 
 if (process.argv.length > 2) {
-    let scraper;
     for (let i = 2; i < process.argv.length; i++) {
-        scraper = require(`./${process.argv[i]}.js`);
+        const scraper = require(`./${process.argv[i]}.js`);
         scrapers.push(scraper);
     }
 } else {
@@ -16,7 +16,7 @@ if (process.argv.length > 2) {
         .map((item) => item.name);
 
     ls.map((fileName) => {
-        scraper = require(`./${fileName}`);
+        let scraper = require(`./${fileName}`);
         scrapers.push(scraper);
     });
 }

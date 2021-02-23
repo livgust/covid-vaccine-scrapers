@@ -58,6 +58,9 @@
             },
             {
                 "id": 24182
+            },
+            {
+                "id": 25336
             }
         ]
     },
@@ -66,8 +69,10 @@
         "street": "153 Chestnut Street",
         "city": "Southbridge",
         "zip": "01550",
-        "website": "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438&startdate=2020%2F12%2F16",
-        "signUpLink": "https://forms.gle/tMDnRLcXzZnPUxqP9"
+        "website": "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438",
+        "signUpLink": "https://forms.gle/tMDnRLcXzZnPUxqP9",
+        "restrictedWebsite": "https://signup.com/api/events?accesskey=6775657374&activity_id=3532310&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3532310",
+        "restrictedSignUpLink": "https://forms.gle/dU1WroZZQPaqLh8YA"
     },
     "Atrius": {
         "name": "Atrius Health",
@@ -142,6 +147,13 @@
             }
         ]
     },
+    "UMassMemorialMarlborough": {
+        "name": "UMass Memorial Marlborough",
+        "street": "157 Union Street",
+        "city": "Marlborough",
+        "zip": "01752",
+        "signUpLink": "https://bit.ly/361gNvq"
+    },
     "UmassMercantile": {
         "name": "UMass Memorial Mercantile Center",
         "street": "201 Commercial St.",
@@ -149,11 +161,23 @@
         "zip": "01608",
         "signUpLink": "https://bit.ly/39Q1esH"
     },
+    "CVS": {
+        "website": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine",
+        "massJson": "https://www.cvs.com/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo"
+    },
     "NatickMall": {
         "name": "Natick Mall",
         "street": "1235 Worcester St.",
         "city": "Natick",
         "zip": "01760",
         "signUpLink": "https://home.color.com/vaccine/register/natickmall"
+    },
+    "Lowell General": {
+        "signUpLink": "https://www.lowellgeneralvaccine.com/#schedule",
+        "startUrl": "https://www.lowellgeneralvaccine.com/schedule.html?wpforms%5Bfields%5D%5B2%5D=Massachusetts+residents+over+the+age+of+75+or+those+75%2B+with+a+Circle+Health+affiliated+PCP&wpforms%5Bfields%5D%5B5%5D%5B%5D=I+hereby+attest+under+penalty+of+perjury+and+to+the+best+of+my+knowledge+and+belief+that+I+%28or+the+individual+I+am+scheduling%29+belong+to+one+of+the+Massachusetts+Vaccination+Priority+Group+selected+above&wpforms%5Bfields%5D%5B6%5D%5B%5D=I+hereby+attest+under+penalty+of+perjury+that+I%2Fthey+reside%2C+work%2C+and%2For+study+in+the+State+of+Massachusetts&wpforms%5Bfields%5D%5B7%5D%5B%5D=I+understand+that+at+the+vaccination+site+I+may+be+asked+to+provide+proof+of+the+above.+Such+proof+can+include%3A+government+issued+ID%2C+work+badge%2C+employment+letter+or+current+pay+stub&wpforms%5Bid%5D=6400&wpforms%5Bauthor%5D=1&wpforms%5Bpost_id%5D=6037&wpforms%5Btoken%5D=dca7ffc8c0e098ddf465f4dc68841c1d",
+        "address": "Cross River Center - East 1001 Pawtucket Blvd",
+        "city": "Lowell",
+        "state": "MA",
+        "zip": "01854"
     }
 }

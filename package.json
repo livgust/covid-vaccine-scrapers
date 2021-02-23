@@ -1,8 +1,9 @@
 {
     "dependencies": {
         "bestzip": "^2.1.7",
-        "chrome-aws-lambda": "^5.5.0",
+        "chrome-aws-lambda": "^7.0.0",
         "dotenv": "^8.2.0",
+        "moment": "^2.29.1",
         "node-fetch": "^2.6.1",
         "node-html-parser": "^2.1.0",
         "puppeteer": "npm:puppeteer-core@^6.0.0",
@@ -12,8 +13,11 @@
     },
     "devDependencies": {
         "aws-sdk": "^2.840.0",
+        "chai": "^4.3.0",
+        "chai-as-promised": "^7.1.1",
         "cross-env": "^7.0.3",
-        "mocha": "^8.3.0"
+        "mocha": "^8.3.0",
+        "nock": "^13.0.7"
     },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",

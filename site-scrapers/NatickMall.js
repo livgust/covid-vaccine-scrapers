@@ -8,6 +8,7 @@ module.exports = async function GetAvailableAppointments() {
     return {
         ...sites.NatickMall,
         ...webData,
+        timestamp: new Date(),
     };
 };
 
@@ -87,7 +88,7 @@ async function ScrapeWebsiteData() {
                 };
                 memo["availability"][appointmentDateET] = dateAvailability;
             }
-            dateAvailability["availability"] += remainingSpaces;
+            dateAvailability["numberAvailableAppointments"] += remainingSpaces;
             dateAvailability["hasAvailability"] = true;
             memo["hasAvailability"] = true;
         }
