@@ -29,30 +29,52 @@ const getLocationData = async () => {
     "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
   );
   const data = await res.json();
-  return JSON.parse(data.body).results;
-};
 
-const getAllCoordinates = async () => {
-  const locations = await getLocationData();
   let locationLookup = {};
+  for (const location of JSON.parse(data.body).results) {
+    const {
+      name = "",
+      street = "",
+      zip = "",
+      resolvedLocation,
+      latitude,
+      longitude,
+    } = location;
 
-  for (const location of locations) {
-    const { name = "", street = "", zip = "" } = location;
-    const locationInd = `${name}${street}${zip}`;
-
-    if (geo[locationInd]) {
-      locationLookup[locationInd] = geo[locationInd];
-    } else {
-      const locationData = await getGeocode(name, street, zip);
+    const locationInd = `${name}|${street}|${zip}`;
+    if (resolvedLocation && latitude && longitude) {
       locationLookup[locationInd] = {
-        resolvedLocation: locationData.results[0].formatted_address,
-        latitude: locationData.results[0].geometry.location.lat,
-        longitude: locationData.results[0].geometry.location.lng,
+        resolvedLocation,
+        latitude,
+        longitude,
       };
     }
-
-    fs.writeFileSync("geo.json", JSON.stringify(locationLookup));
   }
+  return locationLookup;
 };
 
-getAllCoordinates();
+const getAllCoordinates = async (locations) => {
+  const existingLocations = await getLocationData();
+
+  const coordinateData = await Promise.all(
+    locations.map(async (location) => {
+      const { name = "", street = "", zip = "" } = location;
+      const locationInd = `${name}|${street}|${zip}`;
+
+      if (existingLocations[locationInd]) {
+        return { ...location, ...existingLocations[locationInd] };
+      } else {
+        const locationData = await getGeocode(name, street, zip);
+        return {
+          ...location,
+          resolvedLocation: locationData.results[0].formatted_address,
+          latitude: locationData.results[0].geometry.location.lat,
+          longitude: locationData.results[0].geometry.location.lng,
+        };
+      }
+    })
+  );
+  return coordinateData;
+};
+
+exports.getAllCoordinates = getAllCoordinates;
