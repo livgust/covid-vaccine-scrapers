@@ -9,6 +9,7 @@ const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const scrapers = require("./site-scrapers");
 const fetch = require("node-fetch");
 const dataDefaulter = require("./data/dataDefaulter");
+const dataValidation = require("./data/dataValidation");
 
 //aws-sdk is only a dev dependency because Lambda already includes the package by default.
 const AWS = require("aws-sdk");
@@ -100,6 +101,10 @@ async function execute() {
                     }
                 );
             });
+
+            // Validate the results
+            dataValidation.validateResults(finalResultsArray);
+
             return;
         } else {
             const params = {
