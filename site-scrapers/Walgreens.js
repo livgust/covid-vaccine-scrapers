@@ -119,9 +119,10 @@ async function ScrapeWebsiteData(browser) {
                         .then(
                             (res) => resolve(res),
                             (err) => {
+                                console.log(JSON.stringify(err)); // helped with debugging, service throws 404 if no appts found
                                 console.dir(err, { depth: null });
                                 debugger;
-                                resolve(err);
+                                resolve(); // resolve promise without  `err` or else puppeteer fails
                             }
                         );
                 }),
@@ -130,7 +131,7 @@ async function ScrapeWebsiteData(browser) {
             todayString
         );
         console.log(postResponse);
-        if (postResponse.locations) {
+        if (postResponse && postResponse.locations) {
             postResponse.locations.forEach((location) => {
                 availableLocations[location.locationId] = location;
             });
