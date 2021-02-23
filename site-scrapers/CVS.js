@@ -36,12 +36,12 @@ module.exports = async function GetAvailableAppointments(browser) {
         responseLocation.city = toTitleCase(responseLocation.city);
         return {
             name: `${siteName} (${responseLocation.city})`,
+            city: responseLocation.city,
             hasAvailability,
             availability,
             totalAvailability,
-            timestamp: timestamp,
+            timestamp,
             signUpLink: site.website,
-            ...responseLocation,
         };
     });
 };

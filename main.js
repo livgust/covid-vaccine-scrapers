@@ -20,12 +20,6 @@ async function execute() {
         secretAccessKey: process.env.AWSSECRETACCESSKEY,
     });
 
-    const cachedResults = await fetch(
-        "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
-    )
-        .then((res) => res.json())
-        .then((unpack) => JSON.parse(unpack.body).results);
-
     Puppeteer.use(
         Recaptcha({
             provider: { id: "2captcha", token: process.env.RECAPTCHATOKEN },
@@ -67,10 +61,16 @@ async function execute() {
         }
 
         let finalResultsArray = [];
-        if (process.argv.length <= 2) {
-            // Only add default data if we're not testing individual scrapers.
+        if (process.argv.length <= 2 && process.env.NODE_ENV !== "test") {
+            // Only add default data if we're not testing individual scrapers or testing.
             // We are not passing in the optional 3rd arg of mergeResults;
             // this means that there is no time limit on stale data being merged in.
+            const cachedResults = await fetch(
+                "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
+            )
+                .then((res) => res.json())
+                .then((unpack) => JSON.parse(unpack.body).results);
+
             finalResultsArray = dataDefaulter.mergeResults(
                 scrapedResultsArray,
                 cachedResults

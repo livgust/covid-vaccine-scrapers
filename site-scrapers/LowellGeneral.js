@@ -9,7 +9,11 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${siteName} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${siteName} done.`);
-    return webData;
+    const { startUrl, address, ...validDataToReturn } = webData;
+    return {
+        ...validDataToReturn,
+        street: address,
+    };
 };
 
 function leadZero(num) {
