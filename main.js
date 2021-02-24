@@ -74,7 +74,7 @@ async function execute() {
         }
 
         const responseJson = {
-            results: await getAllCoordinates(finalResultsArray),
+            results: await getAllCoordinates(finalResultsArray, cachedResults),
         };
 
         const webData = JSON.stringify(responseJson);
