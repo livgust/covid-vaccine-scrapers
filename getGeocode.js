@@ -2,11 +2,8 @@ const dotenv = require("dotenv");
 //note: this only works locally; in Lambda we use environment variables set manually
 dotenv.config();
 
-const fs = require("fs");
 const fetch = require("node-fetch");
-
 const { Client } = require("@googlemaps/google-maps-services-js");
-const geo = require("./geo.json");
 
 const getGeocode = async (name, street, zip) => {
   const address = `${name},MA,${street},${zip}`;
