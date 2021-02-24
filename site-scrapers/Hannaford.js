@@ -1,29 +1,33 @@
+const s3 = require("../lib/s3");
 const sites = require("../data/sites.json");
 
+const siteName = "Hannaford";
+const site = sites[siteName];
 const noAppointmentMatchString = "no locations with available appointments";
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log("Hannaford starting.");
+    console.log(`${siteName} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log("Hannaford done.");
-    return sites.Hannaford.locations.map((loc) => {
+    console.log(`${siteName} done.`);
+    return site.locations.map((loc) => {
         const newLoc = { ...loc };
         const response = webData[loc.zip];
         return {
-            name: `Hannaford (${loc.city})`,
+            name: `${siteName} (${loc.city})`,
             hasAvailability: response.indexOf(noAppointmentMatchString) == -1,
             extraData: response.length
                 ? response.substring(1, response.length - 1)
                 : response, //take out extra quotes
-            signUpLink: sites.Hannaford.website,
+            signUpLink: site.website,
             ...loc,
+            timestamp: new Date(),
         };
     });
 };
 
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
-    await page.goto(sites.Hannaford.website);
+    await page.goto(site.website);
     await page.solveRecaptchas().then(({ solved }) => {
         if (solved.length) {
             return page.waitForNavigation();
@@ -34,7 +38,7 @@ async function ScrapeWebsiteData(browser) {
 
     const results = {};
 
-    for (const loc of [...new Set(sites.Hannaford.locations)]) {
+    for (const loc of [...new Set(site.locations)]) {
         if (!results[loc.zip]) {
             await page.evaluate(
                 () => (document.getElementById("zip-input").value = "")
@@ -52,16 +56,10 @@ async function ScrapeWebsiteData(browser) {
             const result = (await searchResponse.buffer()).toString();
             //if there's something available, log it with a unique name so we can check it out l8r g8r
             if (result.indexOf(noAppointmentMatchString) == -1) {
-                let today = new Date();
-                today =
-                    today.getFullYear() +
-                    "-" +
-                    (today.getMonth() + 1) +
-                    "-" +
-                    today.getDate();
-                const filename =
-                    "hannaford-zip-" + loc.zip + "-date-" + today + ".png";
-                await page.screenshot({ path: filename });
+                // theoretically found appointments
+                if (!process.env.DEVELOPMENT) {
+                    await s3.savePageContent(`${siteName}-${loc.zip}`, page);
+                }
             }
             results[loc.zip] = result;
         }

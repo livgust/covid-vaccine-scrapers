@@ -39,6 +39,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             signUpLink: sites.Curative.linkWebsite + loc.id,
             hasAvailability: false,
             availability: {}, //date (MM/DD/YYYY) => hasAvailability, numberAvailableAppointments
+            timestamp: new Date(),
         };
         data.appointment_windows.forEach((appointment) => {
             const dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
@@ -47,7 +48,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             ).groups;
             const date = `${month}/${day}/${year}`;
             let newNumberAvailable = 0;
-            if (mappedData.availability[date]) {
+            if (mappedData.availability[date] && appointment.status !== "Disabled") {
                 newNumberAvailable =
                     mappedData.availability[date].numberAvailableAppointments +
                     appointment.slots_available;

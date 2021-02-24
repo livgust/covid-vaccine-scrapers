@@ -1,6 +1,6 @@
 {
     "MAImmunizations": {
-        "website": "https://www.maimmunizations.org/clinic/search",
+        "website": "https://www.maimmunizations.org/clinic/search?q%5Bservices_name_in%5D%5B%5D=Vaccination&location=&search_radius=All&q%5Bvenue_search_name_or_venue_name_i_cont%5D=&q%5Bclinic_date_gteq%5D=&q%5Bvaccinations_name_i_cont%5D=&commit=Search&page=1#search_results",
         "baseWebsite": "https://www.maimmunizations.org"
     },
     "UMassAmherst": {
@@ -8,7 +8,8 @@
         "street": "1 Campus Center Way",
         "city": "Amherst",
         "zip": "01003",
-        "website": "https://uma.force.com/covidtesting/s/first-responders"
+        "website": "https://uma.force.com/covidtesting/s/first-responders",
+        "restrictions": "Eligible populations in Western MA"
     },
     "Family Practice Group": {
         "name": "Family Practice Group",
@@ -29,7 +30,7 @@
             {
                 "street": "8 Merchants Way",
                 "city": "Middleborough",
-                "zip": "01569"
+                "zip": "02346"
             },
             {
                 "street": "255 Joseph E. Warner Blvd.",
@@ -45,6 +46,11 @@
                 "street": "118 Lancaster St.",
                 "city": "Leominster",
                 "zip": "01453"
+            },
+            {
+                "street": "301 Pleasant St.",
+                "city": "Dracut",
+                "zip": "01826"
             }
         ]
     },
@@ -57,6 +63,9 @@
             },
             {
                 "id": 24182
+            },
+            {
+                "id": 25336
             }
         ]
     },
@@ -65,7 +74,115 @@
         "street": "153 Chestnut Street",
         "city": "Southbridge",
         "zip": "01550",
-        "website": "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438&startdate=2020%2F12%2F16",
-        "signUpLink": "https://forms.gle/tMDnRLcXzZnPUxqP9"
+        "website": "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438",
+        "signUpLink": "https://forms.gle/tMDnRLcXzZnPUxqP9",
+        "restrictedWebsite": "https://signup.com/api/events?accesskey=6775657374&activity_id=3532310&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3532310",
+        "restrictedSignUpLink": "https://forms.gle/dU1WroZZQPaqLh8YA"
+    },
+    "Atrius": {
+        "name": "Atrius Health",
+        "street": "100 Second Avenue ",
+        "city": "Needham",
+        "zip": "02494",
+        "website": "https://myhealth.atriushealth.org/fr/",
+        "dphLink": "https://myhealth.atriushealth.org/DPH",
+        "signUpLink": "https://myhealth.atriushealth.org/fr/"
+    },
+    "LynnTech": {
+        "name": "Lynn Tech High School Field House",
+        "street": "80 Neptune Blvd",
+        "city": "Lynn",
+        "zip": "01902",
+        "signUpLink": "https://www.lchcnet.org/covid-19-vaccine-scheduling#vaccine-screening",
+        "restrictions": "Eligible populations in Lynn and Nahant"
+    },
+    "SouthBostonCHC": {
+        "name": "South Boston Community Health Center",
+        "street": "409 W Broadway",
+        "city": "South Boston",
+        "zip": "02127",
+        "signUpLink": "https://forms.office.com/Pages/ResponsePage.aspx?id=J8HP3h4Z8U-yP8ih3jOCukT-1W6NpnVIp4kp5MOEapVUOTNIUVZLODVSMlNSSVc2RlVMQ1o1RjNFUy4u"
+    },
+    "Price Chopper": {
+        "name": "Price Chopper",
+        "websiteRoot": "https://scrcxp.pdhi.com/ScreeningEvent/e047c75c-a431-41a8-8383-81613f39dd55/GetLocations",
+        "signUpLink": "https://pdhi.queue-it.net/?c=pdhi&e=covid19vaccination&t_portalUuid=3e419790-81a3-4639-aa08-6bd223f995df",
+        "locations": [
+            {
+                "street": "555 Hubbard Ave",
+                "city": "Pittsfield",
+                "zip": "01201",
+                "state": "MA"
+            },
+            {
+                "street": "50 Cambridge Street",
+                "city": "Worcester",
+                "zip": "01610",
+                "state": "MA"
+            },
+            {
+                "street": "72 Pullman Street",
+                "city": "Worcester",
+                "zip": "01606",
+                "state": "MA"
+            },
+            {
+                "street": "731 Boston Turnpike",
+                "city": "Shrewsbury",
+                "zip": "01545",
+                "state": "MA"
+            },
+            {
+                "street": "2 Worcester Road",
+                "city": "Webster",
+                "zip": "01570",
+                "state": "MA"
+            },
+            {
+                "street": "21 Galaxy Pass",
+                "city": "Sutton",
+                "zip": "01590",
+                "state": "MA"
+            },
+            {
+                "street": "560 Main Street",
+                "city": "Gardner",
+                "zip": "01440",
+                "state": "MA"
+            }
+        ]
+    },
+    "UMassMemorialMarlborough": {
+        "name": "UMass Memorial Marlborough",
+        "street": "157 Union Street",
+        "city": "Marlborough",
+        "zip": "01752",
+        "signUpLink": "https://bit.ly/361gNvq"
+    },
+    "UmassMercantile": {
+        "name": "UMass Memorial Mercantile Center",
+        "street": "201 Commercial St.",
+        "city": "Worcester",
+        "zip": "01608",
+        "signUpLink": "https://bit.ly/39Q1esH"
+    },
+    "CVS": {
+        "website": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine",
+        "massJson": "https://www.cvs.com/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo"
+    },
+    "NatickMall": {
+        "name": "Natick Mall",
+        "street": "1235 Worcester St.",
+        "city": "Natick",
+        "zip": "01760",
+        "signUpLink": "https://home.color.com/vaccine/register/natickmall"
+    },
+    "Lowell General": {
+        "signUpLink": "https://www.lowellgeneralvaccine.com/#schedule",
+        "startUrl": "https://www.lowellgeneralvaccine.com/schedule.html?wpforms%5Bfields%5D%5B2%5D=Massachusetts+residents+over+the+age+of+75+or+those+75%2B+with+a+Circle+Health+affiliated+PCP&wpforms%5Bfields%5D%5B5%5D%5B%5D=I+hereby+attest+under+penalty+of+perjury+and+to+the+best+of+my+knowledge+and+belief+that+I+%28or+the+individual+I+am+scheduling%29+belong+to+one+of+the+Massachusetts+Vaccination+Priority+Group+selected+above&wpforms%5Bfields%5D%5B6%5D%5B%5D=I+hereby+attest+under+penalty+of+perjury+that+I%2Fthey+reside%2C+work%2C+and%2For+study+in+the+State+of+Massachusetts&wpforms%5Bfields%5D%5B7%5D%5B%5D=I+understand+that+at+the+vaccination+site+I+may+be+asked+to+provide+proof+of+the+above.+Such+proof+can+include%3A+government+issued+ID%2C+work+badge%2C+employment+letter+or+current+pay+stub&wpforms%5Bid%5D=6400&wpforms%5Bauthor%5D=1&wpforms%5Bpost_id%5D=6037&wpforms%5Btoken%5D=dca7ffc8c0e098ddf465f4dc68841c1d",
+        "address": "Cross River Center - East 1001 Pawtucket Blvd",
+        "city": "Lowell",
+        "state": "MA",
+        "zip": "01854"
     }
 }

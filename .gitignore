@@ -5,3 +5,5 @@ proprietary/
 lambda/
 out.json
 chrome-win/
+.eslintrc.json
+.vscode/
