@@ -6,4 +6,5 @@ lambda/
 out.json
 chrome-win/
 .eslintrc.json
+.prettierrc.yaml
 .vscode/
