@@ -2,33 +2,13 @@ const sites = require("./../data/sites.json");
 const usZips = require("us-zips");
 const fs = require("fs");
 const moment = require("moment");
+const dataFormatter = require("./Walgreens/dataFormatter");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log("Walgreens starting.");
     const webData = await ScrapeWebsiteData(browser);
     console.log("Walgreens done.");
-    const results = webData.map((entry) => {
-        const availability = {};
-        entry.appointmentAvailability.forEach((slot) => {
-            const date = moment(slot.date);
-            availability[date.format("M/D/YYYY")] = {
-                hasAvailability: !!slot.slots.length,
-                numberAvailableAppointments: slot.slots.length,
-            };
-        });
-        return {
-            name: entry.name,
-            street: (entry.address.line1 + " " + entry.address.line2).trim(),
-            city: entry.address.city,
-            zip: entry.address.zip,
-            signUpLink: sites.Walgreens.website,
-            hasAvailability: true,
-            extraData: {
-                "Vaccine Type": entry.manufacturerName,
-            },
-            availability: availability,
-        };
-    });
+    const results = dataFormatter(webData, sites.Walgreens.website);
     return results;
 };
 
@@ -87,9 +67,6 @@ async function ScrapeWebsiteData(browser) {
     for (const zip of uniqueZips) {
         const { latitude, longitude } = usZips[zip];
         const todayString = new moment().local().format("YYYY-MM-DD");
-        console.log(
-            `for zip ${zip}, lat: ${latitude} and long: ${longitude}. Today is ${todayString}`
-        );
 
         let postResponse = await page.evaluate(
             (latitude, longitude, todayString) =>
@@ -130,7 +107,6 @@ async function ScrapeWebsiteData(browser) {
             longitude,
             todayString
         );
-        console.log(postResponse);
         if (postResponse && postResponse.locations) {
             postResponse.locations.forEach((location) => {
                 availableLocations[location.locationId] = location;
