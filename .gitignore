@@ -4,3 +4,4 @@ proprietary/
 *.zip
 lambda/
 out.json
+chrome-win/
