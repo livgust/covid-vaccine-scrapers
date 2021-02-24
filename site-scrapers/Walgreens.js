@@ -8,7 +8,10 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log("Walgreens starting.");
     const webData = await ScrapeWebsiteData(browser);
     console.log("Walgreens done.");
-    const results = dataFormatter(webData, sites.Walgreens.website);
+    const results = dataFormatter.formatAndMergeData(
+        webData,
+        sites.Walgreens.website
+    );
     return results;
 };
 
@@ -109,7 +112,7 @@ async function ScrapeWebsiteData(browser) {
         );
         if (postResponse && postResponse.locations) {
             postResponse.locations.forEach((location) => {
-                availableLocations[location.locationId] = location;
+                availableLocations[location.partnerLocationId] = location;
             });
         }
     }
