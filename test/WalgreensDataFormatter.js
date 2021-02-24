@@ -135,7 +135,7 @@ describe("formatData", () => {
 
     it("formats the name and address", () => {
         expect(result).to.be.deep.equal({
-            name: "Walgreens",
+            name: "Walgreens (Los Angeles)",
             street: "3201 W 6th St",
             city: "Los Angeles",
             zip: "90020",
@@ -169,7 +169,7 @@ describe("extendData", () => {
     ];
     const availableSites = [
         {
-            name: "Walgreens",
+            name: "Walgreens (Chelsea)",
             street: "1010 Broadway",
             city: "Chelsea",
             zip: "02150",
@@ -185,7 +185,7 @@ describe("extendData", () => {
     it("formats all sites correctly", () => {
         expect(extendData([], allSites)).to.be.deep.equal([
             {
-                name: "Walgreens",
+                name: "Walgreens (Chelsea)",
                 street: "1010 Broadway",
                 city: "Chelsea",
                 zip: "02150",
@@ -193,7 +193,7 @@ describe("extendData", () => {
                 hasAvailability: false,
             },
             {
-                name: "Walgreens",
+                name: "Walgreens (Danvers)",
                 street: "107 High St",
                 city: "Danvers",
                 zip: "01923",
@@ -205,7 +205,7 @@ describe("extendData", () => {
     it("doesn't add locations if results are there", () => {
         expect(extendData(availableSites, allSites)).to.be.deep.equal([
             {
-                name: "Walgreens",
+                name: "Walgreens (Chelsea)",
                 street: "1010 Broadway",
                 city: "Chelsea",
                 zip: "02150",
@@ -218,7 +218,7 @@ describe("extendData", () => {
                 },
             },
             {
-                name: "Walgreens",
+                name: "Walgreens (Danvers)",
                 street: "107 High St",
                 city: "Danvers",
                 zip: "01923",

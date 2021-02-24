@@ -50,10 +50,13 @@ function extendData(availableStores, allStores) {
     });
     let allResults = [...availableStores];
     allStores.forEach((store) => {
-        const key = generateKey({ name: "Walgreens", ...store });
+        const key = generateKey({
+            name: `Walgreens (${store.city})`,
+            ...store,
+        });
         if (!availableStoreKeyObject[key]) {
             allResults.push({
-                name: "Walgreens",
+                name: `Walgreens (${store.city})`,
                 hasAvailability: false,
                 availability: {},
                 ...store,
@@ -109,7 +112,7 @@ function formatData(data, website) {
             }
         });
         return {
-            name: "Walgreens", // NOTE: change to "entry.name" if we use the commented-out code above
+            name: `Walgreens (${toTitleCase(entry.address.city)})`, // NOTE: change to "entry.name" if we use the commented-out code above
             street: toTitleCase(
                 entry.address.line1 + " " + entry.address.line2
             ).trim(),
