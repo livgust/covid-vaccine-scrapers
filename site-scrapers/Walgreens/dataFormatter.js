@@ -1,6 +1,7 @@
 const moment = require("moment");
 
 module.exports = function (data, website) {
+    let hasAvailability = false;
     return data.map((entry) => {
         const availability = {};
         entry.appointmentAvailability.forEach((daySlot) => {
@@ -10,15 +11,19 @@ module.exports = function (data, website) {
                 const todaySlots = daySlot.slots.filter((slot) =>
                     moment(slot, "HH:mm a").isAfter(moment().local())
                 );
+                const numSlots = todaySlots.length;
                 availability[date.format("M/D/YYYY")] = {
-                    hasAvailability: !!todaySlots.length,
-                    numberAvailableAppointments: todaySlots.length,
+                    hasAvailability: !!numSlots,
+                    numberAvailableAppointments: numSlots,
                 };
+                hasAvailability = hasAvailability || !!numSlots;
             } else if (date.isAfter(midnightToday)) {
+                const numSlots = daySlot.slots.length;
                 availability[date.format("M/D/YYYY")] = {
-                    hasAvailability: !!daySlot.slots.length,
-                    numberAvailableAppointments: daySlot.slots.length,
+                    hasAvailability: !!numSlots,
+                    numberAvailableAppointments: numSlots,
                 };
+                hasAvailability = hasAvailability || numSlots;
             }
         });
         return {
@@ -29,7 +34,7 @@ module.exports = function (data, website) {
             city: toTitleCase(entry.address.city),
             zip: entry.address.zip,
             signUpLink: website,
-            hasAvailability: true,
+            hasAvailability,
             availability: availability,
         };
     });
