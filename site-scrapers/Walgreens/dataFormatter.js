@@ -1,9 +1,11 @@
+const { generateKey } = require("../../data/dataDefaulter");
 const moment = require("moment");
 const fetch = require("node-fetch");
 
-async function formatAndMergeData(data, website) {
+async function formatAndMergeData(data, allLocations, website) {
     const availabilityData = formatData(data, website);
-    return availabilityData;
+    const allLocationsData = extendData(availabilityData, allLocations);
+    return allLocationsData;
     /* THIS IS TODO/NOT WORKING.
      * 1) the walgreens API doesn't respect "r" or "s"
      * 2) we'd need to figure out how to call this to get all stores in the state
@@ -40,11 +42,32 @@ async function formatAndMergeData(data, website) {
     */
 }
 
+function extendData(availableStores, allStores) {
+    const availableStoreKeyObject = {};
+    availableStores.forEach((store) => {
+        const key = generateKey(store);
+        availableStoreKeyObject[key] = true;
+    });
+    let allResults = [...availableStores];
+    allStores.forEach((store) => {
+        const key = generateKey({ name: "Walgreens", ...store });
+        if (!availableStoreKeyObject[key]) {
+            allResults.push({
+                name: "Walgreens",
+                hasAvailability: false,
+                availability: {},
+                ...store,
+            });
+        }
+    });
+    return allResults;
+}
+
 function getFormattedUnavailableStores(retrievedIDs, allNearbyStores) {
     return allNearbyStores
         .filter((store) => !retrievedIDs[store.storeNumber])
         .map((store) => ({
-            name: store.store.name,
+            name: store.store.name, // NOTE right now we hard-code "Walgreens"
             street: toTitleCase(store.store.address.street),
             city: toTitleCase(store.store.address.city),
             zip: store.store.address.zip,
@@ -86,7 +109,7 @@ function formatData(data, website) {
             }
         });
         return {
-            name: entry.name,
+            name: "Walgreens", // NOTE: change to "entry.name" if we use the commented-out code above
             street: toTitleCase(
                 entry.address.line1 + " " + entry.address.line2
             ).trim(),
@@ -100,6 +123,7 @@ function formatData(data, website) {
 }
 
 module.exports = {
+    extendData,
     formatAndMergeData,
     formatData,
     getFormattedUnavailableStores,

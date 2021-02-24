@@ -10,6 +10,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log("Walgreens done.");
     const results = dataFormatter.formatAndMergeData(
         webData,
+        sites.Walgreens.locations,
         sites.Walgreens.website
     );
     return results;
@@ -99,9 +100,7 @@ async function ScrapeWebsiteData(browser) {
                         .then(
                             (res) => resolve(res),
                             (err) => {
-                                console.log(JSON.stringify(err)); // helped with debugging, service throws 404 if no appts found
-                                console.dir(err, { depth: null });
-                                debugger;
+                                // service throws 404 if no appts found
                                 resolve(); // resolve promise without  `err` or else puppeteer fails
                             }
                         );

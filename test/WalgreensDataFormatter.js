@@ -1,6 +1,7 @@
 const {
-    getFormattedUnavailableStores,
+    extendData,
     formatData,
+    getFormattedUnavailableStores,
 } = require("./../site-scrapers/Walgreens/dataFormatter");
 const chai = require("chai");
 const moment = require("moment");
@@ -134,7 +135,7 @@ describe("formatData", () => {
 
     it("formats the name and address", () => {
         expect(result).to.be.deep.equal({
-            name: "Walgreen Drug Store",
+            name: "Walgreens",
             street: "3201 W 6th St",
             city: "Los Angeles",
             zip: "90020",
@@ -158,6 +159,73 @@ describe("formatData", () => {
 
     it("passes the sign up link", () => {
         expect(signUpLink).to.be.equal(fakeWebsite);
+    });
+});
+
+describe("extendData", () => {
+    const allSites = [
+        { street: "1010 Broadway", city: "Chelsea", zip: "02150" },
+        { street: "107 High St", city: "Danvers", zip: "01923" },
+    ];
+    const availableSites = [
+        {
+            name: "Walgreens",
+            street: "1010 Broadway",
+            city: "Chelsea",
+            zip: "02150",
+            hasAvailability: true,
+            availability: {
+                "1/1/2000": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 42,
+                },
+            },
+        },
+    ];
+    it("formats all sites correctly", () => {
+        expect(extendData([], allSites)).to.be.deep.equal([
+            {
+                name: "Walgreens",
+                street: "1010 Broadway",
+                city: "Chelsea",
+                zip: "02150",
+                availability: {},
+                hasAvailability: false,
+            },
+            {
+                name: "Walgreens",
+                street: "107 High St",
+                city: "Danvers",
+                zip: "01923",
+                availability: {},
+                hasAvailability: false,
+            },
+        ]);
+    });
+    it("doesn't add locations if results are there", () => {
+        expect(extendData(availableSites, allSites)).to.be.deep.equal([
+            {
+                name: "Walgreens",
+                street: "1010 Broadway",
+                city: "Chelsea",
+                zip: "02150",
+                hasAvailability: true,
+                availability: {
+                    "1/1/2000": {
+                        hasAvailability: true,
+                        numberAvailableAppointments: 42,
+                    },
+                },
+            },
+            {
+                name: "Walgreens",
+                street: "107 High St",
+                city: "Danvers",
+                zip: "01923",
+                availability: {},
+                hasAvailability: false,
+            },
+        ]);
     });
 });
 
