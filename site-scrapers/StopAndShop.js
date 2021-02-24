@@ -1,12 +1,15 @@
+const s3 = require("../lib/s3");
 const sites = require("../data/sites.json");
 
+const siteName = "StopAndShop";
+const site = sites[siteName];
 const noAppointmentMatchString = "no locations with available appointments";
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log("StopAndShop starting.");
+    console.log(`${siteName} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log("StopAndShop done.");
-    return sites.StopAndShop.locations.map((loc) => {
+    console.log(`${siteName} done.`);
+    return site.locations.map((loc) => {
         const response = webData[loc.zip];
         return {
             name: `Stop & Shop (${loc.city})`,
@@ -14,7 +17,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             extraData: response.length
                 ? response.substring(1, response.length - 1)
                 : response, //take out extra quotes
-            signUpLink: sites.StopAndShop.website,
+            signUpLink: site.website,
             ...loc,
             timestamp: new Date(),
         };
@@ -23,7 +26,7 @@ module.exports = async function GetAvailableAppointments(browser) {
 
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
-    await page.goto(sites.StopAndShop.website);
+    await page.goto(site.website);
     await page.solveRecaptchas().then(({ solved }) => {
         if (solved.length) {
             return page.waitForNavigation();
@@ -34,7 +37,7 @@ async function ScrapeWebsiteData(browser) {
 
     const results = {};
 
-    for (const loc of [...new Set(sites.StopAndShop.locations)]) {
+    for (const loc of [...new Set(site.locations)]) {
         if (!results[loc.zip]) {
             // Delete this cookie to avoid rate limiting after checking zip code 10 times.
             await page.deleteCookie({ name: "ASP.NET_SessionId" });
@@ -55,20 +58,13 @@ async function ScrapeWebsiteData(browser) {
                 const result = (await searchResponse.buffer()).toString();
                 //if there's something available, log it with a unique name so we can check it out l8r g8r
                 if (result.indexOf(noAppointmentMatchString) == -1) {
-                    let today = new Date();
-                    today =
-                        today.getFullYear() +
-                        "-" +
-                        (today.getMonth() + 1) +
-                        "-" +
-                        today.getDate();
-                    const filename =
-                        "stopandshop-zip-" +
-                        loc.zip +
-                        "-date-" +
-                        today +
-                        ".png";
-                    await page.screenshot({ path: filename });
+                    // theoretically found appointments
+                    if (!process.env.DEVELOPMENT) {
+                        await s3.savePageContent(
+                            `${siteName}-${loc.zip}`,
+                            page
+                        );
+                    }
                 }
                 results[loc.zip] = result;
             } catch (e) {

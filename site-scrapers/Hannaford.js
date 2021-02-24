@@ -10,7 +10,6 @@ module.exports = async function GetAvailableAppointments(browser) {
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${siteName} done.`);
     return site.locations.map((loc) => {
-        const newLoc = { ...loc };
         const response = webData[loc.zip];
         return {
             name: `${siteName} (${loc.city})`,
