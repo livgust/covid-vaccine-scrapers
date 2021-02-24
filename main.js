@@ -49,18 +49,18 @@ async function execute() {
       )
     );
     browser.close();
-    const finalResultsArray = [];
+    const allScraperOutputs = [];
     for (const result of results) {
       if (Array.isArray(result)) {
-        finalResultsArray.push(...result);
+        allScraperOutputs.push(...result);
       } else if (result) {
         //ignore nulls
-        finalResultsArray.push(result);
+        allScraperOutputs.push(result);
       }
     }
 
     const responseJson = {
-      results: await getAllCoordinates(finalResultsArray),
+      results: await getAllCoordinates(allScraperOutputs),
     };
 
     if (process.env.DEVELOPMENT) {
