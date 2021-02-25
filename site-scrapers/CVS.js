@@ -47,20 +47,21 @@ module.exports = async function GetAvailableAppointments(browser) {
         // availability.
         // Also, we had previously seen cases where numeric availability was "0" but status
         // was "Available" and it's not apparent what that really meant (skew? bugs?).
-        responseLocation.city = toTitleCase(responseLocation.city);
-        responseLocation.name = `${siteName} (${responseLocation.city})`;
-        responseLocation.hasAvailability =
-            responseLocation.status !== "Fully Booked";
         let totalAvailability =
             responseLocation.totalAvailable &&
             parseInt(responseLocation.totalAvailable);
+        const retval = {
+            city: toTitleCase(responseLocation.city),
+            name: `${siteName} (${responseLocation.city})`,
+            hasAvailability: responseLocation.status !== "Fully Booked",
+            availability: {},
+            timestamp: timestamp,
+            signUpLink: site.website,
+        };
         if (totalAvailability) {
-            responseLocation.totalAvailability = totalAvailability;
+            retval.totalAvailability = totalAvailability;
         }
-        responseLocation.availability = {};
-        responseLocation.timestamp = timestamp;
-        responseLocation.signUpLink = site.website;
-        return responseLocation;
+        return retval;
     });
 };
 
