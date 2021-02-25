@@ -47,20 +47,24 @@ module.exports = async function GetAvailableAppointments(browser) {
                 dateRegexp
             ).groups;
             const date = `${month}/${day}/${year}`;
-            let newNumberAvailable = 0;
-            if (mappedData.availability[date] && appointment.status !== "Disabled") {
-                newNumberAvailable =
-                    mappedData.availability[date].numberAvailableAppointments +
-                    appointment.slots_available;
-            }
-            mappedData.availability[date] = {
-                numberAvailableAppointments: newNumberAvailable,
-                hasAvailability: !!newNumberAvailable,
-            };
+            let newNumberAvailable =
+                appointment.status !== "Disabled"
+                    ? appointment.slots_available
+                    : 0;
 
             if (!!newNumberAvailable) {
                 mappedData.hasAvailability = true;
             }
+
+            if (mappedData.availability[date]) {
+                newNumberAvailable +=
+                    mappedData.availability[date].numberAvailableAppointments;
+            }
+
+            mappedData.availability[date] = {
+                numberAvailableAppointments: newNumberAvailable,
+                hasAvailability: !!newNumberAvailable,
+            };
         });
 
         return mappedData;

@@ -28,21 +28,41 @@ module.exports = async function GetAvailableAppointments(browser) {
         `${webData.responsePayloadData.currentTime}-0${offsetMountain}:00`
     );
     return webData.responsePayloadData.data.MA.map((responseLocation) => {
-        let hasAvailability = parseInt(responseLocation.totalAvailable)
-            ? true
-            : false;
-        let totalAvailability = parseInt(responseLocation.totalAvailable);
-        let availability = {};
-        responseLocation.city = toTitleCase(responseLocation.city);
-        return {
-            name: `${siteName} (${responseLocation.city})`,
-            hasAvailability,
-            availability,
-            totalAvailability,
+        // Prior to Feb 22 or so, CVS's JSON returned:
+        //  {
+        //    "totalAvailable": "0",
+        //    "city": "CAMBRIDGE",
+        //    "state": "MA",
+        //    "pctAvailable": "0.00%",
+        //    "status": "Fully Booked"
+        //  },
+        //
+        // But as of Feb. 25 it returns:
+        //  {
+        //    "city": "CAMBRIDGE",
+        //    "state": "MA",
+        //    "status": "Fully Booked"
+        //  },
+        // It's not clear whether we can expect the other fields to return when there is
+        // availability.
+        // Also, we had previously seen cases where numeric availability was "0" but status
+        // was "Available" and it's not apparent what that really meant (skew? bugs?).
+        const totalAvailability =
+            responseLocation.totalAvailable &&
+            parseInt(responseLocation.totalAvailable);
+        const city = toTitleCase(responseLocation.city);
+        const retval = {
+            city: city,
+            name: `${siteName} (${city})`,
+            hasAvailability: responseLocation.status !== "Fully Booked",
+            availability: {},
             timestamp: timestamp,
             signUpLink: site.website,
-            ...responseLocation,
         };
+        if (totalAvailability) {
+            retval.totalAvailability = totalAvailability;
+        }
+        return retval;
     });
 };
 
