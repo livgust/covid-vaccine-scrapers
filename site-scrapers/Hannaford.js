@@ -12,10 +12,10 @@ module.exports = async function GetAvailableAppointments(browser) {
         const response = webData[loc.zip];
         return {
             name: `${siteName} (${loc.city})`,
-            hasAvailability: response ? response.indexOf(rxTouch.noAppointmentMatchString) == -1 : false,
+            hasAvailability: false, // with current impl of rxTouch, we can't determine for sure if there's availability yet 
             extraData: response && response.length
-                ? response.substring(1, response.length - 1)
-                : response, //take out extra quotes
+                ? response.substring(1, response.length - 1) //take out extra quotes
+                : response,
             signUpLink: site.website,
             ...loc,
             timestamp: new Date(),
