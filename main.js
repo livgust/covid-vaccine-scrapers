@@ -5,6 +5,7 @@ dotenv.config();
 const chromium = require("chrome-aws-lambda");
 const { addExtra } = require("puppeteer-extra");
 const Puppeteer = addExtra(chromium.puppeteer);
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const scrapers = require("./site-scrapers");
 const fetch = require("node-fetch");
@@ -19,6 +20,8 @@ async function execute() {
         .then((res) => res.json())
         .then((unpack) => JSON.parse(unpack.body).results);
 
+    Puppeteer.use(StealthPlugin());
+
     Puppeteer.use(
         Recaptcha({
             provider: { id: "2captcha", token: process.env.RECAPTCHATOKEN },
@@ -28,6 +31,7 @@ async function execute() {
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
               executablePath: process.env.CHROMEPATH,
+              headless: false,
           })
         : await Puppeteer.launch({
               args: chromium.args,
