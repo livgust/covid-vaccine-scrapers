@@ -1,7 +1,7 @@
 const sites = require("../data/sites.json");
 const rxTouch = require("../lib/RxTouch.js");
 
-const siteName = "Hannaford";
+const siteName = "StopAndShop";
 const site = sites[siteName];
 
 module.exports = async function GetAvailableAppointments(browser) {
@@ -11,14 +11,15 @@ module.exports = async function GetAvailableAppointments(browser) {
     return site.locations.map((loc) => {
         const response = webData[loc.zip];
         return {
-            name: `${siteName} (${loc.city})`,
+            name: `Stop & Shop (${loc.city})`,
             hasAvailability: false, // with current impl of rxTouch, we can't determine for sure if there's availability yet 
             extraData: response && response.length
                 ? response.substring(1, response.length - 1) //take out extra quotes
-                : response,
+                : response, 
             signUpLink: site.website,
             ...loc,
             timestamp: new Date(),
         };
     });
 };
+
