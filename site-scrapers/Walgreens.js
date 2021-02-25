@@ -78,7 +78,7 @@ async function ScrapeWebsiteData(browser) {
                     fetch(
                         "https://www.walgreens.com/hcschedulersvc/svc/v2/immunizationLocations/timeslots",
                         {
-                            method: "POST", // or 'PUT'
+                            method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                             },
