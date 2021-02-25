@@ -50,9 +50,10 @@ module.exports = async function GetAvailableAppointments(browser) {
         const totalAvailability =
             responseLocation.totalAvailable &&
             parseInt(responseLocation.totalAvailable);
+        const city = toTitleCase(responseLocation.city);
         const retval = {
-            city: toTitleCase(responseLocation.city),
-            name: `${siteName} (${responseLocation.city})`,
+            city: city,
+            name: `${siteName} (${city})`,
             hasAvailability: responseLocation.status !== "Fully Booked",
             availability: {},
             timestamp: timestamp,
