@@ -47,7 +47,7 @@ module.exports = async function GetAvailableAppointments(browser) {
         // availability.
         // Also, we had previously seen cases where numeric availability was "0" but status
         // was "Available" and it's not apparent what that really meant (skew? bugs?).
-        let totalAvailability =
+        const totalAvailability =
             responseLocation.totalAvailable &&
             parseInt(responseLocation.totalAvailable);
         const retval = {
