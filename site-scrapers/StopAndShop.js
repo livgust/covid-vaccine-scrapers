@@ -12,11 +12,10 @@ module.exports = async function GetAvailableAppointments(browser) {
         const response = webData[loc.zip];
         return {
             name: `Stop & Shop (${loc.city})`,
-            hasAvailability: false, // with current impl of rxTouch, we can't determine for sure if there's availability yet
+            hasAvailability: response.availability ? true : false,
             extraData:
-                response && response.length
-                    ? response.substring(1, response.length - 1) //take out extra quotes
-                    : response,
+                response.message || `Search on website for zip ${loc.zip}`,
+            availability: response.availability,
             signUpLink: site.website,
             ...loc,
             timestamp: new Date(),
