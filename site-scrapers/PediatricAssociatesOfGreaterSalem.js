@@ -1,7 +1,12 @@
 const https = require("https");
 const moment = require("moment");
 const sites = require("../data/sites.json");
+
+// Set to true to see responses in the console.
 const DEBUG = false;
+
+// Total days to search in the schedule.
+const DAYSTOSEARCH = 16;
 
 module.exports = async function GetAvailableAppointments() {
     console.log("Pediatric Associates of Greater Salem starting.");
@@ -14,6 +19,7 @@ module.exports = async function GetAvailableAppointments() {
     } = sites.PediatricAssociatesOfGreaterSalem;
 
     const webData = await QuerySchedule(
+        DAYSTOSEARCH,
         bearerTokenUrl,
         schedulingTokenUrl,
         graphQLUrl
@@ -30,7 +36,12 @@ module.exports = async function GetAvailableAppointments() {
     ];
 };
 
-async function QuerySchedule(bearerTokenUrl, schedulingTokenUrl, graphQLUrl) {
+async function QuerySchedule(
+    days,
+    bearerTokenUrl,
+    schedulingTokenUrl,
+    graphQLUrl
+) {
     // Get a bearer token
     const bearerToken = await GetToken(bearerTokenUrl);
     Debug("bearerToken", bearerToken);
@@ -40,56 +51,21 @@ async function QuerySchedule(bearerTokenUrl, schedulingTokenUrl, graphQLUrl) {
     Debug("schedulingToken", schedulingToken);
 
     // Issue the GetFilters GraphQL query
-    const responseData = await GetFilters(
+    const responseData = await SearchAvailabilityDates(
+        days,
         graphQLUrl,
         bearerToken,
         schedulingToken
     );
     Debug("responseData", responseData);
 
-    let results = { availability: {}, hasAvailability: false };
-    if (responseData.data.getFilters) {
-        // TODO: Parse
-    }
-    return results;
+    return ParseAvailabilityDates(responseData.data.searchAvailabilityDates);
 }
 
 function Debug(...args) {
     if (DEBUG) {
         console.log(...args);
     }
-}
-
-function GraphQLQuery() {
-    return `query GetFilters($locationIds: [String!]!, $practitionerIds: [String!]!) {
-  getFilters(locationIds: $locationIds, practitionerIds: $practitionerIds) {
-    ...Filters
-    __typename
-  }
-}
-
-fragment Filters on Filters {
-  patientNewness {
-    text
-    value
-    __typename
-  }
-  specialties {
-    text
-    value
-    patientNewness
-    __typename
-  }
-  visitReasons {
-    text
-    value
-    patientNewness
-    specialties
-    __typename
-  }
-  hasTelehealthConfiguration
-  __typename
-}`;
 }
 
 function GetToken(url) {
@@ -108,14 +84,26 @@ function GetToken(url) {
     });
 }
 
-async function GetFilters(url, bearerToken, schedulingToken) {
+async function SearchAvailabilityDates(
+    days,
+    url,
+    bearerToken,
+    schedulingToken
+) {
     const postData = JSON.stringify({
-        operationName: "GetFilters",
+        operationName: "SearchAvailabilityDates",
         variables: {
             locationIds: ["2804-102"],
             practitionerIds: [],
+            specialty: "Unknown Provider",
+            serviceTypeTokens: [
+                // TODO: I am not sure what this GUID signifies or if it varies.
+                "codesystem.scheduling.athena.io/servicetype.canonical|49b8e757-0345-4923-9889-a3b57f05aed2",
+            ],
+            startAfter: Today(),
+            startBefore: DaysLater(days - 1),
         },
-        query: GraphQLQuery(),
+        query: SearchAvailabilityDatesQuery(),
     });
 
     const options = {
@@ -132,11 +120,29 @@ async function GetFilters(url, bearerToken, schedulingToken) {
     return JSON.parse(responseData);
 }
 
+function Today() {
+    // Today's date in format 2021-02-26T00:00:00-05:00 (ISO-8601)
+    return moment().startOf("day").format();
+}
+
+function DaysLater(days) {
+    // The last second of "days" days later e.g. 2021-03-13T23:59:59-05:00
+    return moment().add(days, "days").endOf("day").format();
+}
+
+function SearchAvailabilityDatesQuery() {
+    return `query SearchAvailabilityDates($locationIds: [String!], $practitionerIds: [String!], $specialty: String, $serviceTypeTokens: [String!]!, $startAfter: String!, $startBefore: String!, $visitType: VisitType) {
+        searchAvailabilityDates(locationIds: $locationIds, practitionerIds: $practitionerIds, specialty: $specialty, serviceTypeTokens: $serviceTypeTokens, startAfter: $startAfter, startBefore: $startBefore, visitType: $visitType) {
+            date
+            availability
+            __typename
+        }}`;
+}
+
 function Post(url, postData, options) {
     return new Promise((resolve) => {
         const req = https.request(url, options, (res) => {
             let body = "";
-            //responseHeaders = res.headers;
             res.on("data", (chunk) => {
                 body += chunk;
             });
@@ -157,4 +163,26 @@ function Post(url, postData, options) {
         });
         req.end();
     });
+}
+
+function ParseAvailabilityDates(availabilityDates) {
+    // Expected response like
+    // [
+    //     {"date":"2021-02-26","availability":false,"__typename":"Availability"},
+    //     ...
+    // ]
+    const availability = {};
+    let hasAvailability = false;
+    availabilityDates.forEach((availabilityDate) => {
+        if (availabilityDate.availability) {
+            availability[ReformatDate(availabilityDate.date)] = true;
+            hasAvailability = true;
+        }
+    });
+
+    return { availability: availability, hasAvailability: hasAvailability };
+}
+
+function ReformatDate(dateString) {
+    return moment(dateString).format("YYYY/MM/DD");
 }
