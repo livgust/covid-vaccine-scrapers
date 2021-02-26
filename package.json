@@ -1,6 +1,8 @@
 {
     "dependencies": {
         "@googlemaps/google-maps-services-js": "^3.1.16",
+        "axios": "^0.21.1",
+        "axios-retry": "^3.1.9",
         "bestzip": "^2.1.7",
         "chrome-aws-lambda": "^7.0.0",
         "dotenv": "^8.2.0",
