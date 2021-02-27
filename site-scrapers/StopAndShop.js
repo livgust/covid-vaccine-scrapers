@@ -13,8 +13,7 @@ module.exports = async function GetAvailableAppointments(browser) {
         return {
             name: `Stop & Shop (${loc.city})`,
             hasAvailability: response.availability ? true : false,
-            extraData:
-                response.message || `Search on website for zip ${loc.zip}`,
+            extraData: response.message,
             availability: response.availability,
             signUpLink: site.website,
             ...loc,
