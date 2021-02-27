@@ -30,10 +30,9 @@ const getGeocode = async (name, street, zip) => {
 
 const getAllCoordinates = async (locations, cachedResults) => {
     const existingLocations = cachedResults.reduce((acc, location) => {
-        const { resolvedLocation, latitude, longitude } = location;
-        if (resolvedLocation && latitude && longitude) {
+        const { latitude, longitude } = location;
+        if (latitude && longitude) {
             acc[generateKey(location)] = {
-                resolvedLocation,
                 latitude,
                 longitude,
             };
@@ -56,8 +55,6 @@ const getAllCoordinates = async (locations, cachedResults) => {
                 if (locationData) {
                     return {
                         ...location,
-                        resolvedLocation:
-                            locationData?.results[0].formatted_address,
                         latitude:
                             locationData?.results[0].geometry.location.lat,
                         longitude:
