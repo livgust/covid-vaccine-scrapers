@@ -6,3 +6,4 @@ lambda/
 out.json
 .eslintrc.json
 .vscode/
+.DS_Store

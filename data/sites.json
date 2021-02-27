@@ -30,7 +30,7 @@
             {
                 "street": "8 Merchants Way",
                 "city": "Middleborough",
-                "zip": "01569"
+                "zip": "02346"
             },
             {
                 "street": "255 Joseph E. Warner Blvd.",
@@ -46,6 +46,82 @@
                 "street": "118 Lancaster St.",
                 "city": "Leominster",
                 "zip": "01453"
+            },
+            {
+                "street": "301 Pleasant St.",
+                "city": "Dracut",
+                "zip": "01826"
+            }
+        ]
+    },
+    "StopAndShop": {
+        "name": "Stop & Shop",
+        "website": "https://stopandshopsched.rxtouch.com/rbssched/program/covid19/Patient/Advisory",
+        "locations": [
+            {
+                "street": "100 Macy Street",
+                "city": "Amesbury",
+                "zip": "01913"
+            },
+            {
+                "street": "501 Rodman Street",
+                "city": "Fall River",
+                "zip": "02721"
+            },
+            {
+                "street": "1282 Springfield Street",
+                "city": "Feeding Hills",
+                "zip": "01030"
+            },
+            {
+                "street": "341 Plymouth Road",
+                "city": "Halifax",
+                "zip": "02338"
+            },
+            {
+                "street": "111 Chatham Rd",
+                "city": "Harwich",
+                "zip": "02645"
+            },
+            {
+                "street": "425 Attucks Lane",
+                "city": "Hyannis",
+                "zip": "02601"
+            },
+            {
+                "street": "35 Washington Street",
+                "city": "Lynn",
+                "zip": "01904"
+            },
+            {
+                "street": "876 State Road. Rte 2",
+                "city": "North Adams",
+                "zip": "01247"
+            },
+            {
+                "street": "Route 3 6A Cranberry Cove Plaza",
+                "city": "Orleans",
+                "zip": "02653"
+            },
+            {
+                "street": "Dan Fox Drive",
+                "city": "Pittsfield",
+                "zip": "01201"
+            },
+            {
+                "street": "450 Paradise Rd",
+                "city": "Swampscott",
+                "zip": "01907"
+            },
+            {
+                "street": "935 Riverdale Street",
+                "city": "W. Springfield",
+                "zip": "01089"
+            },
+            {
+                "street": "2 Elm Street",
+                "city": "Woburn",
+                "zip": "01801"
             }
         ]
     },
@@ -179,5 +255,55 @@
         "city": "Lowell",
         "state": "MA",
         "zip": "01854"
+    },
+    "Walgreens": {
+        "name": "Walgreens",
+        "website": "https://www.walgreens.com/findcare/vaccination/covid-19/",
+        "locations": [
+            { "street": "1010 Broadway", "city": "Chelsea", "zip": "02150" },
+            { "street": "107 High St", "city": "Danvers", "zip": "01923" },
+            {
+                "street": "757 Gallivan Blvd",
+                "city": "Dorchester",
+                "zip": "02122"
+            },
+            { "street": "405 Broadway", "city": "Everett", "zip": "02149" },
+            {
+                "street": "220 Huttleston Ave",
+                "city": "Fairhaven",
+                "zip": "02719"
+            },
+            {
+                "street": "369 Plymouth Ave",
+                "city": "Fall River",
+                "zip": "02721"
+            },
+            { "street": "232 Main St", "city": "Gardner", "zip": "01440" },
+            {
+                "street": "68 South Main St",
+                "city": "Haverhill",
+                "zip": "01835"
+            },
+            { "street": "1145 Main St", "city": "Holden", "zip": "01520" },
+            { "street": "520 W. Main St", "city": "Hyannis", "zip": "02601" },
+            { "street": "25 Park St", "city": "Lee", "zip": "01238" },
+            { "street": "21 South St", "city": "Mashpee", "zip": "02649" },
+            { "street": "825 Morton St", "city": "Boston", "zip": "02126" },
+            { "street": "90 River St", "city": "Mattapan", "zip": "02126" },
+            {
+                "street": "37 Cheshire Road",
+                "city": "Pittsfield",
+                "zip": "01201"
+            },
+            { "street": "430 Broadway", "city": "Revere", "zip": "02151" },
+            {
+                "street": "1890 Columbus Ave",
+                "city": "Roxbury",
+                "zip": "02119"
+            },
+            { "street": "416 Warren St", "city": "Roxbury", "zip": "02119" },
+            { "street": "166 Walnut St", "city": "Saugus", "zip": "01906" },
+            { "street": "296 Buffinton St", "city": "Somerset", "zip": "02726" }
+        ]
     }
 }
