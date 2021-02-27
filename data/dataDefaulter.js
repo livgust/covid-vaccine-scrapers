@@ -40,7 +40,7 @@ function generateKey(entry) {
         if (entry[key]) {
             uniqueIdentifier += `${entry[key]
                 .toLowerCase()
-                .replace(/[^\w]/g, "")}|`;
+                .replace(/[^1-9bcdghj-np-tv-z]/g, "")}|`; // remove spaces, vowels, and 0
         }
     });
 
