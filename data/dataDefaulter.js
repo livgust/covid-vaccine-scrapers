@@ -16,14 +16,12 @@ function mergeResults(currentResults, cachedResults, secondsOfTolerance) {
         });
 
         cachedResults.forEach((cachedResult) => {
-            if (!currentResultsMap[generateKey(cachedResult)]) {
+            // ignore any cached results that don't have a timestamp
+            if (cachedResult.timestamp && !currentResultsMap[generateKey(cachedResult)]) {
                 if (secondsOfTolerance) {
                     const lowerTimeBound =
                         new Date() - secondsOfTolerance * 1000;
-                    if (
-                        cachedResult.timestamp &&
-                        cachedResult.timestamp >= lowerTimeBound
-                    ) {
+                    if (cachedResult.timestamp >= lowerTimeBound) {
                         combinedResults.push(cachedResult);
                     }
                 } else {
