@@ -305,5 +305,9 @@
             { "street": "166 Walnut St", "city": "Saugus", "zip": "01906" },
             { "street": "296 Buffinton St", "city": "Somerset", "zip": "02726" }
         ]
+    },
+    "BaystateHealth": {
+        "name": "Baystate Health",
+        "website": "https://www.baystatehealth.org/covid19"
     }
 }
