@@ -1,3 +1,4 @@
+const https = require("https");
 const sites = require("../data/sites.json");
 const mychart = require("../lib/MyChartAPI.js");
 
@@ -12,7 +13,32 @@ module.exports = async function GetAvailableAppointments() {
     };
 };
 
+function urlRedirect(url, options) {
+    return new Promise((resolve) => {
+        let response = "";
+        https.get(url, options, (res) => {
+            let body = "";
+            res.on("data", (chunk) => (body += chunk));
+            res.on("end", () => {
+                response = res.headers ? res.headers.location : null;
+                resolve(response);
+            });
+        });
+    });
+}
+
 async function ScrapeWebsiteData() {
+    const checkSlots = await urlRedirect(sites.Atrius.website, {});
+    if (checkSlots && checkSlots.match("No_Slots")) {
+        console.log(
+            `Atrius redirecting to no slots, ${checkSlots}, assuming failure!`
+        );
+        return {
+            hasAvailability: false,
+            availability: {}, //this line is optional
+        };
+    }
+
     // We need to go through the flow and use a request verification token
     const [
         cookie,

@@ -68,6 +68,7 @@ async function ScrapeWebsiteData() {
                 "end": "2021-02-22T14:04:00+00:00",
                 "capacity": 1,
                 "remaining_spaces": -1
+                
             }
         */
         let remainingSpaces = currentValue["remaining_spaces"];
@@ -88,7 +89,7 @@ async function ScrapeWebsiteData() {
                 };
                 memo["availability"][appointmentDateET] = dateAvailability;
             }
-            dateAvailability["availability"] += remainingSpaces;
+            dateAvailability["numberAvailableAppointments"] += remainingSpaces;
             dateAvailability["hasAvailability"] = true;
             memo["hasAvailability"] = true;
         }
