@@ -12,6 +12,7 @@ const fetch = require("node-fetch");
 const dataDefaulter = require("./data/dataDefaulter");
 const file = require("./lib/file");
 const s3 = require("./lib/s3");
+const { getAllCoordinates } = require("./getGeocode");
 
 async function execute() {
     const cachedResults = await fetch(
@@ -77,7 +78,7 @@ async function execute() {
         }
 
         const responseJson = {
-            results: finalResultsArray,
+            results: await getAllCoordinates(finalResultsArray, cachedResults),
         };
 
         const webData = JSON.stringify(responseJson);
