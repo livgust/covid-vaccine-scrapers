@@ -75,13 +75,14 @@ async function ScrapeWebsiteData(browser) {
         let postResponse = await page.evaluate(
             (latitude, longitude, todayString) =>
                 new Promise((resolve) => {
-                    jQuery
-                        .ajax({
-                            url:
-                                "https://www.walgreens.com/hcschedulersvc/svc/v2/immunizationLocations/timeslots",
-                            type: "POST",
-                            dataType: "json",
-                            data: JSON.stringify({
+                    fetch(
+                        "https://www.walgreens.com/hcschedulersvc/svc/v2/immunizationLocations/timeslots",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
                                 position: {
                                     latitude: latitude,
                                     longitude: longitude,
@@ -95,15 +96,15 @@ async function ScrapeWebsiteData(browser) {
                                 serviceId: "99",
                                 state: "MA",
                             }),
-                            contentType: "application/json",
+                        }
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            resolve(data); // fetch won't reject 404 or 500
                         })
-                        .then(
-                            (res) => resolve(res),
-                            (err) => {
-                                // service throws 404 if no appts found
-                                resolve(); // resolve promise without  `err` or else puppeteer fails
-                            }
-                        );
+                        .catch((error) => {
+                            resolve(error); // only happens on network failure
+                        });
                 }),
             latitude,
             longitude,
