@@ -12,7 +12,7 @@ module.exports = async function GetAvailableAppointments(browser) {
         const response = webData[loc.zip];
         return {
             name: `Stop & Shop (${loc.city})`,
-            hasAvailability: response.availability ? true : false,
+            hasAvailability: Object.keys(response.availability).length != 0 ? true : false,
             extraData: response.message,
             availability: response.availability,
             signUpLink: site.website,
