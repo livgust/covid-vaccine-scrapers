@@ -10,11 +10,20 @@ const DAYSTOSEARCH = 16;
 
 module.exports = async function GetAvailableAppointments() {
     console.log("Pediatric Associates of Greater Salem starting.");
+    try {
+        return DoGetAvailableAppointments();
+    } finally {
+        console.log("Pediatric Associates of Greater Salem done.");
+    }
+};
+
+async function DoGetAvailableAppointments() {
     const {
         name,
         bearerTokenUrl,
         schedulingTokenUrl,
         graphQLUrl,
+        locations,
         ...restSalem
     } = sites.PediatricAssociatesOfGreaterSalem;
 
@@ -24,17 +33,17 @@ module.exports = async function GetAvailableAppointments() {
         schedulingTokenUrl,
         graphQLUrl
     );
-    console.log("Pediatric Associates of Greater Salem done.");
-
-    return [
-        {
-            ...restSalem,
+    // We do not have separate availability information for each site.
+    // Distribute webData to all locations.
+    return locations.map((location) => {
+        return {
+            name: `${name} (${location.city})`,
+            ...location,
             ...webData,
-            name: name,
             timestamp: moment().format(),
-        },
-    ];
-};
+        };
+    });
+}
 
 async function QuerySchedule(
     days,
