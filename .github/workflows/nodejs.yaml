@@ -1,5 +1,4 @@
-name: nods.js
-
+name: node.js
 on: push
 
 jobs:
