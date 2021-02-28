@@ -1,0 +1,141 @@
+const chai = require("chai");
+chai.use(require("chai-as-promised"));
+
+const expect = chai.expect;
+
+const fakeAvailabilityForMonth_withAvailability = {
+    Success: true,
+    Message: "Calendar successfully retrieved",
+    Data: {
+        Days: [
+            { DayOfWeek: "Monday", DayNumber: 1, Available: false },
+            { DayOfWeek: "Wednesday", DayNumber: 3, Available: true },
+            { DayOfWeek: "Friday", DayNumber: 26, Available: true },
+            { DayOfWeek: "Saturday", DayNumber: 27, Available: false },
+        ],
+    },
+};
+
+const fakeAvailabilityForMonth_withoutAvailability = {
+    Success: true,
+    Message: "Calendar successfully retrieved",
+    Data: {
+        Days: [
+            { DayOfWeek: "Monday", DayNumber: 1, Available: false },
+            { DayOfWeek: "Wednesday", DayNumber: 3, Available: false },
+            { DayOfWeek: "Friday", DayNumber: 26, Available: false },
+            { DayOfWeek: "Saturday", DayNumber: 27, Available: false },
+        ],
+    },
+};
+
+const fakeAvailabilityForDay_withAvailability = {
+    Success: true,
+    Message: "Day successfully retrieved",
+    Data: {
+        Rows: [
+            {
+                RowTitle: "9:15 am",
+            },
+            {
+                RowTitle: "10:15 am",
+            },
+        ],
+    },
+};
+
+const fakeAvailabilityForDay_withoutAvailability = {
+    Success: true,
+    Message: "Day successfully retrieved",
+    Data: {
+        Rows: [],
+    },
+};
+
+describe("RxTouch Availability Scraper", function () {
+    it("should return availability when it exists for the month and day", async () => {
+        const rxTouch = require("../lib/RxTouch");
+        const availabilityService = {
+            async getAvailabilityForMonth() {
+                return Promise.resolve(
+                    fakeAvailabilityForMonth_withAvailability
+                );
+            },
+            async getAvailabilityForDay() {
+                return Promise.resolve(fakeAvailabilityForDay_withAvailability);
+            },
+        };
+        return expect(
+            rxTouch.GetAllAvailability(availabilityService, "02144")
+        ).to.eventually.deep.equal({
+            message:
+                "Availability found. Search on signup website for zip 02144",
+            availability: {
+                "2/3/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 2,
+                    signUpLink: null,
+                },
+                "2/26/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 2,
+                    signUpLink: null,
+                },
+                "3/3/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 2,
+                    signUpLink: null,
+                },
+                "3/26/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 2,
+                    signUpLink: null,
+                },
+            },
+        });
+    });
+
+    it("should return NO availability when there is none for the month nor the day", async () => {
+        const rxTouch = require("../lib/RxTouch");
+        const availabilityService = {
+            async getAvailabilityForMonth() {
+                return Promise.resolve(
+                    fakeAvailabilityForMonth_withoutAvailability
+                );
+            },
+            async getAvailabilityForDay() {
+                return Promise.resolve(
+                    fakeAvailabilityForDay_withoutAvailability
+                );
+            },
+        };
+        return expect(
+            rxTouch.GetAllAvailability(availabilityService, "02144")
+        ).to.eventually.deep.equal({
+            message: "No available appointments for this facility",
+            availability: {},
+        });
+    });
+
+    it("should return NO availability when there month shows availability but day shows none", async () => {
+        const rxTouch = require("../lib/RxTouch");
+        const availabilityService = {
+            async getAvailabilityForMonth() {
+                return Promise.resolve(
+                    fakeAvailabilityForMonth_withAvailability
+                );
+            },
+            async getAvailabilityForDay() {
+                return Promise.resolve(
+                    fakeAvailabilityForDay_withoutAvailability
+                );
+            },
+        };
+        return expect(
+            rxTouch.GetAllAvailability(availabilityService, "02144")
+        ).to.eventually.deep.equal({
+            message: "No available appointments for this facility",
+            availability: {},
+        });
+    });
+});
