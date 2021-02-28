@@ -1,6 +1,5 @@
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
-
 const expect = chai.expect;
 
 const fakeAvailabilityForMonth_withAvailability = {
@@ -15,7 +14,6 @@ const fakeAvailabilityForMonth_withAvailability = {
         ],
     },
 };
-
 const fakeAvailabilityForMonth_withoutAvailability = {
     Success: true,
     Message: "Calendar successfully retrieved",
@@ -28,7 +26,6 @@ const fakeAvailabilityForMonth_withoutAvailability = {
         ],
     },
 };
-
 const fakeAvailabilityForDay_withAvailability = {
     Success: true,
     Message: "Day successfully retrieved",
@@ -43,7 +40,6 @@ const fakeAvailabilityForDay_withAvailability = {
         ],
     },
 };
-
 const fakeAvailabilityForDay_withoutAvailability = {
     Success: true,
     Message: "Day successfully retrieved",
@@ -53,7 +49,7 @@ const fakeAvailabilityForDay_withoutAvailability = {
 };
 
 describe("RxTouch Availability Scraper", function () {
-    it("should return availability when it exists for the month and day", async () => {
+    it("should return availability when Month and Day APIs return some", async () => {
         const rxTouch = require("../lib/RxTouch");
         const availabilityService = {
             async getAvailabilityForMonth() {
@@ -94,8 +90,7 @@ describe("RxTouch Availability Scraper", function () {
             },
         });
     });
-
-    it("should return NO availability when there is none for the month nor the day", async () => {
+    it("should return NO availability when neither Month nor Day APIs returns any", async () => {
         const rxTouch = require("../lib/RxTouch");
         const availabilityService = {
             async getAvailabilityForMonth() {
@@ -117,7 +112,7 @@ describe("RxTouch Availability Scraper", function () {
         });
     });
 
-    it("should return NO availability when there month shows availability but day shows none", async () => {
+    it("should return NO availability when Month API returns some but Day API doesnt return any", async () => {
         const rxTouch = require("../lib/RxTouch");
         const availabilityService = {
             async getAvailabilityForMonth() {
