@@ -17,7 +17,10 @@ function mergeResults(currentResults, cachedResults, secondsOfTolerance) {
 
         cachedResults.forEach((cachedResult) => {
             // ignore any cached results that don't have a timestamp
-            if (cachedResult.timestamp && !currentResultsMap[generateKey(cachedResult)]) {
+            if (
+                cachedResult.timestamp &&
+                !currentResultsMap[generateKey(cachedResult)]
+            ) {
                 if (secondsOfTolerance) {
                     const lowerTimeBound =
                         new Date() - secondsOfTolerance * 1000;
@@ -40,7 +43,7 @@ function generateKey(entry) {
         if (entry[key]) {
             uniqueIdentifier += `${entry[key]
                 .toLowerCase()
-                .replace(/[^1-9bcdghj-np-tv-z]/g, "")}|`; // remove spaces, vowels, and 0
+                .replace(/[^\w]/g, "")}|`;
         }
     });
 
