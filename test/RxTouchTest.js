@@ -1,6 +1,7 @@
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
+const moment = require("moment");
 
 const fakeAvailabilityForMonth_withAvailability = {
     Success: true,
@@ -48,6 +49,7 @@ const fakeAvailabilityForDay_withoutAvailability = {
     },
 };
 
+const currMonth = parseInt(moment().format("M"));
 describe("RxTouch Availability Scraper", function () {
     it("should return availability when Month and Day APIs return some", async () => {
         const rxTouch = require("../lib/RxTouch");
@@ -67,22 +69,22 @@ describe("RxTouch Availability Scraper", function () {
             message:
                 "Availability found. Search on signup website for zip 02144",
             availability: {
-                "2/3/2021": {
+                [`${currMonth}/3/2021`]: {
                     hasAvailability: true,
                     numberAvailableAppointments: 2,
                     signUpLink: null,
                 },
-                "2/26/2021": {
+                [`${currMonth}/26/2021`]: {
                     hasAvailability: true,
                     numberAvailableAppointments: 2,
                     signUpLink: null,
                 },
-                "3/3/2021": {
+                [`${currMonth + 1}/3/2021`]: {
                     hasAvailability: true,
                     numberAvailableAppointments: 2,
                     signUpLink: null,
                 },
-                "3/26/2021": {
+                [`${currMonth + 1}/26/2021`]: {
                     hasAvailability: true,
                     numberAvailableAppointments: 2,
                     signUpLink: null,
