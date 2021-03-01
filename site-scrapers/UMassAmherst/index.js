@@ -18,10 +18,10 @@ async function ScrapeWebsiteData(browser) {
     // evidently the loading spinner doesn't always show up? so we'll let these silently fail if they time out.
     await page
         .waitForSelector(".loadingSpinner", { visible: true })
-        .catch(() => { });
+        .catch(() => {});
     await page
         .waitForSelector(".loadingSpinner", { hidden: true })
-        .catch(() => { });
+        .catch(() => {});
 
     const content = await page.content();
 

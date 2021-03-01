@@ -19,8 +19,9 @@ module.exports = async function GetAvailableAppointments(browser) {
             ] of responseLocation.visibleTimeSlots.entries()) {
                 //strip time so we group by date, but then force midnight local time zone to avoid UTC dateline issues
                 const date = new Date(`${timeSlot.time.split("T")[0]}T00:00`);
-                const formattedDate = `${date.getMonth() + 1
-                    }/${date.getDate()}/${date.getFullYear()}`;
+                const formattedDate = `${
+                    date.getMonth() + 1
+                }/${date.getDate()}/${date.getFullYear()}`;
                 if (!availability[formattedDate]) {
                     availability[formattedDate] = {
                         hasAvailability: true,

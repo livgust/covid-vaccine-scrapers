@@ -36,10 +36,7 @@ async function ScrapeWebsiteData(browser) {
     for (let pageNumber = 1; pageNumber <= maxPage; pageNumber++) {
         if (pageNumber != 1) {
             await page.goto(
-                site.website.replace(
-                    "page=1",
-                    "page=" + pageNumber
-                )
+                site.website.replace("page=1", "page=" + pageNumber)
             );
         }
 
@@ -100,8 +97,8 @@ async function ScrapeWebsiteData(browser) {
             const signUpLinkElement = await entry.$("p.my-3 a");
             let signUpLink = signUpLinkElement
                 ? await signUpLinkElement.evaluate((node) =>
-                    node.getAttribute("href")
-                )
+                      node.getAttribute("href")
+                  )
                 : null;
             if (signUpLink) {
                 signUpLink = site.baseWebsite + signUpLink;
