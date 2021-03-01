@@ -107,7 +107,7 @@ describe("RxTouch Availability Scraper", function () {
         return expect(
             rxTouch.GetAllAvailability(availabilityService, "02144")
         ).to.eventually.deep.equal({
-            message: "No available appointments for this facility",
+            message: "No available appointments (code 2).",
             availability: {},
         });
     });
@@ -129,7 +129,7 @@ describe("RxTouch Availability Scraper", function () {
         return expect(
             rxTouch.GetAllAvailability(availabilityService, "02144")
         ).to.eventually.deep.equal({
-            message: "No available appointments for this facility",
+            message: "No available appointments (code 2).",
             availability: {},
         });
     });
