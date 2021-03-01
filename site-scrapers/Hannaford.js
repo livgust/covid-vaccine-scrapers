@@ -1,5 +1,6 @@
 const sites = require("../data/sites.json");
 const rxTouch = require("../lib/RxTouch.js");
+const moment = require("moment");
 
 const siteName = "Hannaford";
 const site = sites[siteName];
@@ -17,7 +18,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             availability: response.availability,
             signUpLink: site.website,
             ...loc,
-            timestamp: new Date(),
+            timestamp: moment().format(),
         };
     });
 };
