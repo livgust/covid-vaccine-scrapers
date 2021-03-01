@@ -1,6 +1,6 @@
+const { site } = require("./config");
 const https = require("https");
 const moment = require("moment");
-const sites = require("../data/sites.json");
 
 // Set to true to see responses in the console.
 const DEBUG = false;
@@ -25,7 +25,7 @@ async function DoGetAvailableAppointments() {
         graphQLUrl,
         locations,
         ...restSalem
-    } = sites.PediatricAssociatesOfGreaterSalem;
+    } = site;
 
     const webData = await QuerySchedule(
         DAYSTOSEARCH,
