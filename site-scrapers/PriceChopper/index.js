@@ -1,14 +1,11 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 const https = require("https");
 const crypto = require("crypto");
 
-const siteName = "Price Chopper";
-const site = sites[siteName];
-
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log(`${siteName} starting.`);
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log(`${siteName} done.`);
+    console.log(`${site.name} done.`);
     return site.locations.map((loc) => {
         const locHash = md5HashString(loc.street + loc.city);
         const responseLocation = webData[locHash];
@@ -35,7 +32,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             }
         }
         return {
-            name: `${siteName} (${loc.city})`,
+            name: `${site.name} (${loc.city})`,
             hasAvailability,
             availability,
             signUpLink: site.signUpLink,

@@ -2,17 +2,16 @@ const fs = require("fs");
 
 let scrapers = [];
 
-// args override directory list allowing single site runs, e.g. `node main.js LynnTech` 
+// args override directory list allowing single site runs, e.g. `node main.js LynnTech`
 if (process.argv.length > 2) {
     for (let i = 2; i < process.argv.length; i++) {
-        const scraper = require(`./${process.argv[i]}.js`);
+        const scraper = require(`./${process.argv[i]}`);
         scrapers.push(scraper);
     }
 } else {
     const ls = fs
         .readdirSync("./site-scrapers", { withFileTypes: true })
-        .filter((item) => !item.isDirectory())
-        .filter((item) => item.name !== "index.js")
+        .filter((item) => item.isDirectory())
         .map((item) => item.name);
 
     ls.map((fileName) => {

@@ -12,6 +12,7 @@ const fetch = require("node-fetch");
 const dataDefaulter = require("./data/dataDefaulter");
 const file = require("./lib/file");
 const s3 = require("./lib/s3");
+const { getAllCoordinates } = require("./getGeocode");
 
 async function execute() {
     const cachedResults = await fetch(
@@ -30,16 +31,16 @@ async function execute() {
 
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
-              executablePath: process.env.CHROMEPATH,
-              headless: false,
-          })
+            executablePath: process.env.CHROMEPATH,
+            headless: true,
+        })
         : await Puppeteer.launch({
-              args: chromium.args,
-              defaultViewport: chromium.defaultViewport,
-              executablePath: await chromium.executablePath,
-              headless: chromium.headless,
-              ignoreHTTPSErrors: true,
-          });
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath,
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true,
+        });
 
     const gatherData = async () => {
         const results = await Promise.all(
@@ -77,7 +78,7 @@ async function execute() {
         }
 
         const responseJson = {
-            results: finalResultsArray,
+            results: await getAllCoordinates(finalResultsArray, cachedResults),
         };
 
         const webData = JSON.stringify(responseJson);

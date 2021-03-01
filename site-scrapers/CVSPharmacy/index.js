@@ -1,13 +1,10 @@
+const { site } = require("./config");
 const https = require("https");
-const sites = require("../data/sites.json");
-
-const siteName = "CVS";
-const site = sites[siteName];
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log(`${siteName} starting.`);
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log(`${siteName} done.`);
+    console.log(`${site.name} done.`);
     // Javascript is not good at timezones. CVS's timestamp arrives in
     // Mountain time ("America/Denver"), and we need to convert it to
     // UTC. Since the offset changes twice a year, we need to
@@ -53,7 +50,7 @@ module.exports = async function GetAvailableAppointments(browser) {
         const city = toTitleCase(responseLocation.city);
         const retval = {
             city: city,
-            name: `${siteName} (${city})`,
+            name: `${site.name} (${city})`,
             hasAvailability: responseLocation.status !== "Fully Booked",
             availability: {},
             timestamp: timestamp,
