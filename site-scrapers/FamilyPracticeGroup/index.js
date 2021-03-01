@@ -1,14 +1,14 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 
 const noAppointmentMatchString = "All appointment times are currently reserved";
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log("FPG starting.");
+    console.log(`${site.name} starting.`);
     const data = await ScrapeWebsiteData(browser);
-    console.log("FPG done.");
+    console.log(`${site.name} done.`);
     return {
-        ...sites["Family Practice Group"],
-        signUpLink: sites["Family Practice Group"].website,
+        ...site,
+        signUpLink: site.website,
         ...data,
         timestamp: new Date(),
     };
@@ -21,7 +21,7 @@ async function waitForLoadComplete(page, loaderSelector) {
 
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
-    await page.goto(sites["Family Practice Group"].website);
+    await page.goto(site.website);
     await page.waitForSelector("#nextBtn", { visible: true });
     await page.click("#nextBtn");
     await waitForLoadComplete(page, ".schedulerPanelLoading");

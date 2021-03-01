@@ -1,15 +1,15 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 const https = require("https");
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log("Curative starting.");
-    const locationIDs = sites.Curative.locations.map((loc) => loc.id);
+    console.log(`${site.name} starting.`);
+    const locationIDs = site.locations.map((loc) => loc.id);
 
     const rawData = {};
     for (const id of locationIDs) {
         const p = new Promise((resolve) => {
             let response = "";
-            https.get(sites.Curative.website + id, (res) => {
+            https.get(site.website + id, (res) => {
                 let body = "";
                 res.on("data", (chunk) => {
                     body += chunk;
@@ -23,8 +23,8 @@ module.exports = async function GetAvailableAppointments(browser) {
         rawData[id] = await p;
     }
 
-    console.log("Curative (basically) done.");
-    return sites.Curative.locations.map((loc) => {
+    console.log(`${site.name} (basically) done.`);
+    return site.locations.map((loc) => {
         const data = rawData[loc.id];
         const mappedData = {
             id: loc.id,
@@ -36,7 +36,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             ).trim(),
             city: data.city,
             zip: data.postal_code,
-            signUpLink: sites.Curative.linkWebsite + loc.id,
+            signUpLink: site.linkWebsite + loc.id,
             hasAvailability: false,
             availability: {}, //date (MM/DD/YYYY) => hasAvailability, numberAvailableAppointments
             timestamp: new Date(),
@@ -52,7 +52,7 @@ module.exports = async function GetAvailableAppointments(browser) {
                     ? appointment.slots_available
                     : 0;
 
-            if (!!newNumberAvailable) {
+            if (newNumberAvailable) {
                 mappedData.hasAvailability = true;
             }
 

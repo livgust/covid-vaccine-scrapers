@@ -1,13 +1,13 @@
 const https = require("https");
-const sites = require("../data/sites.json");
-const mychart = require("../lib/MyChartAPI.js");
+const { site } = require("./config");
+const mychart = require("../../lib/MyChartAPI.js");
 
 module.exports = async function GetAvailableAppointments() {
     console.log("Atrius starting.");
     const webData = await ScrapeWebsiteData();
     console.log("Atrius done.");
     return {
-        ...sites.Atrius,
+        ...site,
         ...webData,
         timestamp: new Date(),
     };
@@ -28,7 +28,7 @@ function urlRedirect(url, options) {
 }
 
 async function ScrapeWebsiteData() {
-    const checkSlots = await urlRedirect(sites.Atrius.website, {});
+    const checkSlots = await urlRedirect(site.website, {});
     if (checkSlots && checkSlots.match("No_Slots")) {
         console.log(
             `Atrius redirecting to no slots, ${checkSlots}, assuming failure!`
@@ -43,7 +43,7 @@ async function ScrapeWebsiteData() {
     const [
         cookie,
         verificationToken,
-    ] = await mychart.GetCookieAndVerificationToken(sites.Atrius.dphLink);
+    ] = await mychart.GetCookieAndVerificationToken(site.dphLink);
 
     // Setup the return object.
     return mychart.AddFutureWeeks(

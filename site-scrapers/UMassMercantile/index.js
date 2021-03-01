@@ -1,12 +1,12 @@
-const sites = require("../data/sites.json");
-const mychart = require("../lib/MyChartAPI");
+const { site } = require("./config");
+const mychart = require("../../lib/MyChartAPI");
 
 module.exports = async function GetAvailableAppointments() {
-    console.log("UmassMercantile starting.");
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData();
-    console.log("UmassMercantile done.");
+    console.log(`${site.name} done.`);
     return {
-        ...sites.UmassMercantile,
+        ...site,
         ...webData,
         timestamp: new Date(),
     };

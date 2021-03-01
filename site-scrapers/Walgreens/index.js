@@ -1,17 +1,16 @@
-const sites = require("./../data/sites.json");
+const { site } = require("./config");
 const usZips = require("us-zips");
-const fs = require("fs");
 const moment = require("moment");
-const dataFormatter = require("./Walgreens/dataFormatter");
+const dataFormatter = require("./dataFormatter");
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log("Walgreens starting.");
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log("Walgreens done.");
+    console.log(`${site.name} done.`);
     const results = dataFormatter.formatAndMergeData(
         webData,
-        sites.Walgreens.locations,
-        sites.Walgreens.website
+        site.locations,
+        site.website
     );
     return results;
 };
@@ -24,7 +23,7 @@ async function waitAndClick(page, selector) {
 
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
-    await page.goto(sites.Walgreens.website);
+    await page.goto(site.website);
     // note: this might happen too quickly - might not show up yet
     const needToLogIn = await Promise.race([
         page.waitForSelector("#pf-dropdown-signin").then(() => true),
@@ -63,9 +62,7 @@ async function ScrapeWebsiteData(browser) {
     }
     const availableLocations = {};
 
-    const uniqueZips = [
-        ...new Set(sites.Walgreens.locations.map((site) => site.zip)),
-    ];
+    const uniqueZips = [...new Set(site.locations.map((site) => site.zip))];
 
     // SEARCH PAGE
     for (const zip of uniqueZips) {

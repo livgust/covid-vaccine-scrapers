@@ -11,6 +11,13 @@ const now = moment().local();
 const yesterday = moment().subtract(1, "days").local();
 const tomorrow = moment().add(1, "days").local();
 
+function removeTimestamps(results) {
+    return results.map((entry) => {
+        const { timestamp, ...rest } = entry;
+        return rest;
+    });
+}
+
 const fakeWebsite = "www.example.com/sign-up";
 const exampleEntry = {
     locationId: "9148a7ed-9dd4-4062-9cb5-46277d9b5b3d",
@@ -134,12 +141,14 @@ describe("formatData", () => {
     )[0];
 
     it("formats the name and address", () => {
-        expect(result).to.be.deep.equal({
-            name: "Walgreens (Los Angeles)",
-            street: "3201 W 6th St",
-            city: "Los Angeles",
-            zip: "90020",
-        });
+        expect(removeTimestamps([result])).to.be.deep.equal([
+            {
+                name: "Walgreens (Los Angeles)",
+                street: "3201 W 6th St",
+                city: "Los Angeles",
+                zip: "90020",
+            },
+        ]);
     });
 
     it("filters out and formats availability", () => {
@@ -183,7 +192,7 @@ describe("extendData", () => {
         },
     ];
     it("formats all sites correctly", () => {
-        expect(extendData([], allSites)).to.be.deep.equal([
+        expect(removeTimestamps(extendData([], allSites))).to.be.deep.equal([
             {
                 name: "Walgreens (Chelsea)",
                 street: "1010 Broadway",
@@ -203,7 +212,9 @@ describe("extendData", () => {
         ]);
     });
     it("doesn't add locations if results are there", () => {
-        expect(extendData(availableSites, allSites)).to.be.deep.equal([
+        expect(
+            removeTimestamps(extendData(availableSites, allSites))
+        ).to.be.deep.equal([
             {
                 name: "Walgreens (Chelsea)",
                 street: "1010 Broadway",
