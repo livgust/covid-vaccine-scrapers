@@ -1,12 +1,12 @@
-const sites = require("../data/sites.json");
-const mychart = require("../lib/MyChartAPI");
+const { site } = require("./config");
+const mychart = require("../../lib/MyChartAPI");
 
 module.exports = async function GetAvailableAppointments() {
     console.log("UMassMemorialMarlborough starting.");
     const webData = await ScrapeWebsiteData();
     console.log("UMassMemorialMarlborough done.");
     return {
-        ...sites.UMassMemorialMarlborough,
+        ...site,
         ...webData,
         timestamp: new Date(),
     };

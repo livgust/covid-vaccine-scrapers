@@ -1,14 +1,11 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 const https = require("https");
 const html_parser = require("node-html-parser");
 
-const siteName = "Lowell General";
-const site = sites[siteName];
-
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log(`${siteName} starting.`);
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log(`${siteName} done.`);
+    console.log(`${site.name} done.`);
     return webData;
 };
 
@@ -210,7 +207,7 @@ async function ScrapeWebsiteData(browser) {
         }
     }
     return {
-        name: siteName,
+        name: site.name,
         hasAvailability,
         availability,
         ...site,

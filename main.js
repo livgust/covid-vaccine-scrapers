@@ -31,16 +31,16 @@ async function execute() {
 
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
-              executablePath: process.env.CHROMEPATH,
-              headless: false,
-          })
+            executablePath: process.env.CHROMEPATH,
+            headless: true,
+        })
         : await Puppeteer.launch({
-              args: chromium.args,
-              defaultViewport: chromium.defaultViewport,
-              executablePath: await chromium.executablePath,
-              headless: chromium.headless,
-              ignoreHTTPSErrors: true,
-          });
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath,
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true,
+        });
 
     const gatherData = async () => {
         const results = await Promise.all(
