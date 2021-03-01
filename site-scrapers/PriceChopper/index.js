@@ -1,14 +1,11 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 const https = require("https");
 const crypto = require("crypto");
 
-const siteName = "Price Chopper";
-const site = sites[siteName];
-
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log(`${siteName} starting.`);
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log(`${siteName} done.`);
+    console.log(`${site.name} done.`);
     return site.locations.map((loc) => {
         const locHash = md5HashString(loc.street + loc.city);
         const responseLocation = webData[locHash];
@@ -22,9 +19,8 @@ module.exports = async function GetAvailableAppointments(browser) {
             ] of responseLocation.visibleTimeSlots.entries()) {
                 //strip time so we group by date, but then force midnight local time zone to avoid UTC dateline issues
                 const date = new Date(`${timeSlot.time.split("T")[0]}T00:00`);
-                const formattedDate = `${
-                    date.getMonth() + 1
-                }/${date.getDate()}/${date.getFullYear()}`;
+                const formattedDate = `${date.getMonth() + 1
+                    }/${date.getDate()}/${date.getFullYear()}`;
                 if (!availability[formattedDate]) {
                     availability[formattedDate] = {
                         hasAvailability: true,
@@ -35,7 +31,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             }
         }
         return {
-            name: `${siteName} (${loc.city})`,
+            name: `${site.name} (${loc.city})`,
             hasAvailability,
             availability,
             signUpLink: site.signUpLink,

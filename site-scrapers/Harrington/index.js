@@ -1,9 +1,9 @@
+const { site } = require("./config");
 const https = require("https");
 const moment = require("moment");
-const sites = require("../data/sites.json");
 
 module.exports = async function GetAvailableAppointments() {
-    console.log("Harrington starting.");
+    console.log(`${site.name} starting.`);
     const {
         name,
         website,
@@ -11,10 +11,10 @@ module.exports = async function GetAvailableAppointments() {
         restrictedWebsite,
         restrictedSignUpLink,
         ...restHarrington
-    } = sites.Harrington;
+    } = site;
     const webData = await ScrapeWebsiteData(website);
     const restrictedWebData = await ScrapeWebsiteData(restrictedWebsite);
-    console.log("Harrington done.");
+    console.log(`${site.name} done.`);
 
     return [
         {
