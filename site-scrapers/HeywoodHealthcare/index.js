@@ -1,4 +1,4 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 
 const noAppointmentMatchString =
     "All appointment types are private, none are available for scheduling.";
