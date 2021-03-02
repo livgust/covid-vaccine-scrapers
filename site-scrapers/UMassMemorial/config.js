@@ -1,4 +1,5 @@
-const signUpLink = "https://mychartonline.umassmemorial.org/mychart/openscheduling?specialty=15&hidespecialtysection=1"
+const signUpLink =
+    "https://mychartonline.umassmemorial.org/mychart/openscheduling?specialty=15&hidespecialtysection=1";
 
 const sites = [
     {
@@ -15,7 +16,8 @@ const sites = [
         signUpLink,
     },
     {
-        name: "UMMHC HealthAlliance Clinton Hospital Leominster Campus – Simonds Building Guild Conference Vaccine Clinic",
+        name:
+            "UMMHC HealthAlliance Clinton Hospital Leominster Campus – Simonds Building Guild Conference Vaccine Clinic",
         departmentID: "104001144",
         signUpLink,
     },

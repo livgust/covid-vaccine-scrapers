@@ -361,8 +361,8 @@ const exampleWithError = {
     LatestDate: null,
     Specialty: null,
     VisitType: null,
-    ErrorCode: 'StartDateTooFarInFuture',
-    VisitTypeInfo: null
+    ErrorCode: "StartDateTooFarInFuture",
+    VisitTypeInfo: null,
 };
 
 describe("AddSiteInfo", () => {
@@ -370,27 +370,29 @@ describe("AddSiteInfo", () => {
         results = {};
         siteKey = Object.keys(exampleWithAvailability.AllDepartments)[0];
         siteInfo = exampleWithAvailability.AllDepartments[siteKey];
-        
-        mychart.AddSiteInfo(results, {default: 'default'}, siteKey, siteInfo)
-        
+
+        mychart.AddSiteInfo(results, { default: "default" }, siteKey, siteInfo);
+
         // should have key for department ID
         expect(results).to.have.property(siteKey);
-        
+
         // should add default values
-        expect(results[siteKey].default).to.equal('default');
-        
+        expect(results[siteKey].default).to.equal("default");
+
         // should add name and address
-        expect(results[siteKey].name).to.equal(siteInfo.Name)
-        expect(results[siteKey].street).to.equal(siteInfo.Address.Street.join(" "))
-        expect(results[siteKey].city).to.equal(siteInfo.Address.City)
-        expect(results[siteKey].zip).to.equal(siteInfo.Address.PostalCode)
+        expect(results[siteKey].name).to.equal(siteInfo.Name);
+        expect(results[siteKey].street).to.equal(
+            siteInfo.Address.Street.join(" ")
+        );
+        expect(results[siteKey].city).to.equal(siteInfo.Address.City);
+        expect(results[siteKey].zip).to.equal(siteInfo.Address.PostalCode);
     });
 });
 
 describe("UpdateResults", () => {
     it("should add site info and default data to results object", () => {
-        results = {};        
-        mychart.UpdateResults(results, exampleWithAvailability)
+        results = {};
+        mychart.UpdateResults(results, exampleWithAvailability);
 
         for (const [key, info] of Object.entries(results)) {
             if (key == 10098243) {
@@ -408,8 +410,8 @@ describe("UpdateResults", () => {
         }
     });
     it("should handle null values", () => {
-        results = {};        
-        mychart.UpdateResults(results, exampleWithError)
+        results = {};
+        mychart.UpdateResults(results, exampleWithError);
         expect(results).to.deep.equal({});
     });
 });
