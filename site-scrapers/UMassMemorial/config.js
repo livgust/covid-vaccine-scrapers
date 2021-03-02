@@ -11,13 +11,15 @@ const sites = [
         signUpLink,
     },
     {
-        name: "UMass Memorial Healthcare",
+        name: "UMass Memorial Mercantile Center",
+        street: "201 Commercial St.",
+        city: "Worcester",
+        zip: "01608",
         departmentID: "111029146",
         signUpLink,
     },
     {
-        name:
-            "UMMHC HealthAlliance Clinton Hospital Leominster Campus – Simonds Building Guild Conference Vaccine Clinic",
+        name: "UMMHC HealthAlliance Clinton Hospital Leominster Campus",
         departmentID: "104001144",
         signUpLink,
     },
