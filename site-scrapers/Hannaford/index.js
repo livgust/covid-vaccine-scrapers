@@ -1,5 +1,6 @@
 const { site } = require("./config");
 const rxTouch = require("../../lib/RxTouch.js");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
@@ -9,14 +10,12 @@ module.exports = async function GetAvailableAppointments(browser) {
         const response = webData[loc.zip];
         return {
             name: `${site.name} (${loc.city})`,
-            hasAvailability: false, // with current impl of rxTouch, we can't determine for sure if there's availability yet
-            extraData:
-                response && response.length
-                    ? response.substring(1, response.length - 1) //take out extra quotes
-                    : response,
+            hasAvailability: !!Object.keys(response.availability).length,
+            extraData: response.message,
+            availability: response.availability,
             signUpLink: site.website,
             ...loc,
-            timestamp: new Date(),
+            timestamp: moment().format(),
         };
     });
 };
