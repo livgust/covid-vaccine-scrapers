@@ -1,6 +1,6 @@
 const site = {
     name: "Heywood Healthcare",
-    street: "171 KENDALL POND W",
+    street: "171 Kendall Pond W",
     city: "Gardner",
     state: "MA",
     zip: "01440",
