@@ -4,7 +4,7 @@ const site = {
     city: "Gardner",
     state: "MA",
     zip: "01440",
-    signUpLink: "https://gardnervaccinations.as.me/schedule.php"
+    signUpLink: "https://gardnervaccinations.as.me/schedule.php",
 };
 
 module.exports = {

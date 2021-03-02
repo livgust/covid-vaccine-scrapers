@@ -15,8 +15,9 @@ async function ScrapeWebsiteData(browser) {
     await page.goto(site.signUpLink);
     // Is the clinic open?
     const alertElement = await page.$("div.alert[data-qa=error-notice]");
-    let alert = alertElement ? await alertElement.evaluate(
-        ((node) => node.innerText)) : null;
+    let alert = alertElement
+        ? await alertElement.evaluate((node) => node.innerText)
+        : null;
 
     return {
         hasAvailability: alert.indexOf(noAppointmentMatchString) === -1,
