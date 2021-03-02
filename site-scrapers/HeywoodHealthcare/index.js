@@ -4,14 +4,10 @@ const noAppointmentMatchString =
     "All appointment types are private, none are available for scheduling.";
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log(sites.HeywoodHealthcare.name + " starting.");
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log(sites.HeywoodHealthcare.name + " finished.");
-    return {
-        ...sites.HeywoodHealthcare,
-        ...webData,
-        timestamp: new Date(),
-    };
+    console.log(`${site.name} done.`);
+    return webData;
 };
 
 async function ScrapeWebsiteData(browser) {
