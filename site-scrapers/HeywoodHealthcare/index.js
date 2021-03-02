@@ -12,7 +12,7 @@ module.exports = async function GetAvailableAppointments(browser) {
 
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
-    await page.goto(sites.HeywoodHealthcare.signUpLink);
+    await page.goto(site.signUpLink);
     // Is the clinic open?
     const alert = await (
         await page.$("div.alert[data-qa=error-notice]")
