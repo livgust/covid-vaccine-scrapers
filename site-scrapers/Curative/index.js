@@ -67,6 +67,10 @@ module.exports = async function GetAvailableAppointments(browser) {
             };
         });
 
+        if (data.hasOwnProperty('visible_in_search') && !data.visible_in_search) {
+            mappedData.hasAvailability = false;
+        }
+
         return mappedData;
     });
 };
