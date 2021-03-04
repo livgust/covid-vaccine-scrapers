@@ -14,12 +14,12 @@ describe("Transformations", () => {
             .reply(200, `{"token":"${token}"}`);
 
         // mock out the availability request
-        const response = `[{
+        const response = `{"results": [{
             "start": "2021-02-22T14:00:00+00:00",
             "end": "2021-02-22T14:04:00+00:00",
             "capacity": 1,
             "remaining_spaces":-1
-        }]`;
+        }]}`;
         nock("https://home.color.com")
             .get(
                 `/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=Natick%20Mall`
@@ -48,12 +48,12 @@ describe("Transformations", () => {
             .reply(200, `{"token":"${token}"}`);
 
         // mock out the availability request
-        const response = `[{
+        const response = `{"results":[{
             "start": "2021-02-22T14:00:00+00:00",
             "end": "2021-02-22T14:04:00+00:00",
             "capacity": 1,
             "remaining_spaces":1
-        }]`;
+        }]}`;
         nock("https://home.color.com")
             .get(
                 `/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=Natick%20Mall`
@@ -91,7 +91,7 @@ describe("Transformations", () => {
             .reply(200, `{"token":"${token}"}`);
 
         // mock out the availability request
-        const response = `[{
+        const response = `{"results":[{
             "start": "2021-02-22T14:00:00+00:00",
             "end": "2021-02-22T14:04:00+00:00",
             "capacity": 1,
@@ -108,7 +108,7 @@ describe("Transformations", () => {
             "end": "2021-02-23T14:08:00+00:00",
             "capacity": 1,
             "remaining_spaces":1
-        }]`;
+        }]}`;
         nock("https://home.color.com")
             .get(
                 `/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=Natick%20Mall`
