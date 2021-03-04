@@ -44,7 +44,7 @@ module.exports = async function GetAvailableAppointments(browser) {
         data.appointment_windows.forEach((appointment) => {
             const dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
             const { year, month, day } = appointment.start_time.match(
-                dateRegexp
+                dateRegexp,
             ).groups;
             const date = `${month}/${day}/${year}`;
             let newNumberAvailable =
@@ -71,7 +71,11 @@ module.exports = async function GetAvailableAppointments(browser) {
             data.hasOwnProperty("visible_in_search") &&
             !data.visible_in_search
         ) {
-            mappedData.hasAvailability = false;
+            // Commented out the following line because there is currently a
+            // waiting room for people to join for an event that starts at 8:30am.
+            // We should revisit this later after the appointments are gone.
+
+            //mappedData.hasAvailability = false;
         }
 
         return mappedData;
