@@ -71,7 +71,10 @@ module.exports = async function GetAvailableAppointments(browser) {
             data.hasOwnProperty("visible_in_search") &&
             !data.visible_in_search
         ) {
-            mappedData.hasAvailability = false;
+            // Commented out the following line because there is currently a
+            // waiting room for people to join for an event that starts at 8:30am.
+            // We should revisit this later after the appointments are gone.
+            //mappedData.hasAvailability = false;
         }
 
         return mappedData;
