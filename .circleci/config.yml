@@ -1,0 +1,36 @@
+# config file for circleci
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@1.4.0
+jobs:
+  build:
+    docker:
+      - image: circleci/node:14.15.4
+    steps:
+      - checkout
+      - restore_cache:
+          key: livgust-covid-vaccine-scrapers-{{ checksum "package.json" }}2
+      - run:
+          name: npm ci
+          command: npm ci
+      - run:
+          name: npm run build
+          command: npm run build
+      - run:
+          name: npm test
+          command: npm test
+      - run:
+          name: npm run predeploy
+          command: npm run predeploy
+      - run:
+          name: upload lamdba.zip to s3
+          command: aws s3 cp lambda.zip s3://covid-vaccine-scraper-test/lambda.zip
+      - run:
+          name: publish to lambda
+          command: aws lambda update-function-code --function-name scrapeCovidAppointmentDataTEST
+                   --s3-bucket covid-vaccine-scraper-test --s3-key lambda.zip --publish
+      - save_cache:
+          paths:
+            - ~/.npm
+            - node_modules
+          key: livgust-covid-vaccine-scrapers-{{ checksum "package.json" }}2
