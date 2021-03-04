@@ -61,10 +61,13 @@ module.exports = async function GetAvailableAppointments(browser) {
                     mappedData.availability[date].numberAvailableAppointments;
             }
 
-            mappedData.availability[date] = {
-                numberAvailableAppointments: newNumberAvailable,
-                hasAvailability: !!newNumberAvailable,
-            };
+            // Only add date keys if there are appointments
+            if (newNumberAvailable) {
+                mappedData.availability[date] = {
+                    numberAvailableAppointments: newNumberAvailable,
+                    hasAvailability: true,
+                };
+            }
         });
 
         if (
