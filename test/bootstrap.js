@@ -7,17 +7,21 @@ const globalVariables = _.pick(global, ["browser", "expect"]);
 const dotenv = require("dotenv");
 dotenv.config();
 
-// puppeteer options
-const opts = {
-    headless: true,
-    executablePath: process.env.CHROMEPATH,
-    timeout: 0,
-};
-
 // expose variables
 before(async function () {
     global.expect = expect;
-    global.browser = await puppeteer.launch(opts);
+    global.browser = process.env.DEVELOPMENT
+        ? await puppeteer.launch({
+              executablePath: process.env.CHROMEPATH,
+              headless: true,
+          })
+        : await puppeteer.launch({
+              args: chromium.args,
+              defaultViewport: chromium.defaultViewport,
+              executablePath: await chromium.executablePath,
+              headless: chromium.headless,
+              ignoreHTTPSErrors: true,
+          });
 });
 
 // close browser and reset global variables
