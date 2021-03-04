@@ -1,4 +1,6 @@
-const puppeteer = require("puppeteer");
+const chromium = require("chrome-aws-lambda");
+const { addExtra } = require("puppeteer-extra");
+const puppeteer = addExtra(chromium.puppeteer);
 const { expect } = require("chai");
 const _ = require("lodash");
 const globalVariables = _.pick(global, ["browser", "expect"]);
