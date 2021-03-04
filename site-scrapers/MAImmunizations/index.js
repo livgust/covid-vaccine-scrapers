@@ -1,10 +1,10 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 const fetch = require("node-fetch");
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log("MAImmunizations starting.");
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log("MAImmunizations done.");
+    console.log(`${site.name} done.`);
     return Object.values(webData);
 };
 
@@ -12,7 +12,7 @@ async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(1 * 60 * 1000);
 
-    await page.goto(sites.MAImmunizations.website);
+    await page.goto(site.website);
     const pages = await page.$$(
         "nav.pagination span.page:not(.prev):not(.next)"
     );
@@ -36,10 +36,7 @@ async function ScrapeWebsiteData(browser) {
     for (let pageNumber = 1; pageNumber <= maxPage; pageNumber++) {
         if (pageNumber != 1) {
             await page.goto(
-                sites.MAImmunizations.website.replace(
-                    "page=1",
-                    "page=" + pageNumber
-                )
+                site.website.replace("page=1", "page=" + pageNumber)
             );
         }
 
@@ -104,7 +101,7 @@ async function ScrapeWebsiteData(browser) {
                   )
                 : null;
             if (signUpLink) {
-                signUpLink = sites.MAImmunizations.baseWebsite + signUpLink;
+                signUpLink = site.baseWebsite + signUpLink;
             }
 
             results[uniqueID].availability[date] = {
@@ -112,7 +109,7 @@ async function ScrapeWebsiteData(browser) {
                 numberAvailableAppointments: availableAppointments,
                 signUpLink: availableAppointments ? signUpLink : null,
             };
-            if (!!availableAppointments) {
+            if (availableAppointments) {
                 results[uniqueID].hasAvailability = true;
             }
         }

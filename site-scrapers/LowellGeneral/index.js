@@ -1,14 +1,11 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 const https = require("https");
 const html_parser = require("node-html-parser");
 
-const siteName = "Lowell General";
-const site = sites[siteName];
-
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log(`${siteName} starting.`);
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    console.log(`${siteName} done.`);
+    console.log(`${site.name} done.`);
     return webData;
 };
 
@@ -90,7 +87,14 @@ function parseAvailability(body) {
     body = body.substring(38, body.length - 2);
     let justHTML = body.split('time_slots_div":"')[1];
     justHTML = justHTML.substring(0, justHTML.length - 2);
-    const parsedHTML = html_parser.parse(justHTML);
+
+    // When parsing real responses it was necessary to convert the unicode to ASCII
+    const parsedHTML = html_parser.parse(
+        justHTML.replace(/\\u[\dA-F]{4}/gi, function (match) {
+            return String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16));
+        })
+    );
+
     const rows = parsedHTML.querySelectorAll(
         ".time-slot-table-container table tr"
     );
@@ -106,19 +110,41 @@ function parseAvailability(body) {
                 // For some reason the html parser we are using
                 // doesn't calculate the cellIndex so we have to.
                 tdIndex += 1;
-                const numLIs = td.childNodes[1].childNodes.length;
-                if (numLIs) {
+                if (!td.childNodes[1]) {
+                    return;
+                }
+                // const numLIs = td.childNodes[1].childNodes.length;
+                const ulHTML = td.childNodes[1].innerHTML;
+                const ul = html_parser.parse(ulHTML);
+
+                const LIs = ul.querySelectorAll("li");
+                let countNotHiddenLIs = 0;
+
+                // There are other LIs that do not represent actual slots
+                // so we don't count those.
+                LIs.map((li) => {
+                    if (
+                        li.rawAttrs.indexOf("hidden") === -1 &&
+                        li.rawAttrs.indexOf("slot") > -1 &&
+                        (li.rawText.includes("am") || li.rawText.includes("pm"))
+                    ) {
+                        countNotHiddenLIs += 1;
+                    }
+                });
+
+                if (countNotHiddenLIs) {
                     // Ex headerText: Sat  Mar 20
                     // There's an extra space between the Day of the week and
-                    // the month hence [2] returns the month and so on
-                    const headerText = headers.childNodes[tdIndex].innerText;
-                    const thMonth = headerText.split(" ")[2];
-                    const thDay = headerText.split(" ")[3];
+                    // so we remove double spaces
+                    const headerText = headers.childNodes[
+                        tdIndex
+                    ].innerText.replace(/ {2,}/g, " ");
+                    const thMonth = headerText.split(" ")[1];
+                    const thDay = leadZero(headerText.split(" ")[2]);
                     const [month, year] = getYearForMonth(thMonth);
                     const formattedDate = [month, thDay, year].join("/");
                     // length of LIs found is number of appointments
-                    const slots = td.childNodes[1].childNodes.length;
-                    availability[formattedDate] = slots;
+                    availability[formattedDate] = countNotHiddenLIs;
                     hasAvailability = true;
                 }
             }
@@ -208,9 +234,17 @@ async function ScrapeWebsiteData(browser) {
             availability[dateKey].numberAvailableAppointments +=
                 stationAvailability[dateKey];
         }
+
+        // Sort the keys since we get dates out of order.
+        availability = Object.keys(availability)
+            .sort()
+            .reduce((obj, key) => {
+                obj[key] = availability[key];
+                return obj;
+            }, {});
     }
     return {
-        name: siteName,
+        name: site.name,
         hasAvailability,
         availability,
         ...site,

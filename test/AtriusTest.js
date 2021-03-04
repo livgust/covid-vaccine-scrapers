@@ -1,5 +1,4 @@
 const assert = require("assert");
-const sites = require("../data/sites.json");
 const nock = require("nock");
 const mock = require("mock-require");
 const chai = require("chai");
