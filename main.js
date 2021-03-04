@@ -78,6 +78,13 @@ async function execute() {
         }
 
         const responseJson = {
+            // Version number of the file
+            version: 1,
+
+            // Timestamp for the archived data.json file.
+            timestamp: s3.getTimestampForFile(),
+
+            // Add geocoding for all locations
             results: await getAllCoordinates(finalResultsArray, cachedResults),
         };
 
@@ -89,7 +96,7 @@ async function execute() {
             file.write("out.json", webData);
             return responseJson;
         } else {
-            const uploadResponse = await s3.saveWebData(webData);
+            const uploadResponse = await s3.saveWebData(webData, responseJson.timestamp);
             return uploadResponse;
         }
     };
