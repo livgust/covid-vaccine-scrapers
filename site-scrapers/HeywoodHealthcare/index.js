@@ -41,6 +41,7 @@ async function ScrapeWebsiteData(browser) {
     let alert = alertElement
         ? await alertElement.evaluate((node) => node.innerText)
         : false;
+    let hasAppointments = false;
     let totalAvailability = 0;
     if (!alert) {
         // Pull table with appointments
@@ -60,10 +61,15 @@ async function ScrapeWebsiteData(browser) {
                 totalAvailability += spotNum;
             }
         });
+
+        if(totalAvailability > 0)
+        {
+            hasAppointments = true;
+        }
     }
 
     return {
-        hasAppointments: alert.indexOf(noAppointmentMatchString) === -1,
+        hasAppointments: hasAppointments,
         totalAvailability: totalAvailability,
     };
 }
