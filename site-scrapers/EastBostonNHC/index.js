@@ -3,7 +3,6 @@ const moment = require("moment");
 const lodash = require("lodash");
 const https = require("https");
 
-// TODO: - paginate (get multiple pages so we can show >100 results), look farther into the future for appointments
 module.exports = async function GetAvailableAppointments(
     _browser, // gets passed from main.js but we dont use it here
     availabilityService = getAvailabilityService()
