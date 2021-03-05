@@ -19,10 +19,8 @@ describe(`${site.name}`, function () {
 
     it("Test against live site", async function () {
         await page.goto(site.signUpLink);
-        await expect(heywood(browser)).to.eventually.include({
-            hasAppointments: false,
-            totalAvailability: 0,
-        });
+        await expect(heywood(browser)).to.eventually.have.keys([
+            'hasAppointments', 'totalAvailability' ]);
     });
 
     it("Test against mock'd site with no alert", async function () {
