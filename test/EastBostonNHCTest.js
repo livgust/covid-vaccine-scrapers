@@ -9,7 +9,7 @@ const fakeLoginResponse = {
 
 const fakeAvailabilityResponse = {
     page: 1,
-    size: 2,
+    size: 4,
     response: [
         {
             _id: "603fe04156700900a0285848",
@@ -50,23 +50,78 @@ const fakeAvailabilityResponse = {
     ],
 };
 
+function removeTimestamps(results) {
+    return results.map((entry) => {
+        const { timestamp, ...rest } = entry;
+        return rest;
+    });
+}
+
 describe("East Boston NHC Availability Scraper", function () {
     it("should return availability ", async () => {
         const eastBostonNHC = require("../site-scrapers/EastBostonNHC");
         console.log(eastBostonNHC);
         const availabilityService = {
-            async getLoginResponse() {
+            async getLoginResponseHttps() {
                 return Promise.resolve(fakeLoginResponse);
             },
-            async getAvailabilityResponse() {
+            async getAvailabilityResponseHttps() {
                 return Promise.resolve(fakeAvailabilityResponse);
             },
         };
-        return expect(
-            eastBostonNHC.GetAllAvailability(availabilityService, "02144")
-        ).to.eventually.deep.equal({
-            "02118": {
-                // index by zip of the facility? probably.
+        const results = removeTimestamps(
+            await eastBostonNHC(null, availabilityService)
+        );
+
+        return expect(results).to.deep.equal([
+            {
+                name: "East Boston Neighborhood Health Center (Revere - 02151)",
+                hasAvailability: true,
+                availability: {
+                    "2021-03-08": {
+                        hasAvailability: true,
+                        numberAvailableAppointments: 1,
+                    },
+                },
+                signUpLink:
+                    "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
+                extraData:
+                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                street: "10 Garofalo St",
+                city: "Revere",
+                zip: "02151",
+                facility_id: "6011f3c1fa2b92009a1c0e28",
+            },
+            {
+                name:
+                    "East Boston Neighborhood Health Center (Chelsea - 02150)",
+                hasAvailability: false,
+                availability: {},
+                signUpLink:
+                    "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
+                extraData:
+                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                street: "318 Broadway",
+                city: "Chelsea",
+                zip: "02150",
+                facility_id: "601a236ff7f880001333e993",
+            },
+            {
+                name: "East Boston Neighborhood Health Center (Boston - 02128)",
+                hasAvailability: false,
+                availability: {},
+                signUpLink:
+                    "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
+                extraData:
+                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                street: "120 Liverpool St",
+                city: "Boston",
+                zip: "02128",
+                facility_id: "6011f3c1fa2b92009a1c0e24",
+            },
+            {
+                name: "East Boston Neighborhood Health Center (Boston - 02118)",
+                hasAvailability: true,
                 availability: {
                     "2021-03-08": {
                         hasAvailability: true,
@@ -77,16 +132,15 @@ describe("East Boston NHC Availability Scraper", function () {
                         numberAvailableAppointments: 1,
                     },
                 },
+                signUpLink:
+                    "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
+                extraData:
+                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                street: "1601 Washington St",
+                city: "Boston",
+                zip: "02118",
+                facility_id: "6011f3c1fa2b92009a1c0e2a",
             },
-            "02151": {
-                // index by zip of the facility? probably.
-                availability: {
-                    "2021-03-08": {
-                        hasAvailability: true,
-                        numberAvailableAppointments: 1,
-                    },
-                },
-            },
-        });
+        ]);
     });
 });

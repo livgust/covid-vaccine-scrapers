@@ -2,6 +2,7 @@ const { site } = require("./config");
 const fetch = require("node-fetch");
 const moment = require("moment");
 const lodash = require("lodash");
+const https = require("https");
 
 // appointmentTypes seem not to matter.
 // facilityIDs line up with locations.
@@ -25,24 +26,84 @@ async function getFetchResponse(page, url, method, headers, body) {
         body
     );
 }
+
+async function getHttpsResponse(url, method, headers, inputBody) {
+    const options = {
+        method,
+        headers,
+    };
+    const promiseToRes = new Promise((resolve) => {
+        const req = https.request(url, options, (res) => {
+            let body = "";
+            console.log(`statusCode: ${res.statusCode}`);
+            res.on("data", (chunk) => {
+                body += chunk;
+            });
+            res.on("end", () => {
+                resolve(body);
+            });
+        });
+        req.on("error", (error) => {
+            console.error(error);
+        });
+        if (inputBody) {
+            req.write(inputBody);
+        }
+        req.end();
+    });
+
+    // const tokenPromise = new Promise((resolve) => {
+    //     https
+    //         .request(url, options, (res) => {
+    //             let body = "";
+    //             res.on("data", (chunk) => {
+    //                 body += chunk;
+    //             });
+    //             res.on("end", () => {
+    //                 resolve(body);
+    //             });
+    //         })
+    //         .on("error", (e) => {
+    //             console.error(
+    //                 `Error making request with options ${options} for EastBostonNHC` +
+    //                     e
+    //             );
+    //         })
+    //         // .write(inputBody)
+    //         .end();
+    // });
+    const tokenResp = await promiseToRes;
+    return JSON.parse(tokenResp);
+}
+
 // the function to unit test. will return an availability dictionary.
 async function GetAllAvailability(availabilityService) {
     // Fetch 1
-    const loginResponse = await availabilityService.getLoginResponse();
-    console.log("got loginResponse", loginResponse);
+    // const loginResponse = await availabilityService.getLoginResponse();
+    // console.log("got loginResponse", loginResponse);
 
-    const accessToken = JSON.parse(loginResponse).token;
-    console.log("got loginToken", accessToken);
+    // const accessToken = JSON.parse(loginResponse).token;
+    // console.log("got loginToken", accessToken);
 
-    // Fetch 2
-    const rawAvailability = await availabilityService.getAvailabilityResponse(
-        accessToken
+    const loginResponseHttps = await availabilityService.getLoginResponseHttps();
+    console.log("got loginResponseHttps", loginResponseHttps);
+
+    const accessTokenHttps = loginResponseHttps.token;
+    console.log("got accessTokenHttps", accessTokenHttps);
+
+    // // Fetch 2
+    // const rawAvailability = await availabilityService.getAvailabilityResponse(
+    //     accessToken
+    // );
+
+    const rawAvailabilityHttps = await availabilityService.getAvailabilityResponseHttps(
+        accessTokenHttps
     );
     // parse appointmentsResponse
 
-    // console.log('raw', JSON.parse(rawAvailability)
+    console.log("raw", rawAvailabilityHttps);
 
-    const availabilityObj = JSON.parse(rawAvailability).response.reduce(
+    const availabilityObj = rawAvailabilityHttps.response.reduce(
         (acc, appointment) => {
             const zip = appointment.facility.postcode;
             const date = appointment.date.split("T")[0]; // get 2021-03-08 from 2021-03-08T22:40:00.000Z
@@ -90,45 +151,43 @@ async function GetAllAvailability(availabilityService) {
     // should return webData in the correct format, by zip code
     return availabilityObj;
 }
-function getAvailabilityService(page) {
+function getAvailabilityService() {
     return {
-        async getLoginResponse() {
-            return await getFetchResponse(
-                page,
+        async getLoginResponseHttps() {
+            const data = JSON.stringify({ id: "600f45213901d90012deb171" });
+            return await getHttpsResponse(
                 "https://api.lumahealth.io/api/widgets/login",
                 "POST",
                 {
                     "Content-Type": "application/json;charset=UTF-8",
+                    "Content-Length": data.length,
                 },
-                JSON.stringify({ id: "600f45213901d90012deb171" })
+                data
             );
         },
-        async getAvailabilityResponse(accessToken) {
-            return await getFetchResponse(
-                page, // todo - swap out the date to be today + 30 days?
+
+        async getAvailabilityResponseHttps(accessToken) {
+            return await getHttpsResponse(
                 "https://api.lumahealth.io/api/scheduler/availabilities?appointmentType=6011f3c4fa2b92009a1c0f43&date=%3E2021-03-03T00%3A00%3A00-05%3A00&date=%3C2021-03-23T23%3A59%3A59-04%3A00&facility=6011f3c1fa2b92009a1c0e28%2C6011f3c1fa2b92009a1c0e24%2C601a236ff7f880001333e993%2C601a236ff7f880001333e993%2C6011f3c1fa2b92009a1c0e2a&includeNullApptTypes=true&limit=100&page=1&patientForm=603fd7026345ba0013a476ef&populate=true&provider=601a24ac98d5e900120d2582%2C6011f3c2fa2b92009a1c0e59%2C6011f3c2fa2b92009a1c0e69%2C6011f3c2fa2b92009a1c0e6d&sort=date&sortBy=asc&status=available",
                 "GET",
                 {
                     "x-access-token": accessToken,
-                },
-                null
+                }
             );
         },
     };
 }
 
-module.exports = async function GetAvailableAppointments(browser) {
+module.exports = async function GetAvailableAppointments(
+    _browser, // gets passed from main.js but we dont use
+    availabilityService = getAvailabilityService()
+) {
     console.log(`${site.name} starting.`);
-    const page = await browser.newPage();
-    const availabilityService = getAvailabilityService(page);
+    // const availabilityService = getAvailabilityService();
 
-    const webData = await GetAllAvailability(
-        availabilityService,
-        site.locations
-    );
+    const webData = await GetAllAvailability(availabilityService);
     // start with 100 appointments, worry about pagination later.
 
-    // const webData = true;
     console.log("got webData", webData);
 
     console.log(`${site.name} done.`);
