@@ -18,7 +18,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm test
-      - run: npx prettier --check ./
+      - run: npm run predeploy
       - run: aws s3 cp lambda.zip s3://covid-vaccine-scraper-test/lambda.zip
       - run: aws lambda update-function-code --function-name scrapeCovidAppointmentDataTEST \
                    --s3-bucket covid-vaccine-scraper-test --s3-key lambda.zip --publish
+      - run: npx prettier --check ./
