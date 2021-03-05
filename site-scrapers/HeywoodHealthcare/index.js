@@ -62,8 +62,7 @@ async function ScrapeWebsiteData(browser) {
             }
         });
 
-        if(totalAvailability > 0)
-        {
+        if (totalAvailability > 0) {
             hasAppointments = true;
         }
     }
