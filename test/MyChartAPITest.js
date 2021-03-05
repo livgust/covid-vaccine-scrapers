@@ -398,8 +398,11 @@ describe("UpdateResults", () => {
             if (key == 10098243) {
                 // this is the only site that has availability
                 expect(info.hasAvailability).to.equal(true);
-                expect(Object.keys(info.availability).length).to.equal(1);
-                expect(Object.values(info.availability)[0]).to.deep.equal({
+                // check that the only date with availability is 3/4/21
+                expect(Object.keys(info.availability)).to.deep.equal([
+                    "3/4/2021",
+                ]);
+                expect(info.availability["3/4/2021"]).to.deep.equal({
                     numberAvailableAppointments: 1,
                     hasAvailability: true,
                 });
