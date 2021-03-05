@@ -10,9 +10,11 @@ jobs:
       matrix:
         node-version: [14.x]
     steps:
-      - name: Setting up dependencies
-        run: sudo apt-get -q -y update
-        run: sudo apt-get -q -y install chromium-browser
+      - name: Install chromium browser
+        run: |
+          sudo apt-get -q -y update
+          sudo apt-get -q -y install chromium-browser
+      - name: Set timezone to America/New_York
         run: sudo timedatectl set-timezone America/New_York
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
