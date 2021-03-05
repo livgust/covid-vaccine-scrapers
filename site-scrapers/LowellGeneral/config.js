@@ -7,6 +7,7 @@ const site = {
     city: "Lowell",
     state: "MA",
     zip: "01854",
+    noAppointments: /Vaccine appointments are full at this time due to high demand and our scheduling tool is now offline./,
 };
 
 module.exports = {

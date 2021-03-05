@@ -61,17 +61,23 @@ module.exports = async function GetAvailableAppointments(browser) {
                     mappedData.availability[date].numberAvailableAppointments;
             }
 
-            mappedData.availability[date] = {
-                numberAvailableAppointments: newNumberAvailable,
-                hasAvailability: !!newNumberAvailable,
-            };
+            // Only add date keys if there are appointments
+            if (newNumberAvailable) {
+                mappedData.availability[date] = {
+                    numberAvailableAppointments: newNumberAvailable,
+                    hasAvailability: true,
+                };
+            }
         });
 
         if (
             data.hasOwnProperty("visible_in_search") &&
             !data.visible_in_search
         ) {
-            mappedData.hasAvailability = false;
+            // Commented out the following line because there is currently a
+            // waiting room for people to join for an event that starts at 8:30am.
+            // We should revisit this later after the appointments are gone.
+            //mappedData.hasAvailability = false;
         }
 
         return mappedData;
