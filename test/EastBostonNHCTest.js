@@ -12,7 +12,6 @@ const fakeAvailabilityResponse = {
     size: 4,
     response: [
         {
-            _id: "603fe04156700900a0285848",
             facility: {
                 _id: "6011f3c1fa2b92009a1c0e2a",
                 name: "COVID19 VACCINE SOUTH END",
@@ -21,7 +20,6 @@ const fakeAvailabilityResponse = {
             date: "2021-03-08T22:20:00.000Z",
         },
         {
-            _id: "603fe04156700900a0285848",
             facility: {
                 _id: "6011f3c1fa2b92009a1c0e2a",
                 name: "COVID19 VACCINE SOUTH END",
@@ -30,7 +28,6 @@ const fakeAvailabilityResponse = {
             date: "2021-03-08T22:30:00.000Z",
         },
         {
-            _id: "603fe04156700900a0285849",
             facility: {
                 _id: "6011f3c1fa2b92009a1c0e2a",
                 name: "COVID19 VACCINE SOUTH END",
@@ -39,7 +36,6 @@ const fakeAvailabilityResponse = {
             date: "2021-03-09T22:40:00.000Z",
         },
         {
-            _id: "603fe04156700900a0285849",
             facility: {
                 _id: "6011f3c1fa2b92009a1c0e28",
                 name: "COVID19 VACCINE REVERE",
@@ -58,14 +54,13 @@ function removeTimestamps(results) {
 }
 
 describe("East Boston NHC Availability Scraper", function () {
-    it("should return availability ", async () => {
+    it("should return availability", async () => {
         const eastBostonNHC = require("../site-scrapers/EastBostonNHC");
-        console.log(eastBostonNHC);
         const availabilityService = {
-            async getLoginResponseHttps() {
+            async getLoginResponse() {
                 return Promise.resolve(fakeLoginResponse);
             },
-            async getAvailabilityResponseHttps() {
+            async getAvailabilityResponse() {
                 return Promise.resolve(fakeAvailabilityResponse);
             },
         };
@@ -90,7 +85,6 @@ describe("East Boston NHC Availability Scraper", function () {
                 street: "10 Garofalo St",
                 city: "Revere",
                 zip: "02151",
-                facility_id: "6011f3c1fa2b92009a1c0e28",
             },
             {
                 name:
@@ -104,7 +98,6 @@ describe("East Boston NHC Availability Scraper", function () {
                 street: "318 Broadway",
                 city: "Chelsea",
                 zip: "02150",
-                facility_id: "601a236ff7f880001333e993",
             },
             {
                 name: "East Boston Neighborhood Health Center (Boston - 02128)",
@@ -117,7 +110,6 @@ describe("East Boston NHC Availability Scraper", function () {
                 street: "120 Liverpool St",
                 city: "Boston",
                 zip: "02128",
-                facility_id: "6011f3c1fa2b92009a1c0e24",
             },
             {
                 name: "East Boston Neighborhood Health Center (Boston - 02118)",
@@ -139,7 +131,6 @@ describe("East Boston NHC Availability Scraper", function () {
                 street: "1601 Washington St",
                 city: "Boston",
                 zip: "02118",
-                facility_id: "6011f3c1fa2b92009a1c0e2a",
             },
         ]);
     });
