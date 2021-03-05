@@ -2,6 +2,8 @@ const https = require("https");
 const { site } = require("./config");
 const mychart = require("../../lib/MyChartAPI.js");
 
+const dept = "12701803";
+
 module.exports = async function GetAvailableAppointments() {
     console.log("Atrius starting.");
     const webData = await ScrapeWebsiteData();
@@ -46,7 +48,7 @@ async function ScrapeWebsiteData() {
     ] = await mychart.GetCookieAndVerificationToken(site.dphLink);
 
     // Setup the return object.
-    return mychart.AddFutureWeeks(
+    const results = mychart.AddFutureWeeks(
         "myhealth.atriushealth.org",
         "/OpenScheduling/OpenScheduling/GetScheduleDays",
         cookie,
@@ -54,6 +56,9 @@ async function ScrapeWebsiteData() {
         10,
         PostDataCallback
     );
+    // object returned from AddFutureWeeks maps dept ID -> availability info
+    // here, we want to just return availability info for relevant dept.
+    return results[dept];
 }
 
 /**
