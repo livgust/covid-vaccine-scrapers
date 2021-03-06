@@ -34,7 +34,7 @@ async function ScrapeWebsiteData() {
 
     return mychart.AddFutureWeeks(
         "mychartscheduling.bmc.org",
-        "/MyChartscheduling/OpenScheduling/OpenScheduling/GetOpeningsForProvider?noCache=0.4024598146273777",
+        `/MyChartscheduling/OpenScheduling/OpenScheduling/GetOpeningsForProvider?noCache=${Math.random()}`,
         cookie,
         verificationToken,
         10,
