@@ -1,7 +1,7 @@
 const { site } = require("./config");
 const moment = require("moment");
 const lodash = require("lodash");
-const https = require("https");
+const fetch = require("node-fetch");
 
 module.exports = async function GetAvailableAppointments(
     _browser, // gets passed from main.js but we dont use it here
@@ -62,48 +62,33 @@ async function GetAllAvailability(availabilityService) {
     }, {});
 }
 
-async function getHttpsResponse(url, method, headers, inputBody) {
-    const responsePromise = new Promise((resolve) => {
-        const req = https.request(
-            url,
-            {
-                method,
-                headers,
-            },
-            (res) => {
-                let body = "";
-                res.on("data", (chunk) => {
-                    body += chunk;
-                });
-                res.on("end", () => {
-                    resolve(body);
-                });
-            }
-        );
-        req.on("error", (error) => {
-            console.error(error);
-        });
-        if (inputBody) {
-            req.write(inputBody);
+async function fetchResponse({url, method, headers, body}) {
+    return await fetch(url, {
+        method,
+        body,
+        headers,
+    }).then(
+        (res) => res.json(),
+        (err) => {
+            console.error(err);
+            return null;
         }
-        req.end();
-    });
-    return JSON.parse(await responsePromise);
+    );
 }
 
 function getAvailabilityService() {
     return {
         async getLoginResponse() {
             const data = JSON.stringify({ id: "600f45213901d90012deb171" });
-            return await getHttpsResponse(
-                "https://api.lumahealth.io/api/widgets/login",
-                "POST",
-                {
+            return await fetchResponse({
+                url: "https://api.lumahealth.io/api/widgets/login",
+                method: "POST",
+                headers: {
                     "Content-Type": "application/json;charset=UTF-8",
                     "Content-Length": data.length,
                 },
-                data
-            );
+                body: data
+            });
         },
 
         async getAvailabilityResponse(accessToken) {
@@ -111,13 +96,26 @@ function getAvailabilityService() {
             const startDate = moment().format("YYYY-MM-DD");
             const endDate = moment().add(20, "days").format("YYYY-MM-DD");
 
-            return await getHttpsResponse(
-                `https://api.lumahealth.io/api/scheduler/availabilities?appointmentType=6011f3c4fa2b92009a1c0f43&date=%3E${startDate}T00%3A00%3A00-05%3A00&date=%3C${endDate}T23%3A59%3A59-04%3A00&facility=6011f3c1fa2b92009a1c0e28%2C6011f3c1fa2b92009a1c0e24%2C601a236ff7f880001333e993%2C601a236ff7f880001333e993%2C6011f3c1fa2b92009a1c0e2a&includeNullApptTypes=true&limit=100&page=1&patientForm=603fd7026345ba0013a476ef&populate=true&provider=601a24ac98d5e900120d2582%2C6011f3c2fa2b92009a1c0e59%2C6011f3c2fa2b92009a1c0e69%2C6011f3c2fa2b92009a1c0e6d&sort=date&sortBy=asc&status=available`,
-                "GET",
-                {
-                    "x-access-token": accessToken,
-                }
-            );
+            return await fetchResponse({
+                url: [
+                    "https://api.lumahealth.io/api/scheduler/availabilities?appointmentType=6011f3c4fa2b92009a1c0f43",
+                    `date=%3E${startDate}T00%3A00%3A00-05%3A00`,
+                    `date=%3C${endDate}T23%3A59%3A59-04%3A00`,
+                    "facility=6011f3c1fa2b92009a1c0e28%2C6011f3c1fa2b92009a1c0e24%2C601a236ff7f880001333e993%2C601a236ff7f880001333e993%2C6011f3c1fa2b92009a1c0e2a",
+                    "includeNullApptTypes=true",
+                    "limit=100",
+                    "page=1",
+                    "patientForm=603fd7026345ba0013a476ef",
+                    "populate=true",
+                    "provider=601a24ac98d5e900120d2582%2C6011f3c2fa2b92009a1c0e59%2C6011f3c2fa2b92009a1c0e69%2C6011f3c2fa2b92009a1c0e6d",
+                    "sort=date",
+                    "sortBy=asc",
+                    "status=available",
+                ].join("&"), 
+                method: "GET", 
+                headers: {
+                "x-access-token": accessToken,
+            }});
         },
     };
 }
