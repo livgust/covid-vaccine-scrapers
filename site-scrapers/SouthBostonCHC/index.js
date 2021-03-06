@@ -36,7 +36,7 @@ async function ScrapeWebsiteData() {
 }
 
 /**
- * This is the callback function.
+ * mychart.AddFutureWeeks calls this function to get the data it should POST to the API.
  * The string was retrieved from the Form Data found in a GetOpeningsForProvider request.
  */
 function PostDataCallback(startDateFormatted) {

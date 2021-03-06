@@ -36,7 +36,7 @@ async function ScrapeWebsiteData() {
 }
 
 /**
- * This is the callback function
+ * mychart.AddFutureWeeks calls this function to get the data it should POST to the API.
  */
 function PostDataCallback(startDateFormatted) {
     return `id=${siteId}&vt=${vt}&dept=${dept}&view=plain&start=${startDateFormatted}&filters=%7B%22Providers%22%3A%7B%2213300632%22%3Atrue%7D%2C%22Departments%22%3A%7B%22${dept}%22%3Atrue%7D%2C%22DaysOfWeek%22%3A%7B%220%22%3Atrue%2C%221%22%3Atrue%2C%222%22%3Atrue%2C%223%22%3Atrue%2C%224%22%3Atrue%2C%225%22%3Atrue%2C%226%22%3Atrue%7D%2C%22TimesOfDay%22%3A%22both%22%7D`;
