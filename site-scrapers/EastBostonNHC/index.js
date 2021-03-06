@@ -62,7 +62,7 @@ async function GetAllAvailability(availabilityService) {
     }, {});
 }
 
-async function fetchResponse({url, method, headers, body}) {
+async function fetchResponse({ url, method, headers, body }) {
     return await fetch(url, {
         method,
         body,
@@ -87,7 +87,7 @@ function getAvailabilityService() {
                     "Content-Type": "application/json;charset=UTF-8",
                     "Content-Length": data.length,
                 },
-                body: data
+                body: data,
             });
         },
 
@@ -111,11 +111,12 @@ function getAvailabilityService() {
                     "sort=date",
                     "sortBy=asc",
                     "status=available",
-                ].join("&"), 
-                method: "GET", 
+                ].join("&"),
+                method: "GET",
                 headers: {
-                "x-access-token": accessToken,
-            }});
+                    "x-access-token": accessToken,
+                },
+            });
         },
     };
 }
