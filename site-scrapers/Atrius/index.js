@@ -65,5 +65,13 @@ async function ScrapeWebsiteData() {
  * mychart.AddFutureWeeks calls this function to get the data it should POST to the API.
  */
 function PostDataCallback(startDateFormatted) {
-    return `view=grouped&specList=121&vtList=1424&start=${startDateFormatted}&filters=%7B%22Providers%22%3A%7B%7D%2C%22Departments%22%3A%7B%7D%2C%22DaysOfWeek%22%3A%7B%7D%2C%22TimesOfDay%22%3A%22both%22%7D`;
+    const { TimesOfDay } = mychart.CommonFilters;
+    return `view=grouped&specList=121&vtList=1424&start=${startDateFormatted}&filters=${encodeURIComponent(
+        JSON.stringify({
+            Providers: {},
+            Departments: {},
+            DaysOfWeek: {},
+            TimesOfDay,
+        })
+    )}`;
 }

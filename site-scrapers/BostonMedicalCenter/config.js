@@ -45,6 +45,9 @@ const sites = [
     },
 ];
 
+providerIDs = ["10033319", "10033364", "10033367", "10033370", "10033373"];
+
 module.exports = {
     sites,
+    providerIDs,
 };
