@@ -43,12 +43,15 @@ async function ScrapeWebsiteData(browser) {
         : false;
     let hasAppointments = false;
     let totalAvailability = 0;
+    let date = false;
     if (!alert) {
         // Pull table with appointments
         const dateElement = await page.$(
             "div#step-pick-appointment table.class-list > tbody > tr.class-date-row > td > span.babel-ignore"
         );
-        let date = await dateElement.evaluate((node) => node.innerText);
+        if(dateElement) {
+            date = await dateElement.evaluate((node) => node.innerText);
+        }
         const spotsArray = await page.$$eval(
             "div#step-pick-appointment table.class-list > tbody > tr.class-class-row > td.class-signup-container > div.class-spots",
             (spots) => {
