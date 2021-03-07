@@ -49,7 +49,7 @@ async function ScrapeWebsiteData(browser) {
         const dateElement = await page.$(
             "div#step-pick-appointment table.class-list > tbody > tr.class-date-row > td > span.babel-ignore"
         );
-        if(dateElement) {
+        if (dateElement) {
             date = await dateElement.evaluate((node) => node.innerText);
         }
         const spotsArray = await page.$$eval(
