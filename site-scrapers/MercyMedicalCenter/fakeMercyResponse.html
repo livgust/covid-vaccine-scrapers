@@ -1,0 +1,114 @@
+`
+<div class="row">
+    <div class="col-xs-6 text-left">
+        <button
+            type="button"
+            class="btn btn-primary"
+            onclick="
+					ScheduleDay = '03/11/2021';
+					getListing();
+			"
+        >
+            &lt; Prev Day
+        </button>
+    </div>
+    <!--- div class="col-xs-6 text-center">
+			<form action="index.php" method="post">
+					<button name="SiteName" class="btn btn-primary" value="">Choose A New Site</button>
+			</form>
+	</div --->
+    <div class="col-xs-6 text-right">
+        <button
+            type="button"
+            class="btn btn-primary"
+            onclick="
+					ScheduleDay = '03/13/2021';
+					getListing();
+			"
+        >
+            Next Day &gt;
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 text-center">
+        <h4>
+            <div>
+                Please select a date and time to book your initial vaccine
+                appointment.
+                <strong
+                    >These appointments are only for a first dose of a COVID
+                    vaccination series.</strong
+                >
+                Individuals should generally return to the site where they
+                received their first dose to receive their second dose.
+            </div>
+        </h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 text-center">
+        <h4>
+            <div>
+                Second doses will be booked automatically with our clinic based
+                off the vaccine you receive during your first visit. You will be
+                notified of your 2nd appointment date/time by the clinic staff
+                when your first dose is administered.
+            </div>
+        </h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 text-center">
+        <input
+            type="hidden"
+            id="CurrentDayDisplay"
+            name="CurrentDayDisplay"
+            value="03/12/2021"
+        />
+        <h3 id="CurrentDay" data-date="03/12/2021" data-dayofweek="Friday">
+            <div>
+                Friday March 12, 2021
+                <input
+                    type="hidden"
+                    id="datepicker"
+                    name="datepicker"
+                    class="JQDatePicker"
+                    value="03/12/2021"
+                />
+            </div>
+        </h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="row">
+            <div class="col-sm-3 col-xs-6">
+                <div class="well">
+                    <div class="row">
+                        <div class="col-xs-12 text-left">
+                            11:15 AM - 11:30 AM
+                        </div>
+                    </div>
+                    <div class="row PadTop">
+                        <div class="col-xs-12 text-center">
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                onclick="
+													ReserveAppt('11:15 AM', '11:15 AM - 11:30 AM');
+											"
+                            >
+                                Reserve Appointment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+</div>
