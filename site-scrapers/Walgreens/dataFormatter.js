@@ -60,6 +60,7 @@ function extendData(availableStores, allStores) {
                 hasAvailability: false,
                 availability: {},
                 ...store,
+                timestamp: new Date(),
             });
         }
     });
@@ -121,6 +122,7 @@ function formatData(data, website) {
             signUpLink: website,
             hasAvailability,
             availability: availability,
+            timestamp: new Date(),
         };
     });
 }
