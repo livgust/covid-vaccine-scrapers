@@ -389,6 +389,42 @@ describe("AddSiteInfo", () => {
     });
 });
 
+describe("CommonPostDataCallback", () => {
+    it("should return a function", () => {
+        const res = mychart.CommonPostDataCallback([], [], "");
+        expect(res).to.be.a("function");
+    });
+
+    const startDateFormatted = "2021-03-07";
+
+    it("should return properly formatted data (when you call the returned function)", () => {
+        // this data is copied from the LynnTech scraper
+        const siteId = "13300632";
+        const vt = "1089";
+        const dept = "133001025";
+
+        // this line was copied from the previous implementation of the LynnTech scraper (before CommonPostDataCallback was added to MyChartAPI)
+        const lynnTechData = `id=${siteId}&vt=${vt}&dept=${dept}&view=plain&start=${startDateFormatted}&filters=%7B%22Providers%22%3A%7B%2213300632%22%3Atrue%7D%2C%22Departments%22%3A%7B%22${dept}%22%3Atrue%7D%2C%22DaysOfWeek%22%3A%7B%220%22%3Atrue%2C%221%22%3Atrue%2C%222%22%3Atrue%2C%223%22%3Atrue%2C%224%22%3Atrue%2C%225%22%3Atrue%2C%226%22%3Atrue%7D%2C%22TimesOfDay%22%3A%22both%22%7D`;
+
+        const res = mychart.CommonPostDataCallback(
+            [siteId],
+            [dept],
+            vt,
+            "plain"
+        )(startDateFormatted);
+        expect(res).to.equal(lynnTechData);
+    });
+
+    it("should default to view=grouped (when you call the returned function)", () => {
+        const res = mychart.CommonPostDataCallback(
+            ["1234"],
+            ["5678"],
+            "910"
+        )(startDateFormatted);
+        expect(res).to.contain("view=grouped");
+    });
+});
+
 describe("UpdateResults", () => {
     it("should add site info and default data to results object", () => {
         results = {};
