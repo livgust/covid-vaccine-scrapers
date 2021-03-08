@@ -1,4 +1,4 @@
-const sites = require("../data/sites.json");
+const { site } = require("./config");
 const moment = require("moment");
 const fetch = require("node-fetch");
 
@@ -14,13 +14,10 @@ function Debug(...args) {
 module.exports = async function GetAvailableAppointments() {
     console.log("SouthLawrence starting.");
 
-    const {
-        name,
-        website,
-        ...restLawrence
-    } = sites.SouthLawrenceEastElementarySchool;
+    const { name, website, ...restLawrence } = site;
 
     const websiteData = await ScrapeWebsiteData(website);
+    Debug("websiteData", websiteData);
 
     console.log("SouthLawrence done.");
     return {
@@ -31,8 +28,8 @@ module.exports = async function GetAvailableAppointments() {
 };
 
 async function ScrapeWebsiteData(website) {
+    Debug("website", website);
     // GET the website to scrape the calendar and type codes.
-    // We could hard-code them but I don't know if they could change.
     const calendarHtml = await fetch(website)
         .then((res) => res.text())
         .then((body) => {
@@ -64,15 +61,25 @@ function ParseCovidVaccineCalendar(body) {
     // looking for the type and calendar of the COVID vaccine, first dose.
     // javascript looks like:
     // typeToCalendars[19267408] = [[4896962, '1st Dose - COVID Vaccine', '', '', '']  ];
-    const regex = /typeToCalendars\[(?<type>\d+)\] = \[\[(?<calendar>\d+), '1st Dose - COVID Vaccine'/;
-    const match = body.match(regex);
-    Debug("match", match && match.groups);
-
-    return match ? match.groups : {};
+    // The calendar name displayed on the website changes over time.
+    // Pick the best one.
+    const regexes = [
+        /typeToCalendars\[(?<type>\d+)\] = \[\[(?<calendar>\d+), '1st Dose - COVID Vaccine/,
+        /typeToCalendars\[(?<type>\d+)\] = \[\[(?<calendar>\d+), 'STAND-BY LIST\s+-\sS[.] Lawrence East School/,
+    ];
+    for (let i = 0; i < regexes.length; i++) {
+        const match = body.match(regexes[i]);
+        if (match) {
+            Debug("match", match && match.groups);
+            return match.groups;
+        }
+    }
+    Debug("no match");
+    return {};
 }
 
 function ShowCalendar(website, type, calendar) {
-    console.log("website", website);
+    Debug("website", website, "type", type, "calendar", calendar);
     return new Promise((resolve) => {
         fetch(
             website +
