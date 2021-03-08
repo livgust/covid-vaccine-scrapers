@@ -43,18 +43,18 @@ async function ScrapeWebsiteData(browser) {
     await page.goto(site.signUpLink, { waitUntil: "networkidle0" });
     await page.waitForSelector("form");
     await page.evaluate(() => {
-        document.querySelector('button[name="SiteName"]').click();
+        document.querySelector("button[name='SiteName']").click();
     });
     // Wait for form to post
-    await page.waitForTimeout(2000);
-    const daysToCheck = 11; // we could check more but it looks like the only allow 11 days right now.
+    await page.waitForSelector("button[onclick*='ScheduleDay']");
+    const daysToCheck = 11; // we could check more but it looks like they only allow 11 days right now.
 
     let hasAvailability = false;
     let availability = {};
 
     for (let i = 0; i < daysToCheck; i++) {
-        const dayString = moment().local().add(i, "days").format("MM/DD/YYYY");
-        const xhrRes = await getTimeSlotsForDate(page, dayString);
+        const date = moment().local().add(i, "days").format("MM/DD/YYYY");
+        const xhrRes = await getTimeSlotsForDate(page, date);
         // xhrRes is html in this case so we can just string match regex
         // but we also match any html so we know we get a good response
         const someHTMLRegex = /div/;
@@ -71,18 +71,18 @@ async function ScrapeWebsiteData(browser) {
             if (numAvailableAppts) {
                 hasAvailability = true;
             } else {
-                console.log(`could be appointments ${xhrRes}`);
-                const msg = `${site.name} - possible appointments on ${dayString}`;
+                console.log(`There could be appointments: ${xhrRes}`);
+                const msg = `${site.name} - possible appointments on ${date}`;
                 await sendSlackMsg("bot", msg);
             }
 
-            if (!availability[dayString]) {
-                availability[dayString] = {
+            if (!availability[date]) {
+                availability[date] = {
                     hasAvailability: true,
                     numberAvailableAppointments: 0,
                 };
                 availability[
-                    dayString
+                    date
                 ].numberAvailableAppointments += numAvailableAppts;
             }
         }
