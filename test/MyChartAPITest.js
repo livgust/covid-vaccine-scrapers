@@ -429,9 +429,8 @@ describe("UpdateResults", () => {
     it("should add site info and default data to results object", () => {
         results = {};
         mychart.UpdateResults(results, exampleWithAvailability);
-
         for (const [key, info] of Object.entries(results)) {
-            if (key === 10098243) {
+            if (key === "10098243") {
                 // this is the only site that has availability
                 expect(info.hasAvailability).to.equal(true);
                 // check that the only date with availability is 4/3/21
