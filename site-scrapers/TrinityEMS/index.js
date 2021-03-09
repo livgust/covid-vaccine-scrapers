@@ -42,7 +42,7 @@ async function ScrapeWebsiteData(browser, site) {
             page
         );
 
-        accumulateAvailabilityForMonth(dailySlotsForMonth);
+        accumulateAvailabilityForMonth(results, dailySlotsForMonth);
     }
 
     return results;
@@ -196,7 +196,7 @@ async function advanceMonth(page) {
  *
  * @param {availability Object} dailySlotsForMonth -- a month's collection of availability by date
  */
-function accumulateAvailabilityForMonth(dailySlotsForMonth) {
+function accumulateAvailabilityForMonth(results, dailySlotsForMonth) {
     if (
         dailySlotsForMonth == null ||
         Object.keys(dailySlotsForMonth).length == 0
