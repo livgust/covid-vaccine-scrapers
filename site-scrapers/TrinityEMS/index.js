@@ -5,13 +5,6 @@ module.exports = async function GetAvailableAppointments(browser) {
     const siteName = site.name;
     console.log(`${siteName} starting.`);
     const availability = await ScrapeWebsiteData(browser, site);
-    if (process.env.DEVELOPMENT) {
-        console.log(
-            `*** Dev result logging \n${siteName} availability: ${JSON.stringify(
-                availability
-            )}\n***`
-        );
-    }
     console.log(`${siteName} done.`);
     return {
         ...site,
