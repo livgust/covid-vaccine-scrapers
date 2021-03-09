@@ -1,12 +1,19 @@
 const site = {
     name: "Wegmans",
     signUpLink: "https://www.wegmans.com/covid-vaccine-registration/",
+};
+
+const paths = {
     getStartedBtn: "//div[@role='button'][contains(.,'Get Started')]",
-    massLinkXPath:
+    massOption:
         "//span[contains(@class,'quick_reply')][@role='button'][contains(.,'MA')]",
-    noAppointments: /All available vaccine appointments are reserved at this time\./,
+
+    botMessage: "//div[contains(@class,'left_message')]",
+    noAppointments:
+        "All available vaccine appointments are reserved at this time",
 };
 
 module.exports = {
     site,
+    paths,
 };

@@ -1,4 +1,4 @@
-const { site } = require("./config");
+const { site, paths } = require("./config");
 const moment = require("moment");
 const s3 = require("../../lib/s3");
 const { sendSlackMsg } = require("../../lib/slack");
@@ -19,33 +19,40 @@ async function ScrapeWebsiteData(browser) {
     await page.goto(site.signUpLink, { waitUntil: "networkidle0" });
     await page.waitForSelector("#frameForm");
 
-    let hasAvailability = false;
-    let availability = {};
     const frameForm = await page.$("#frameForm");
     const botUrl = await frameForm.evaluate((node) =>
         node.getAttribute("action")
     );
     await page.goto(botUrl, { waitUntil: "networkidle0" });
-    await page.waitForXPath(site.getStartedBtn);
-    const getStartedBtns = await page.$x(site.getStartedBtn);
+
+    await page.waitForXPath(paths.getStartedBtn);
+    const getStartedBtns = await page.$x(paths.getStartedBtn);
     getStartedBtns[0].click();
-    await page.waitForXPath(site.massLinkXPath);
-    const massLinks = await page.$x(site.massLinkXPath);
+    await page.waitForXPath(paths.massOption);
+    const massLinks = await page.$x(paths.massOption);
     massLinks[1].click();
-    // Wait for schedule bot response
-    const poll = new Promise((resolve) => {
+
+    // Wait for schedule chat bot response
+    const lastMessageText = await new Promise((resolve) => {
         const interval = setInterval(async () => {
-            // wait for count of bot responses to be 3
-            const botMessages = await page.$x(site.botMessageXPath);
+            // wait for count of chat bot responses to be at least 2
+            const botMessages = await page.$x(paths.botMessage);
             const count = botMessages.length;
+            const lastMessage = botMessages.pop();
+            const messageText = await lastMessage.evaluate(
+                (node) => node.innerText
+            );
             if (count > 2) {
                 clearInterval(interval);
-                resolve(count);
+                resolve(messageText);
             }
         }, 500);
     });
-    const botFrameContents = await page.content();
-    const noAppointments = botFrameContents.match(site.noAppointments);
+
+    let hasAvailability = false;
+    let availability = {};
+
+    const noAppointments = lastMessageText.includes(paths.noAppointments);
     if (!noAppointments) {
         const msg = `${site.name} - possible appointments`;
         console.log(msg);
