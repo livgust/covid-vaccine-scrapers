@@ -78,6 +78,11 @@ async function getDailyAvailabilityCountsForMonth(page) {
     let days = [];
     let monthlyAvailability = {};
 
+    function reformatDate(date) {
+        const dateObj = new Date(date + "T00:00:00");
+        return new Intl.DateTimeFormat("en-US").format(dateObj);
+    }
+
     const activeDays = await getActiveDays(page);
 
     if (activeDays.length > 0) {
@@ -100,7 +105,7 @@ async function getDailyAvailabilityCountsForMonth(page) {
 
                 const slotCount = await getSlotsForDate(page, date);
 
-                monthlyAvailability[date] = {
+                monthlyAvailability[reformatDate(date)] = {
                     hasAvailability: !!slotCount,
                     numberAvailableAppointments: slotCount,
                 };
