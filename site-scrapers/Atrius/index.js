@@ -2,6 +2,8 @@ const https = require("https");
 const { site } = require("./config");
 const mychart = require("../../lib/MyChartAPI.js");
 
+const dept = "12701803";
+
 module.exports = async function GetAvailableAppointments() {
     console.log("Atrius starting.");
     const webData = await ScrapeWebsiteData();
@@ -46,7 +48,7 @@ async function ScrapeWebsiteData() {
     ] = await mychart.GetCookieAndVerificationToken(site.dphLink);
 
     // Setup the return object.
-    return mychart.AddFutureWeeks(
+    const results = mychart.AddFutureWeeks(
         "myhealth.atriushealth.org",
         "/OpenScheduling/OpenScheduling/GetScheduleDays",
         cookie,
@@ -54,11 +56,22 @@ async function ScrapeWebsiteData() {
         10,
         PostDataCallback
     );
+    // object returned from AddFutureWeeks maps dept ID -> availability info
+    // here, we want to just return availability info for relevant dept.
+    return results[dept];
 }
 
 /**
- * This is the callback function
+ * mychart.AddFutureWeeks calls this function to get the data it should POST to the API.
  */
 function PostDataCallback(startDateFormatted) {
-    return `view=grouped&specList=121&vtList=1424&start=${startDateFormatted}&filters=%7B%22Providers%22%3A%7B%7D%2C%22Departments%22%3A%7B%7D%2C%22DaysOfWeek%22%3A%7B%7D%2C%22TimesOfDay%22%3A%22both%22%7D`;
+    const { TimesOfDay } = mychart.CommonFilters;
+    return `view=grouped&specList=121&vtList=1424&start=${startDateFormatted}&filters=${encodeURIComponent(
+        JSON.stringify({
+            Providers: {},
+            Departments: {},
+            DaysOfWeek: {},
+            TimesOfDay,
+        })
+    )}`;
 }

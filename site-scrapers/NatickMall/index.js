@@ -58,11 +58,11 @@ async function ScrapeWebsiteData() {
     });
 
     const availabilityResponse = await availabilityPromise;
-    const availability = JSON.parse(availabilityResponse);
+    const availability = JSON.parse(availabilityResponse).results;
     const results = { availability: {}, hasAvailability: false };
     // Collect availability count by date
     availability.reduce((memo, currentValue) => {
-        /* The availability returns and array of appointments like this:
+        /* The availability returns an array of appointments like this:
             {
                 "start": "2021-02-22T14:00:00+00:00",
                 "end": "2021-02-22T14:04:00+00:00",

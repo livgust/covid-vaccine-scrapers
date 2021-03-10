@@ -6,6 +6,8 @@
         "bestzip": "^2.1.7",
         "chrome-aws-lambda": "^7.0.0",
         "dotenv": "^8.2.0",
+        "jsdom": "^16.4.0",
+        "lodash": "^4.17.21",
         "moment": "^2.29.1",
         "node-fetch": "^2.6.1",
         "node-html-parser": "^2.1.0",
@@ -20,6 +22,7 @@
         "aws-sdk": "^2.840.0",
         "chai": "^4.3.0",
         "chai-as-promised": "^7.1.1",
+        "chai-subset": "^1.6.0",
         "mocha": "^8.3.0",
         "mock-require": "^3.0.3",
         "nock": "^13.0.7"
