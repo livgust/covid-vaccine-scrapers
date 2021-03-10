@@ -42,6 +42,14 @@ const sites = [
         signUpLink: "https://home.color.com/vaccine/register/shdk8qoyo0mxguo4",
         siteUrl: "Fenway%20Park",
     },
+    {
+        name: "Hynes Convention Center",
+        siteUrl: "Hynes%20Convention%20Center",
+        street: "900 Boylston St.",
+        city: "Boston",
+        zip: "02115",
+        signUpLink: "", // TODO - this isn't public yet it seems.
+    },
 ];
 
 module.exports = sites;

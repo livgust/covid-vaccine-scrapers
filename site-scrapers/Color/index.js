@@ -2,7 +2,7 @@ const https = require("https");
 const sites = require("./config");
 
 const token = "bcd282a6fe22e6fc47e14be11a35b33fe1bc";
-module.exports = async function GetAvailableAppointments() {
+async function GetAvailableAppointments() {
     console.log("Color locations starting");
     const originalSites = sites;
     const finalSites = [];
@@ -17,7 +17,7 @@ module.exports = async function GetAvailableAppointments() {
     }
     console.log("Color locations complete");
     return finalSites;
-};
+}
 
 async function ScrapeWebsiteData(siteName, siteUrl) {
     const availabilityUrl = `https://home.color.com/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=${siteUrl}`;
@@ -29,7 +29,6 @@ async function ScrapeWebsiteData(siteName, siteUrl) {
                     body += chunk;
                 });
                 res.on("end", () => {
-                    console.log(body);
                     resolve(body);
                 });
             })
@@ -42,6 +41,10 @@ async function ScrapeWebsiteData(siteName, siteUrl) {
     });
 
     const availabilityResponse = await availabilityPromise;
+    return formatResponse(availabilityResponse);
+}
+
+function formatResponse(availabilityResponse) {
     const availability = JSON.parse(availabilityResponse).results;
     const results = { availability: {}, hasAvailability: false };
     // Collect availability count by date
@@ -82,3 +85,7 @@ async function ScrapeWebsiteData(siteName, siteUrl) {
 
     return results;
 }
+
+//ES5 way of doing named & default exports
+const Color = (module.exports = GetAvailableAppointments);
+Color.formatResponse = formatResponse;
