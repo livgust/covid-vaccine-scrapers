@@ -113,7 +113,8 @@ async function getDailyAvailabilityCountsForMonth(page) {
     return monthlyAvailability;
 }
 
-/** Looks for "no-dates-available" class, or ".activeday" elements.
+/**
+ * Looks for "no-dates-available" class, or ".activeday" elements.
  * If not found, there are active days, and the page should be
  * parsed for which days have availability.
  *
@@ -139,6 +140,9 @@ async function getActiveDays(page) {
 }
 
 /**
+ * Fetches the small snippet of HTML which would appear in a popup when an active day is clicked by a human.
+ *
+ * As yet, it's not know how the slot count will be presented. See parseHTMLforSlotCount().
  *
  * @param {*} page
  * @param {String} dateStr -- yyyy-mm-dd, as in '2021-04-26'
@@ -158,7 +162,8 @@ async function getSlotsForDate(page, dateStr) {
 
     return await page.evaluate(async (url) => {
         const response = await fetch(url);
-        return await response.text();
+        const text = await response.text();
+        return parseHTMLforSlotCount(text);
     }, url);
 }
 
@@ -210,6 +215,19 @@ function accumulateAvailabilityForMonth(dailySlotsForMonth) {
     } catch (error) {
         console.log(`${site.name} :: error trying to merge results: ${error}`);
     }
+}
+
+/**
+ * TODO: this is just a guess as to how the popup will present the number of appointments.
+ *
+ * @param {String} responseText
+ */
+function parseHTMLforSlotCount(responseText) {
+    const text = responseText;
+    const pattern = /\d+/;
+    const number = text.match(pattern);
+
+    return number == null ? 0 : number[0];
 }
 
 async function waitForLoadComplete(page, loaderSelector) {
