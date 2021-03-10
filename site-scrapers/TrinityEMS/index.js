@@ -60,14 +60,16 @@ async function getMonthCountFromDropDown(page) {
 }
 
 /**
- * The working hypothesis, based on the presence in the CSS for the site, a day with availability will be marked
- * in the calendar table with a <td class="scheduleday activeday"...>.
+ * The working hypothesis is that a day with availability will be marked
+ * in the calendar table cell with the class "activeday", as in
+ * <td class="scheduleday activeday"...>. Playing with this in the web browser
+ * inspector yields a clickable day, which when clicked, shows a popup which would
+ * presumably show the number of slots. Currently, it just says "No times available."
  *
  * This method evaluates the calendar for the presense of the "activeday" class. If found,
  * each day marked with it is assessed for the number of slots via an XHR query. The actual
  * response, how it presents the amount of availability, is not presently known, since
  * no availability has ever been posted.
- *
  *
  * @param {*} page
  * @returns
