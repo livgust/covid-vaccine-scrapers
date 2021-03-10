@@ -1,18 +1,14 @@
 const assert = require("assert");
-const natickmall = require("./../site-scrapers/NatickMall");
+const color = require("./../site-scrapers/Color");
 const nock = require("nock");
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
 
+const token = "bcd282a6fe22e6fc47e14be11a35b33fe1bc";
+
 describe("Transformations", () => {
     it("should return no availabilities when there is -1", () => {
-        // mock out the http request that returns the token
-        const token = "abc";
-        nock("https://home.color.com")
-            .get("/api/v1/get_onsite_claim?partner=natickmall")
-            .reply(200, `{"token":"${token}"}`);
-
         // mock out the availability request
         const response = `{"results": [{
             "start": "2021-02-22T14:00:00+00:00",
@@ -33,7 +29,7 @@ describe("Transformations", () => {
            "availability: {}
           }
         */
-        return expect(natickmall())
+        return expect(color()[0])
             .to.eventually.deep.include({
                 hasAvailability: false,
             })
@@ -73,7 +69,7 @@ describe("Transformations", () => {
          *   }
          * }
          */
-        return expect(natickmall()).to.eventually.deep.include({
+        return expect(color[0]).to.eventually.deep.include({
             hasAvailability: true,
             availability: {
                 "2/22/2021": {
@@ -131,7 +127,7 @@ describe("Transformations", () => {
          *      },
          * }
          */
-        return expect(natickmall()).to.eventually.deep.include({
+        return expect(color[0]).to.eventually.deep.include({
             hasAvailability: true,
             availability: {
                 "2/22/2021": {
