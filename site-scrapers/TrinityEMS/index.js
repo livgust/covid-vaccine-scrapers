@@ -128,9 +128,6 @@ async function getDailyAvailabilityCountsForMonth(page) {
  * @returns Array of active day elements. Empty array is returned if there's no availability.
  */
 async function getActiveDays(page) {
-    // Sanity check that we are reading the calendar...
-    const dayCount = await (await page.$$(".scheduleday")).length;
-
     const noDatesAvailable = await page.$(".no-dates-available");
     // No appointments available if defined
     if (noDatesAvailable != undefined) {
