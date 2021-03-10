@@ -1,4 +1,5 @@
 const { generateKey } = require("../../data/dataDefaulter");
+const { toTitleCase } = require("../../lib/stringUtil");
 const moment = require("moment");
 const fetch = require("node-fetch");
 
@@ -78,12 +79,6 @@ function getFormattedUnavailableStores(retrievedIDs, allNearbyStores) {
             hasAvailability: false,
             availability: {},
         }));
-}
-
-function toTitleCase(string) {
-    return string.replace(/\w+/g, function (text) {
-        return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
-    });
 }
 
 function formatData(data, website) {
