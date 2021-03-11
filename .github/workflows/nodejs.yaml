@@ -28,3 +28,4 @@ jobs:
           CHROMEPATH: /usr/bin/chromium-browser
         run: npm test
       - run: npx prettier --check ./
+      - run: npm run verifyLockfile

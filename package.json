@@ -27,8 +27,13 @@
         "mock-require": "^3.0.3",
         "nock": "^13.0.7"
     },
+    "engines": {
+        "node": ">= 14.0.0",
+        "npm": ">= 7.0.0"
+    },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",
-        "test": "mocha"
+        "test": "mocha",
+        "verifyLockfile": "node -e \"if(require('./package-lock.json').lockfileVersion !== 2) {process.exit(1);};\""
     }
 }
