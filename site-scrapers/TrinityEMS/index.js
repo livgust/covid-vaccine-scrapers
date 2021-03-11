@@ -1,6 +1,6 @@
 const { S3 } = require("aws-sdk");
 const { site } = require("./config.js");
-const slack = require("slack");
+const { sendSlackMsg } = require("../../lib/slack");
 
 module.exports = async function GetAvailableAppointments(browser) {
     const siteName = site.name;
@@ -140,27 +140,6 @@ async function getDailyAvailabilityCountsForMonth(page) {
  * @returns Array of active day elements. Empty array is returned if there's no availability.
  */
 async function getActiveDays(page) {
-    const scheduleDays = await page.$$(".scheduleday");
-    // Sanity check that we are reading the calendar...
-    const dayCount = await scheduleDays.length;
-
-    let theseDaysAreBitingMyAss = await page.evaluate(() => {
-        let days = document.querySelectorAll(".scheduleday.pastday");
-        return days;
-    });
-    console.log(`theseDaysAreBitingMyAss: ${theseDaysAreBitingMyAss}`);
-    // for (item of theseDaysAreBitingMyAss.keys()) {
-    //     console.log(`item: ${item.getAttribute("class")}`);
-    // }
-
-    // for (element of scheduleDays) {
-    //     console.log(`element: ${await element}`);
-    //     var classPropertyHandle = await element.getProperty("class");
-    //     console.log(`classPropertyHandle: ${classPropertyHandle}`);
-    //     const classPropertyValue = await classPropertyHandle.jsonValue();
-    //     console.log(`classes: ${await classPropertyValue}`);
-    // }
-
     const noDatesAvailable = await page.$(".no-dates-available");
     // No appointments available if defined
     if (noDatesAvailable != undefined) {
