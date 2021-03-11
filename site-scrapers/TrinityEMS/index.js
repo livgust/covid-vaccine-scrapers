@@ -1,5 +1,6 @@
 const { S3 } = require("aws-sdk");
 const { site } = require("./config.js");
+const slack = require("slack");
 
 module.exports = async function GetAvailableAppointments(browser) {
     const siteName = site.name;
