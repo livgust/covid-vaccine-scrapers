@@ -13,7 +13,7 @@ const sites = [
         city: "Foxborough",
         zip: "02035",
         signUpLink:
-            "https://home.color.com/vaccine/register/sbo91shys1qhb0gi100123871238",
+            "https://www.cic-health.com/vaccines",
         siteUrl: "Gillette%20Stadium%20-%20East",
     },
     {
@@ -22,7 +22,7 @@ const sites = [
         city: "Foxborough",
         zip: "02035",
         signUpLink:
-            "https://home.color.com/vaccine/register/sbo91shys1qhb0gi100123871238",
+            "https://home.color.com/vaccine/register/gillettestadium",
         siteUrl: "Gillette%20Stadium%20-%20West",
     },
     {
@@ -31,7 +31,7 @@ const sites = [
         city: "Roxbury",
         zip: "02120",
         signUpLink:
-            "https://home.color.com/vaccine/register/datygzcebcivrplwlvikuqrfp",
+            "https://home.color.com/vaccine/register/reggielewis",
         siteUrl: "Reggie%20Lewis%20Center",
     },
     {
@@ -39,7 +39,7 @@ const sites = [
         street: "4 Jersey St.",
         city: "Boston",
         zip: "02215",
-        signUpLink: "https://home.color.com/vaccine/register/shdk8qoyo0mxguo4",
+        signUpLink: "https://home.color.com/vaccine/register/fenway-hynes",
         siteUrl: "Fenway%20Park",
     },
     {
@@ -48,7 +48,7 @@ const sites = [
         street: "900 Boylston St.",
         city: "Boston",
         zip: "02115",
-        signUpLink: "", // TODO - this isn't public yet it seems.
+        signUpLink: "https://home.color.com/vaccine/register/fenway-hynes", // TODO - this isn't public yet it seems.
     },
 ];
 
