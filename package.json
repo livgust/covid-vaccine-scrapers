@@ -6,6 +6,7 @@
         "bestzip": "^2.1.7",
         "chrome-aws-lambda": "^7.0.0",
         "dotenv": "^8.2.0",
+        "faunadb": "^4.1.1",
         "jsdom": "^16.4.0",
         "lodash": "^4.17.21",
         "moment": "^2.29.1",
