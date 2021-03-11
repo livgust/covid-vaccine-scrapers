@@ -1,3 +1,4 @@
+const { S3 } = require("aws-sdk");
 const { site } = require("./config.js");
 
 module.exports = async function GetAvailableAppointments(browser) {
@@ -10,6 +11,12 @@ module.exports = async function GetAvailableAppointments(browser) {
         ...availability,
     };
 };
+
+/**
+ * Flag to indicate that the page content has been writtent to s3 because a date with
+ * availability has been found and logged.
+ */
+let pageContentSavedToS3 = false;
 
 async function ScrapeWebsiteData(browser, site) {
     const page = await browser.newPage();
@@ -86,10 +93,14 @@ async function getDailyAvailabilityCountsForMonth(page) {
     const activeDays = await getActiveDays(page);
 
     if (activeDays.length > 0) {
-        /*
-        <div class="choose-time-container" style="top: 457px; left: 249.1875px; width: 140px; display: block;">
-            <h1>24</h1>
-        */
+        if (!pageContentSavedToS3) {
+            const msg = `${site.name} - possible appointments`;
+            console.log(msg);
+            await s3.savePageContent(site.name, page);
+            await sendSlackMsg("bot", msg);
+            pageContentSavedToS3 = true;
+        }
+
         try {
             for (let day of activeDays) {
                 /* Working hypothesis: the "activeday" CSS class will mark days with available slots.
@@ -128,6 +139,27 @@ async function getDailyAvailabilityCountsForMonth(page) {
  * @returns Array of active day elements. Empty array is returned if there's no availability.
  */
 async function getActiveDays(page) {
+    const scheduleDays = await page.$$(".scheduleday");
+    // Sanity check that we are reading the calendar...
+    const dayCount = await scheduleDays.length;
+
+    let theseDaysAreBitingMyAss = await page.evaluate(() => {
+        let days = document.querySelectorAll(".scheduleday.pastday");
+        return days;
+    });
+    console.log(`theseDaysAreBitingMyAss: ${theseDaysAreBitingMyAss}`);
+    // for (item of theseDaysAreBitingMyAss.keys()) {
+    //     console.log(`item: ${item.getAttribute("class")}`);
+    // }
+
+    // for (element of scheduleDays) {
+    //     console.log(`element: ${await element}`);
+    //     var classPropertyHandle = await element.getProperty("class");
+    //     console.log(`classPropertyHandle: ${classPropertyHandle}`);
+    //     const classPropertyValue = await classPropertyHandle.jsonValue();
+    //     console.log(`classes: ${await classPropertyValue}`);
+    // }
+
     const noDatesAvailable = await page.$(".no-dates-available");
     // No appointments available if defined
     if (noDatesAvailable != undefined) {
