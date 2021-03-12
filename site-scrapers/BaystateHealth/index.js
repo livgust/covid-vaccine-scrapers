@@ -36,7 +36,7 @@ async function ScrapeWebsiteData(browser) {
     const page = pageArray[1];
     // Is the clinic open?
     const alertElement = await page.$(
-        "app-guest-covid-vaccine-register > div > div > div > h3"
+        "app-guest-covid-vaccine-register.ion-page > div.sky-bg > div.content-body > div.content-card > h3.text-align-center"
     );
     let alert = alertElement
         ? await alertElement.evaluate((node) => node.innerText)
