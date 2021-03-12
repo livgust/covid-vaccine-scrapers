@@ -429,16 +429,15 @@ describe("UpdateResults", () => {
     it("should add site info and default data to results object", () => {
         results = {};
         mychart.UpdateResults(results, exampleWithAvailability);
-
         for (const [key, info] of Object.entries(results)) {
-            if (key == 10098243) {
+            if (key === "10098243") {
                 // this is the only site that has availability
                 expect(info.hasAvailability).to.equal(true);
-                // check that the only date with availability is 3/4/21
+                // check that the only date with availability is 4/3/21
                 expect(Object.keys(info.availability)).to.deep.equal([
-                    "3/4/2021",
+                    "4/3/2021",
                 ]);
-                expect(info.availability["3/4/2021"]).to.deep.equal({
+                expect(info.availability["4/3/2021"]).to.deep.equal({
                     numberAvailableAppointments: 1,
                     hasAvailability: true,
                 });

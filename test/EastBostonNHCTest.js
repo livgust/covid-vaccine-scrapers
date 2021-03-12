@@ -79,8 +79,8 @@ describe("East Boston NHC Availability Scraper", function () {
                 },
                 signUpLink:
                     "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
-                extraData:
-                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                restrictions:
+                    "Open to eligible residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
                 street: "10 Garofalo St",
                 city: "Revere",
                 zip: "02151",
@@ -92,8 +92,8 @@ describe("East Boston NHC Availability Scraper", function () {
                 availability: {},
                 signUpLink:
                     "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
-                extraData:
-                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                restrictions:
+                    "Open to eligible residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
                 street: "318 Broadway",
                 city: "Chelsea",
                 zip: "02150",
@@ -104,8 +104,8 @@ describe("East Boston NHC Availability Scraper", function () {
                 availability: {},
                 signUpLink:
                     "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
-                extraData:
-                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                restrictions:
+                    "Open to eligible residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
                 street: "120 Liverpool St",
                 city: "Boston",
                 zip: "02128",
@@ -125,8 +125,8 @@ describe("East Boston NHC Availability Scraper", function () {
                 },
                 signUpLink:
                     "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
-                extraData:
-                    "Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
+                restrictions:
+                    "Open to eligible residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
                 street: "1601 Washington St",
                 city: "Boston",
                 zip: "02118",

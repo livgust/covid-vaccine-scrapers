@@ -17,7 +17,7 @@ module.exports = async function GetAvailableAppointments(
             hasAvailability: !!response,
             availability: response?.availability || {},
             signUpLink: site.website,
-            extraData: `Open to residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)`,
+            restrictions: `Open to eligible residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)`,
             ...loc,
             timestamp: moment().format(),
         };

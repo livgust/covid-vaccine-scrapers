@@ -1,4 +1,5 @@
 const { site } = require("./config");
+const { toTitleCase } = require("../../lib/stringUtil");
 const https = require("https");
 
 module.exports = async function GetAvailableAppointments(browser) {
@@ -62,14 +63,6 @@ module.exports = async function GetAvailableAppointments(browser) {
         return retval;
     });
 };
-
-function toTitleCase(str) {
-    return str
-        .toLowerCase()
-        .split(" ")
-        .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-        .join(" ");
-}
 
 function urlContent(url, options) {
     return new Promise((resolve) => {
