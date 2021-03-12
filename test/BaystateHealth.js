@@ -8,16 +8,16 @@ describe(`${site.name}`, function () {
     let context;
     let page;
 
-    beforeEach(async function() {
+    beforeEach(async function () {
         context = await browser.createIncognitoBrowserContext();
         page = await browser.newPage();
     });
 
-    afterEach(async function() {
+    afterEach(async function () {
         await page.close();
     });
 
-    it("Test against live site", async function() {
+    it("Test against live site", async function () {
         await page.goto(site.signUpLink);
         await expect(baystatehealth(browser)).to.eventually.have.keys([
             "name",
