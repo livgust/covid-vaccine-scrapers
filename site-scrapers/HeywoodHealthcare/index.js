@@ -15,14 +15,22 @@ module.exports = async function GetAvailableAppointments(browser) {
         await console.log(`${site.name} testsuite started...`);
         const webData = await ScrapeWebsiteData(browser);
         await console.log(`${site.name} testsuite finished...`);
-        return webData;
+        return {
+            ...site,
+            ...webData,
+            timestamp: new Date(),
+        };
     } else {
         await console.log(`${site.name} starting.`);
         const page = await browser.newPage();
         await page.goto(site.signUpLink);
         const webData = await ScrapeWebsiteData(browser);
         await console.log(`${site.name} done.`);
-        return webData;
+        return {
+            ...site,
+            ...webData,
+            timestamp: new Date(),
+        };
     }
 };
 
