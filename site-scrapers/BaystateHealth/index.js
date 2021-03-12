@@ -1,7 +1,5 @@
 const { site } = require("./config");
 
-const noAppointmentMatchString = "Registration Temporarily Unavailable";
-
 /*
  * This function calls ScrapeWebsiteData to gather availability data from the
  * site
@@ -36,18 +34,6 @@ module.exports = async function GetAvailableAppointments(browser) {
 async function ScrapeWebsiteData(browser) {
     let pageArray = await browser.pages();
     const page = pageArray[1];
-    const signUpPageSelector = "div > div > section > div > div > p > a";
-    await page.waitForSelector(signUpPageSelector, { visible: true });
-
-    let signUpPageElement = await page.$(signUpPageSelector);
-    await page.evaluateHandle((el) => {
-        el.target = "_self";
-    }, signUpPageElement);
-    await Promise.all([
-        page.waitForNavigation({ waitUntil: "networkidle0" }),
-        page.click(signUpPageSelector),
-    ]);
-
     // Is the clinic open?
     const alertElement = await page.$(
         "app-guest-covid-vaccine-register > div > div > div > h3"
