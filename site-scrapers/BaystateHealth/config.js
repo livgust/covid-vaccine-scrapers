@@ -4,7 +4,7 @@ const site = {
     city: "Holyoke",
     state: "MA",
     zip: "01040",
-    signUpLink: "https://www.baystatehealth.org/covid19",
+    signUpLink: "https://workwell.apps.baystatehealth.org/guest/covid-vaccine/register?r=mafirstresp210121",
 };
 
 module.exports = {
