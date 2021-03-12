@@ -1,4 +1,4 @@
-const { S3 } = require("aws-sdk");
+const s3 = require("../../lib/s3");
 const { site } = require("./config.js");
 const { sendSlackMsg } = require("../../lib/slack");
 
