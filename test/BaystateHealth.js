@@ -5,20 +5,8 @@ const baystatehealth = require("./../site-scrapers/BaystateHealth");
 const { site } = require("./../site-scrapers/BaystateHealth/config");
 
 describe(`${site.name}`, function () {
-    let context;
-    let page;
-
-    beforeEach(async function () {
-        context = await browser.createIncognitoBrowserContext();
-        page = await browser.newPage();
-    });
-
-    afterEach(async function () {
-        await page.close();
-    });
-
+    this.timeout(5000);
     it("Test against live site", async function () {
-        await page.goto(site.signUpLink);
         await expect(baystatehealth(browser)).to.eventually.have.keys([
             "name",
             "street",
