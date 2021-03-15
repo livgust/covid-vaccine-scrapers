@@ -24,6 +24,7 @@
         "aws-sdk": "^2.840.0",
         "chai": "^4.3.0",
         "chai-as-promised": "^7.1.1",
+        "chai-shallow-deep-equal": "^1.4.6",
         "chai-subset": "^1.6.0",
         "mocha": "^8.3.0",
         "mock-require": "^3.0.3",
