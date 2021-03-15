@@ -10,16 +10,22 @@ jobs:
       matrix:
         node-version: [14.x]
     steps:
-      - run: sudo timedatectl set-timezone America/New_York
+      - name: Install chromium browser
+        run: |
+          sudo apt-get -q -y update
+          sudo apt-get -q -y install chromium-browser
+      - name: Set timezone to America/New_York
+        run: sudo timedatectl set-timezone America/New_York
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm test
-      - run: npm run predeploy
-      - run: aws s3 cp lambda.zip s3://covid-vaccine-scraper-test/lambda.zip
-      - run: aws lambda update-function-code --function-name scrapeCovidAppointmentDataTEST \
-                   --s3-bucket covid-vaccine-scraper-test --s3-key lambda.zip --publish
+      - name: Run test suite
+        env:
+          DEVELOPMENT: true
+          CHROMEPATH: /usr/bin/chromium-browser
+        run: npm test
       - run: npx prettier --check ./
+      - run: npm run verifyLockfile

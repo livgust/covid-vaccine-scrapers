@@ -66,6 +66,7 @@ describe("RxTouch Availability Scraper", function () {
         return expect(
             rxTouch.GetAllAvailability(availabilityService, "02144")
         ).to.eventually.deep.equal({
+            debug: "",
             message:
                 "Availability found. Search on signup website for zip 02144",
             availability: {
@@ -109,7 +110,8 @@ describe("RxTouch Availability Scraper", function () {
         return expect(
             rxTouch.GetAllAvailability(availabilityService, "02144")
         ).to.eventually.deep.equal({
-            message: "No available appointments (code 2).",
+            debug: "No available appointments (code 2).",
+            message: "",
             availability: {},
         });
     });
@@ -131,7 +133,8 @@ describe("RxTouch Availability Scraper", function () {
         return expect(
             rxTouch.GetAllAvailability(availabilityService, "02144")
         ).to.eventually.deep.equal({
-            message: "No available appointments (code 2).",
+            debug: "No available appointments (code 2).",
+            message: "",
             availability: {},
         });
     });

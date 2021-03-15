@@ -1,43 +1,26 @@
-const { site } = require("./config");
 const https = require("https");
+const sites = require("./config");
 
-module.exports = async function GetAvailableAppointments() {
-    console.log(`${site.name} starting.`);
-    const webData = await ScrapeWebsiteData();
-    console.log(`${site.name} done.`);
-    return {
-        ...site,
-        ...webData,
-        timestamp: new Date(),
-    };
-};
+const token = "bcd282a6fe22e6fc47e14be11a35b33fe1bc";
+async function GetAvailableAppointments() {
+    console.log("Color locations starting");
+    const originalSites = sites;
+    const finalSites = [];
+    for (const site of originalSites) {
+        const { siteUrl, ...rest } = site;
+        const webData = await ScrapeWebsiteData(rest.name, siteUrl);
+        finalSites.push({
+            ...rest,
+            ...webData,
+            timestamp: new Date(),
+        });
+    }
+    console.log("Color locations complete");
+    return finalSites;
+}
 
-async function ScrapeWebsiteData() {
-    const tokenUrl =
-        "https://home.color.com/api/v1/get_onsite_claim?partner=natickmall";
-    // Get a request token
-    const tokenPromise = new Promise((resolve) => {
-        https
-            .get(tokenUrl, (res) => {
-                let body = "";
-                res.on("data", (chunk) => {
-                    body += chunk;
-                });
-                res.on("end", () => {
-                    resolve(body);
-                });
-            })
-            .on("error", (e) => {
-                console.error(
-                    "Error making token request for the Natick Mall" + e
-                );
-            })
-            .end();
-    });
-    const tokenResponse = await tokenPromise;
-    const responseJson = JSON.parse(tokenResponse);
-    const token = responseJson["token"];
-    const availabilityUrl = `https://home.color.com/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=Natick%20Mall`;
+async function ScrapeWebsiteData(siteName, siteUrl) {
+    const availabilityUrl = `https://home.color.com/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=${siteUrl}`;
     const availabilityPromise = new Promise((resolve) => {
         https
             .get(availabilityUrl, (res) => {
@@ -51,13 +34,17 @@ async function ScrapeWebsiteData() {
             })
             .on("error", (e) => {
                 console.error(
-                    "Error making token request for the Natick Mall" + e
+                    `Error making token request for ${siteName}: + ${e}`
                 );
             })
             .end();
     });
 
     const availabilityResponse = await availabilityPromise;
+    return formatResponse(availabilityResponse);
+}
+
+function formatResponse(availabilityResponse) {
     const availability = JSON.parse(availabilityResponse).results;
     const results = { availability: {}, hasAvailability: false };
     // Collect availability count by date
@@ -98,3 +85,7 @@ async function ScrapeWebsiteData() {
 
     return results;
 }
+
+//ES5 way of doing named & default exports
+const Color = (module.exports = GetAvailableAppointments);
+Color.formatResponse = formatResponse;
