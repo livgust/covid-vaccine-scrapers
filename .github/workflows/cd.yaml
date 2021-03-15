@@ -1,0 +1,35 @@
+name: cd
+on:
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: package
+        run: npm run predeploy
+      - name: upload
+        if: ${{ steps.package.conclusion == 'success' }}
+        run: aws s3 cp ./lambda.zip s3://${{ secrets.AWS_S3_BUCKET }}/lambda.zip
+      - name: update
+        if: ${{ steps.upload.conclusion == 'success' }}
+        run: aws update-function-code \
+          --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+          --zip-file lambda.zip \
+          --s3-bucket ${{ secrets.AWS_S3_BUCKET }} \
+          --no-publish
+      - name: publish
+        if: ${{ steps.update.conclusion == 'success' }}
+        run: aws publish-version \
+          --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }}
+          --description ${{ GITHUB_SHA }}
