@@ -1,4 +1,6 @@
 const { site } = require("./config");
+const { sendSlackMsg } = require("../../lib/slack");
+const s3 = require("../../lib/s3");
 
 /*
  * This function calls ScrapeWebsiteData to gather availability data from the
@@ -8,44 +10,33 @@ const { site } = require("./config");
  * @return JSON blob with { hasAppointments: Bool, totalAvailability: Int }
  */
 module.exports = async function GetAvailableAppointments(browser) {
-    if (browser.browserContexts().length > 1) {
-        await console.log(`${site.name} testsuite started...`);
-        const webData = await ScrapeWebsiteData(browser);
-        await console.log(`${site.name} testsuite finished...`);
-        return {
-            ...site,
-            ...webData,
-            timestamp: new Date(),
-        };
-    } else {
-        await console.log(`${site.name} starting.`);
-        const page = await browser.newPage();
-        await page.goto(site.signUpLink);
-        const webData = await ScrapeWebsiteData(browser);
-        await console.log(`${site.name} done.`);
-        return {
-            ...site,
-            ...webData,
-            timestamp: new Date(),
-        };
-    }
+    await console.log(`${site.name} starting.`);
+    const webData = await ScrapeWebsiteData(browser);
+    await console.log(`${site.name} done.`);
+    return {
+        ...site,
+        ...webData,
+        timestamp: new Date(),
+    };
 };
 
 async function ScrapeWebsiteData(browser) {
-    let pageArray = await browser.pages();
-    const page = pageArray[1];
-    // Is the clinic open?
-    const alertElement = await page.$(
+    const page = await browser.newPage();
+    await page.goto(site.signUpLink);
+    const alertElement = await page.waitForSelector(
         "app-guest-covid-vaccine-register.ion-page > div.sky-bg > div.content-body > div.content-card > h3.text-align-center"
     );
-    let alert = alertElement
-        ? await alertElement.evaluate((node) => node.innerText)
-        : false;
+    // Is the clinic open?
+    const alert = await (alertElement
+        ? alertElement.evaluate((node) => node.innerText)
+        : false);
     let hasAppointments = false;
     let totalAvailability = 0;
-    let date = false;
     if (!alert) {
-        // TBD: Are there appointments?
+        const msg = `${site.name} may have appointments...`;
+        await console.log(msg);
+        await s3.savePageContent(site.name, page);
+        await sendSlackMsg("bot", msg);
     }
 
     return {
