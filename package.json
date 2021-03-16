@@ -19,6 +19,7 @@
         "us-zips": "^4.0.2"
     },
     "devDependencies": {
+        "@aws-sdk/client-cloudwatch": "^3.8.1",
         "aws-sdk": "^2.840.0",
         "chai": "^4.3.0",
         "chai-as-promised": "^7.1.1",
