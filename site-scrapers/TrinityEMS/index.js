@@ -2,35 +2,26 @@ const s3 = require("../../lib/s3");
 const { site } = require("./config.js");
 const { sendSlackMsg } = require("../../lib/slack");
 
-module.exports = async function GetAvailableAppointments(browser) {
-    const siteName = site.name;
-    console.log(`${siteName} starting.`);
-    const availability = await ScrapeWebsiteData(browser, site);
-    console.log(`${siteName} done.`);
+module.exports = async function GetAvailableAppointments(
+    browser,
+    pageService = defaultPageService()
+) {
+    console.log(`${site.name} starting.`);
+    const availability = await ScrapeWebsiteData(browser, site, pageService);
+    console.log(`${site.name} done.`);
     return {
         ...site,
         ...availability,
     };
 };
 
-/**
- * Flag to indicate that the page content has been writtent to s3 because a date with
- * availability has been found and logged.
- */
-let pageContentSavedToS3 = false;
+let activeDayPageContentSavedToS3 = false; // becomes true upon first save to s3
+let parseSlotHtmlPageContentSavedToS3 = false; // becomes true upon first save to s3
 
-async function ScrapeWebsiteData(browser, site) {
+async function ScrapeWebsiteData(browser, site, pageService) {
     const page = await browser.newPage();
 
-    await page.goto(site.website);
-    try {
-        // Wait until Javascript has loaded availabity data
-        const classToWaitFor = ".scheduleday";
-        await waitForLoadComplete(page, classToWaitFor);
-    } catch (error) {
-        console.log(`error waiting for `);
-        return { hasAvailability: false };
-    }
+    await pageService.getHomePage(page);
 
     // Initialize results to no availability
     const results = {
@@ -38,53 +29,60 @@ async function ScrapeWebsiteData(browser, site) {
         hasAvailability: false,
     };
 
-    const monthCount = await getMonthCountFromDropDown(page);
+    const monthCount = await getMonthCount(page);
 
     for (const key of new Array(monthCount).keys()) {
-        // for the current month, we scrape the initial page
+        // Don't advance the calendar if it's the first month
         if (key > 0) {
-            // advance page to next month
-            await advanceMonth(page);
+            await pageService.getNextMonthCalendar(page);
         }
         const dailySlotsForMonth = await getDailyAvailabilityCountsForMonth(
             page
         );
-
-        accumulateAvailabilityForMonth(results, dailySlotsForMonth);
+        // Add all day objects to results.availability
+        dailySlotsForMonth.forEach(
+            (value, key) => (results.availability[key] = value)
+        );
     }
+
+    results.hasAvailability = !!Object.keys(results.availability).length;
 
     return results;
 }
 
 /**
+ * The Trinity EMS scheduling page presents a drop-down month chooser.
+ * This function gets the number of month options from the \<select\> element.
  *
  * @param {*} page
- * @returns number of months in month chooser (drop-down)
+ * @returns number of months in month chooser
  */
-async function getMonthCountFromDropDown(page) {
+async function getMonthCount(page) {
     const selectElement = await page.$("#chooseMonthSched");
-    const options = await selectElement.$$("option");
-    return options.length;
+    const optionValues = await selectElement.$$eval("option", (options) =>
+        options.map((option) => option.getAttribute("value"))
+    );
+
+    return optionValues.length;
 }
 
 /**
  * The working hypothesis is that a day with availability will be marked
- * in the calendar table cell with the class "activeday", as in
+ * in a calendar table cell with the class "activeday", as in
  * <td class="scheduleday activeday"...>. Playing with this in the web browser
  * inspector yields a clickable day, which when clicked, shows a popup which would
  * presumably show the number of slots. Currently, it just says "No times available."
  *
- * This method evaluates the calendar for the presense of the "activeday" class. If found,
- * each day marked with it is assessed for the number of slots via an XHR query. The actual
+ * This function evaluates the calendar for the presense of the "activeday" class. If found,
+ * each day marked with it is assessed for the number of slots. The actual
  * response, how it presents the amount of availability, is not presently known, since
  * no availability has ever been posted.
  *
  * @param {*} page
- * @returns
+ * @returns Map of availability keyed by date. Guaranteed not null, returning at least an empty map.
  */
 async function getDailyAvailabilityCountsForMonth(page) {
-    let days = [];
-    let monthlyAvailability = {};
+    let monthlyAvailability = new Map();
 
     function reformatDate(date) {
         const dateObj = new Date(date + "T00:00:00");
@@ -94,33 +92,24 @@ async function getDailyAvailabilityCountsForMonth(page) {
     const activeDays = await getActiveDays(page);
 
     if (activeDays.length > 0) {
-        if (!pageContentSavedToS3) {
-            const msg = `${site.name} - possible appointments`;
-            console.log(msg);
-            await s3.savePageContent(site.name, page);
-            await sendSlackMsg("bot", msg);
-            pageContentSavedToS3 = true;
+        if (!activeDayPageContentSavedToS3) {
+            await notifyPageContentChange(page);
+            activeDayPageContentSavedToS3 = true;
         }
 
         try {
             for (let day of activeDays) {
-                /* Working hypothesis: the "activeday" CSS class will mark days with available slots.
-                <td class="scheduleday activeday ..." day="2021-04-24"
-                    data-qa="monthly-calendar-24-day-select"><span data-qa=""
-                        class="scheduledate">24</span>
-                </td>
-                */
-                const date = await page.evaluate(
+                const date = await day.evaluate(
                     (el) => el.getAttribute("day"),
                     day
                 );
 
                 const slotCount = await getSlotsForDate(page, date);
 
-                monthlyAvailability[reformatDate(date)] = {
-                    hasAvailability: !!slotCount,
+                monthlyAvailability.set(reformatDate(date), {
                     numberAvailableAppointments: slotCount,
-                };
+                    hasAvailability: !!slotCount,
+                });
             }
         } catch (error) {
             console.log(
@@ -134,15 +123,16 @@ async function getDailyAvailabilityCountsForMonth(page) {
 
 /**
  * Looks for "no-dates-available" class, or ".activeday" elements.
- * If not found, there are active days, and the page should be
+ * If not found, there are active days, and the page is
  * parsed for which days have availability.
  *
  * @returns Array of active day elements. Empty array is returned if there's no availability.
+ * Guaranteed not null or undefined.
  */
 async function getActiveDays(page) {
     const noDatesAvailable = await page.$(".no-dates-available");
     // No appointments available if defined
-    if (noDatesAvailable != undefined) {
+    if (noDatesAvailable) {
         return [];
     } else {
         let days = [];
@@ -164,6 +154,12 @@ async function getActiveDays(page) {
  * @returns response text of available times XHR query
  */
 async function getSlotsForDate(page, dateStr) {
+    const slotResponse = await fetchSlotsResponse(page, dateStr);
+
+    return parseHTMLforSlotCount(page, slotResponse);
+}
+
+async function fetchSlotsResponse(page, dateStr) {
     const url = [
         "https://app.acuityscheduling.com/schedule.php?action=availableTimes",
         "showSelect=0",
@@ -175,11 +171,11 @@ async function getSlotsForDate(page, dateStr) {
         "ignoreAppointment=",
     ].join("&");
 
-    return await page.evaluate(async (url) => {
+    const slotResponse = await page.evaluate(async (url) => {
         const response = await fetch(url);
         const text = await response.text();
-        return parseHTMLforSlotCount(text);
     }, url);
+    return slotResponse;
 }
 
 /**
@@ -193,12 +189,20 @@ async function advanceMonth(page) {
     try {
         await Promise.all([
             await page.click(nextMonthLinkClass),
-            // If the timeout option is not set, the timeout (30000 ms) will expire, and
-            // no results will be returned. Setting it to something shorter yields results.
-            // 5000 seems to be too much because the pages return nearly instantaneously.
-            // But will leave it at that just in case of ... what?
-            await page.waitForSelector(nextMonthLinkClass, {
-                timeout: 5000,
+            /*
+            For some unexplainable reason, using the default timeout (30000 ms) 
+            results in a timeout! No results will be returned. 
+            
+            Setting the timeout to something shorter yields results.
+
+            5000 seems to be too much time because the page update 
+            returns nearly instantaneously.
+
+            No clear way to determine what is the optimal value, so will leave
+            it set to 5000 -- anything shorter might causes problems.
+            */
+            await page.waitForSelector("#chooseMonthSched", {
+                timeout: 15000,
             }),
         ]);
     } catch (error) {
@@ -206,45 +210,53 @@ async function advanceMonth(page) {
     }
 }
 
-/**
- * Accumulates a month's worth of availability into the results object.
- *
- * @param {availability Object} dailySlotsForMonth -- a month's collection of availability by date
- */
-function accumulateAvailabilityForMonth(results, dailySlotsForMonth) {
-    if (
-        dailySlotsForMonth == null ||
-        Object.keys(dailySlotsForMonth).length == 0
-    ) {
-        return;
-    }
+function defaultPageService() {
+    return {
+        async getHomePage(page) {
+            const classToWaitFor = ".scheduleday";
+            await Promise.all([
+                page.goto(site.website),
+                waitForLoadComplete(page, classToWaitFor),
+            ]);
+        },
 
-    try {
-        let accumulatedAvailability = results.availability;
-        Object.assign(
-            results.availability,
-            accumulatedAvailability,
-            dailySlotsForMonth
-        );
-        results.hasAvailability = true;
-    } catch (error) {
-        console.log(`${site.name} :: error trying to merge results: ${error}`);
-    }
+        async getNextMonthCalendar(page) {
+            return advanceMonth(page);
+        },
+
+        async getActiveDayResponse(page, dateString) {
+            return fetchSlotsResponse(page, dateString);
+        },
+    };
 }
-
 /**
- * TODO: this is just a guess as to how the popup will present the number of appointments.
+ * TODO: We don't know how availability will be described on the page at this moment.
  *
  * @param {String} responseText
  */
-function parseHTMLforSlotCount(responseText) {
-    const text = responseText;
-    const pattern = /\d+/;
-    const number = text.match(pattern);
+function parseHTMLforSlotCount(page, responseText) {
+    console.log(`response text: ${responseText}`);
+    if (!parseSlotHtmlPageContentSavedToS3) {
+        notifyAvailabilityContentUpdte(page);
 
-    return number == null ? 0 : number[0];
+        parseSlotHtmlPageContentSavedToS3 = true;
+    }
+    return 0;
 }
 
+async function notifyAvailabilityContentUpdte(page) {
+    const msg = `${site.name} - possible appointments`;
+    console.log(msg);
+    await sendSlackMsg("bot", msg);
+    await s3.savePageContent(site.name, page);
+}
+
+async function notifyPageContentChange(page) {
+    const msg = `${site.name} - possible appointments`;
+    console.log(msg);
+    await sendSlackMsg("bot", msg);
+    await s3.savePageContent(site.name, page);
+}
 async function waitForLoadComplete(page, loaderSelector) {
     await page.waitForSelector(loaderSelector, {
         visible: true,
