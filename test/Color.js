@@ -19,7 +19,8 @@ describe("Transformations", () => {
             .and.nested.property("availability")
             .deep.equal({});
     });
-    it("should return one availabilitiy when there is one", () => {
+    // Skipping this test as we're hard-coding no availability due to mandatory pre-registration
+    it.skip("should return one availabilitiy when there is one", () => {
         // mock out the http request that returns the token
         const response = `{"results":[{
             "start": "2021-02-22T14:00:00+00:00",
@@ -50,7 +51,8 @@ describe("Transformations", () => {
             },
         });
     });
-    it("should return multiple date availabilities", () => {
+    // Skipping this test as we're hard-coding no availability due to mandatory pre-registration
+    it.skip("should return multiple date availabilities", () => {
         // mock out the http request that returns the token
         const response = `{"results":[{
             "start": "2021-02-22T14:00:00+00:00",
