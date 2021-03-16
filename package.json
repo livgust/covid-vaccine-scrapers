@@ -12,9 +12,9 @@
         "node-fetch": "^2.6.1",
         "node-html-parser": "^2.1.0",
         "puppeteer": "npm:puppeteer-core@^6.0.0",
-        "puppeteer-extra": "^3.1.16",
-        "puppeteer-extra-plugin-recaptcha": "^3.3.2",
-        "puppeteer-extra-plugin-stealth": "^2.7.5",
+        "puppeteer-extra": "^3.1.18",
+        "puppeteer-extra-plugin-recaptcha": "^3.3.5",
+        "puppeteer-extra-plugin-stealth": "^2.7.6",
         "rimraf": "^3.0.2",
         "us-zips": "^4.0.2"
     },
