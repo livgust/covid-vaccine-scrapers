@@ -6,7 +6,10 @@ let scrapers = [];
 if (process.argv.length > 2) {
     for (let i = 2; i < process.argv.length; i++) {
         const scraper = require(`./${process.argv[i]}`);
-        scrapers.push(scraper);
+        scrapers.push({
+            run: scraper,
+            name: process.argv[i],
+        });
     }
 } else {
     const ls = fs
@@ -16,7 +19,7 @@ if (process.argv.length > 2) {
 
     ls.map((fileName) => {
         let scraper = require(`./${fileName}`);
-        scrapers.push(scraper);
+        scrapers.push({ run: scraper, name: fileName });
     });
 }
 
