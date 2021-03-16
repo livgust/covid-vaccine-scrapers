@@ -54,7 +54,8 @@ module.exports = async function GetAvailableAppointments(browser) {
             name: `${site.name} (${city})`,
             hasAvailability: responseLocation.status !== "Fully Booked",
             availability: {},
-            timestamp: timestamp,
+            timestamp: new Date(),
+            siteTimestamp: timestamp,
             signUpLink: site.website,
         };
         if (totalAvailability) {
