@@ -5,14 +5,16 @@ dotenv.config();
 const chromium = require("chrome-aws-lambda");
 const { addExtra } = require("puppeteer-extra");
 const Puppeteer = addExtra(chromium.puppeteer);
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+
+const { getAllCoordinates } = require("./getGeocode");
+const { logScraperRun } = require("./lib/metrics");
+const dataDefaulter = require("./data/dataDefaulter");
+const fetch = require("node-fetch");
+const file = require("./lib/file");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const scrapers = require("./site-scrapers");
-const fetch = require("node-fetch");
-const dataDefaulter = require("./data/dataDefaulter");
-const file = require("./lib/file");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
-const { getAllCoordinates } = require("./getGeocode");
 
 async function execute() {
     const cachedResults = await fetch(
@@ -34,27 +36,41 @@ async function execute() {
 
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
-            executablePath: process.env.CHROMEPATH,
-            headless: true,
-        })
+              executablePath: process.env.CHROMEPATH,
+              headless: true,
+          })
         : await Puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath,
-            headless: chromium.headless,
-            ignoreHTTPSErrors: true,
-        });
+              args: chromium.args,
+              defaultViewport: chromium.defaultViewport,
+              executablePath: await chromium.executablePath,
+              headless: chromium.headless,
+              ignoreHTTPSErrors: true,
+          });
 
     const gatherData = async () => {
         const results = await Promise.all(
-            scrapers.map((scraper) =>
-                scraper(browser).catch((error) => {
-                    //print out the issue but don't fail, this way we still publish updates
-                    //for other locations even if this website's scrape doesn't work
-                    console.log(error);
-                    return null;
-                })
-            )
+            scrapers.map((scraper) => {
+                const startTime = new Date();
+                let isSuccess = true;
+                return scraper
+                    .run(browser)
+                    .catch((error) => {
+                        //print out the issue but don't fail, this way we still publish updates
+                        //for other locations even if this website's scrape doesn't work
+                        console.log(error);
+                        isSuccess = false;
+                        return null;
+                    })
+                    .then(async (result) => {
+                        await logScraperRun(
+                            scraper.name,
+                            isSuccess,
+                            new Date() - startTime,
+                            startTime
+                        );
+                        return result;
+                    });
+            })
         );
         browser.close();
         let scrapedResultsArray = [];
@@ -103,7 +119,10 @@ async function execute() {
             file.write("out.json", webData);
             return responseJson;
         } else {
-            const uploadResponse = await s3.saveWebData(webData, responseJson.timestamp);
+            const uploadResponse = await s3.saveWebData(
+                webData,
+                responseJson.timestamp
+            );
             return uploadResponse;
         }
     };
