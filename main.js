@@ -31,8 +31,11 @@ async function execute() {
         })
     );
 
-    const clientIpAddress = await fetch("https://ifconfig.me/ip")
-        .then(res => res.text());
+    let clientIpAddress = null;
+
+    fetch("https://ifconfig.me/ip")
+        .then(res => res.text())
+        .then(body => clientIpAddress = body);
 
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
