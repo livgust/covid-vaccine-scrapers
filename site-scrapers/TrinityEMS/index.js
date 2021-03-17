@@ -4,24 +4,38 @@ const { sendSlackMsg } = require("../../lib/slack");
 
 module.exports = async function GetAvailableAppointments(
     browser,
-    pageService = defaultPageService()
+    pageService = defaultPageService(),
+    customNotificationService
 ) {
     console.log(`${site.name} starting.`);
-    const availability = await ScrapeWebsiteData(browser, site, pageService);
+    if (customNotificationService) {
+        notificationService = customNotificationService;
+    }
+    const availability = await ScrapeWebsiteData(browser, pageService);
     console.log(`${site.name} done.`);
-    return {
+    const results = {
         ...site,
         ...availability,
     };
+    return results;
 };
 
 let activeDayPageContentSavedToS3 = false; // becomes true upon first save to s3
 let parseSlotHtmlPageContentSavedToS3 = false; // becomes true upon first save to s3
 
-async function ScrapeWebsiteData(browser, site, pageService) {
-    const page = await browser.newPage();
+let notificationService = function defaultNotificationService() {
+    return {
+        async handlePageContentChange(page) {
+            return notifyPageContentChange(page);
+        },
+        async handleAvailabilityContentUpdate(page) {
+            return notifyAvailabilityContentUpdate(page);
+        },
+    };
+};
 
-    await pageService.getHomePage(page);
+async function ScrapeWebsiteData(browser, pageService) {
+    const page = await pageService.getHomePage(browser);
 
     // Initialize results to no availability
     const results = {
@@ -37,7 +51,8 @@ async function ScrapeWebsiteData(browser, site, pageService) {
             await pageService.getNextMonthCalendar(page);
         }
         const dailySlotsForMonth = await getDailyAvailabilityCountsForMonth(
-            page
+            page,
+            pageService
         );
         // Add all day objects to results.availability
         dailySlotsForMonth.forEach(
@@ -81,7 +96,7 @@ async function getMonthCount(page) {
  * @param {*} page
  * @returns Map of availability keyed by date. Guaranteed not null, returning at least an empty map.
  */
-async function getDailyAvailabilityCountsForMonth(page) {
+async function getDailyAvailabilityCountsForMonth(page, pageService) {
     let monthlyAvailability = new Map();
 
     function reformatDate(date) {
@@ -93,7 +108,7 @@ async function getDailyAvailabilityCountsForMonth(page) {
 
     if (activeDays.length > 0) {
         if (!activeDayPageContentSavedToS3) {
-            await notifyPageContentChange(page);
+            await notificationService.handlePageContentChange(page);
             activeDayPageContentSavedToS3 = true;
         }
 
@@ -104,7 +119,11 @@ async function getDailyAvailabilityCountsForMonth(page) {
                     day
                 );
 
-                const slotCount = await getSlotsForDate(page, date);
+                const slotCount = await getSlotsForDate(
+                    page,
+                    date,
+                    pageService
+                );
 
                 monthlyAvailability.set(reformatDate(date), {
                     numberAvailableAppointments: slotCount,
@@ -153,10 +172,10 @@ async function getActiveDays(page) {
  * @param {String} dateStr -- yyyy-mm-dd, as in '2021-04-26'
  * @returns response text of available times XHR query
  */
-async function getSlotsForDate(page, dateStr) {
-    const slotResponse = await fetchSlotsResponse(page, dateStr);
+async function getSlotsForDate(page, dateStr, pageService) {
+    const slotResponse = await pageService.getActiveDayResponse(page, dateStr);
 
-    return parseHTMLforSlotCount(page, slotResponse);
+    return pageService.parseSlotCountFromResponse(page, slotResponse);
 }
 
 async function fetchSlotsResponse(page, dateStr) {
@@ -212,12 +231,14 @@ async function advanceMonth(page) {
 
 function defaultPageService() {
     return {
-        async getHomePage(page) {
+        async getHomePage(browser) {
             const classToWaitFor = ".scheduleday";
+            const page = await browser.newPage();
             await Promise.all([
                 page.goto(site.website),
                 waitForLoadComplete(page, classToWaitFor),
             ]);
+            return page;
         },
 
         async getNextMonthCalendar(page) {
@@ -226,6 +247,10 @@ function defaultPageService() {
 
         async getActiveDayResponse(page, dateString) {
             return fetchSlotsResponse(page, dateString);
+        },
+
+        parseSlotCountFromResponse(page, responseText) {
+            parseHTMLforSlotCount(page, responseText);
         },
     };
 }
@@ -237,14 +262,13 @@ function defaultPageService() {
 function parseHTMLforSlotCount(page, responseText) {
     console.log(`response text: ${responseText}`);
     if (!parseSlotHtmlPageContentSavedToS3) {
-        notifyAvailabilityContentUpdte(page);
-
+        notificationService.handleAvailabilityContentUpdate(page);
         parseSlotHtmlPageContentSavedToS3 = true;
     }
     return 0;
 }
 
-async function notifyAvailabilityContentUpdte(page) {
+async function notifyAvailabilityContentUpdate(page) {
     const msg = `${site.name} - possible appointments`;
     console.log(msg);
     await sendSlackMsg("bot", msg);
@@ -257,6 +281,7 @@ async function notifyPageContentChange(page) {
     await sendSlackMsg("bot", msg);
     await s3.savePageContent(site.name, page);
 }
+
 async function waitForLoadComplete(page, loaderSelector) {
     await page.waitForSelector(loaderSelector, {
         visible: true,
