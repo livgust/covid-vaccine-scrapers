@@ -18,11 +18,8 @@ function* generateSequence(start, end) {
 }
 
 before(async function () {
-    const chromePath =
-        "/Applications/Google Chrome Dev.app/Contents/MacOS/Google Chrome Dev";
-    console.log(`chromepath: ${chromePath}`);
     browser = await Puppeteer.launch({
-        executablePath: chromePath,
+        executablePath: process.env.CHROMEPATH,
         headless: true,
     });
 });
