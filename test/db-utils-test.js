@@ -9,9 +9,7 @@ describe("FaunaDB Utils", function () {
     const dbUtils = require("../lib/db-utils");
     this.timeout(5000);
 
-    // major issue... what if more than 1 person is running these at once... does each person need their own version of the DB??
-    // maybe... randomly create the locationName to be a random string?
-    it.only("can create, retrieve, replace, and delete docs from LOCATIONS collection", async () => {
+    it("can create, retrieve, replace, and delete docs from Locations collection", async () => {
         const randomName = Math.random().toString(36).substring(7);
         const collectionName = "locations";
         const data = {
@@ -59,7 +57,6 @@ describe("FaunaDB Utils", function () {
             data,
         });
 
-        // modify the data
         const modifiedData = {
             name: `NewRandomName-${randomName}`,
             address: { street: "1 Main St", city: "Newton", zip: "02458" },
@@ -266,9 +263,5 @@ describe("FaunaDB Utils", function () {
         appointmentRefIds.map(async (id) => {
             await dbUtils.deleteItemByRefId("appointments", id);
         });
-    });
-
-    it("for all locs, find the most recent run's availability", async () => {
-        // do the thing
     });
 });
