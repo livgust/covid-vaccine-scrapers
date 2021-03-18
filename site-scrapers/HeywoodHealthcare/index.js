@@ -1,4 +1,6 @@
 const { site } = require("./config");
+const { sendSlackMsg } = require("../../lib/slack");
+const s3 = require("../../lib/s3");
 
 const noAppointmentMatchString =
     "All appointment types are private, none are available for scheduling.";
@@ -11,19 +13,14 @@ const noAppointmentMatchString =
  * @return JSON blob with { hasAppointments: Bool, totalAvailability: Int }
  */
 module.exports = async function GetAvailableAppointments(browser) {
-    if (browser.browserContexts().length > 1) {
-        await console.log(`${site.name} testsuite started...`);
-        const webData = await ScrapeWebsiteData(browser);
-        await console.log(`${site.name} testsuite finished...`);
-        return webData;
-    } else {
-        await console.log(`${site.name} starting.`);
-        const page = await browser.newPage();
-        await page.goto(site.signUpLink);
-        const webData = await ScrapeWebsiteData(browser);
-        await console.log(`${site.name} done.`);
-        return webData;
-    }
+    await console.log(`${site.name} starting.`);
+    const webData = await ScrapeWebsiteData(browser);
+    await console.log(`${site.name} done.`);
+    return {
+        ...site,
+        ...webData,
+        timestamp: new Date(),
+    };
 };
 
 /*
@@ -34,13 +31,14 @@ module.exports = async function GetAvailableAppointments(browser) {
  * @return JSON blob with { hasAppointments: Bool, totalAvailability: Int }
  */
 async function ScrapeWebsiteData(browser) {
-    let pageArray = await browser.pages();
-    const page = pageArray[1];
-    // Is the clinic open?
-    const alertElement = await page.$("div.alert[data-qa=error-notice]");
-    let alert = alertElement
-        ? await alertElement.evaluate((node) => node.innerText)
-        : false;
+    const page = await browser.newPage();
+    await page.goto(site.signUpLink);
+    const alertElement = await page.waitForSelector(
+        "div.alert[data-qa=error-notice]"
+    );
+    const alert = await (alertElement
+        ? alertElement.evaluate((node) => node.innerText)
+        : false);
     let hasAppointments = false;
     let totalAvailability = 0;
     let date = false;

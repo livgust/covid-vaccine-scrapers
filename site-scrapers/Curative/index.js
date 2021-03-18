@@ -41,44 +41,45 @@ module.exports = async function GetAvailableAppointments(browser) {
             availability: {}, //date (MM/DD/YYYY) => hasAvailability, numberAvailableAppointments
             timestamp: new Date(),
         };
-        data.appointment_windows.forEach((appointment) => {
-            const dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
-            const { year, month, day } = appointment.start_time.match(
-                dateRegexp
-            ).groups;
-            const date = `${month}/${day}/${year}`;
-            let newNumberAvailable =
-                appointment.status !== "Disabled"
-                    ? appointment.slots_available
-                    : 0;
+        /* COMMENTING OUT BELOW BECAUSE APPTS ARE INVITE-ONLY */
+        // data.appointment_windows.forEach((appointment) => {
+        //     const dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
+        //     const { year, month, day } = appointment.start_time.match(
+        //         dateRegexp
+        //     ).groups;
+        //     const date = `${month}/${day}/${year}`;
+        //     let newNumberAvailable =
+        //         appointment.status !== "Disabled"
+        //             ? appointment.slots_available
+        //             : 0;
 
-            if (newNumberAvailable) {
-                mappedData.hasAvailability = true;
-            }
+        //     if (newNumberAvailable) {
+        //         mappedData.hasAvailability = true;
+        //     }
 
-            if (mappedData.availability[date]) {
-                newNumberAvailable +=
-                    mappedData.availability[date].numberAvailableAppointments;
-            }
+        //     if (mappedData.availability[date]) {
+        //         newNumberAvailable +=
+        //             mappedData.availability[date].numberAvailableAppointments;
+        //     }
 
-            // Only add date keys if there are appointments
-            if (newNumberAvailable) {
-                mappedData.availability[date] = {
-                    numberAvailableAppointments: newNumberAvailable,
-                    hasAvailability: true,
-                };
-            }
-        });
+        //     // Only add date keys if there are appointments
+        //     if (newNumberAvailable) {
+        //         mappedData.availability[date] = {
+        //             numberAvailableAppointments: newNumberAvailable,
+        //             hasAvailability: true,
+        //         };
+        //     }
+        // });
 
-        if (
-            data.hasOwnProperty("visible_in_search") &&
-            !data.visible_in_search
-        ) {
-            // Commented out the following line because there is currently a
-            // waiting room for people to join for an event that starts at 8:30am.
-            // We should revisit this later after the appointments are gone.
-            //mappedData.hasAvailability = false;
-        }
+        // if (
+        //     data.hasOwnProperty("visible_in_search") &&
+        //     !data.visible_in_search
+        // ) {
+        //     // Commented out the following line because there is currently a
+        //     // waiting room for people to join for an event that starts at 8:30am.
+        //     // We should revisit this later after the appointments are gone.
+        //     //mappedData.hasAvailability = false;
+        // }
 
         return mappedData;
     });

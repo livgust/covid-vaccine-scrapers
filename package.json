@@ -12,9 +12,9 @@
         "node-fetch": "^2.6.1",
         "node-html-parser": "^2.1.0",
         "puppeteer": "npm:puppeteer-core@^6.0.0",
-        "puppeteer-extra": "^3.1.16",
-        "puppeteer-extra-plugin-recaptcha": "^3.3.2",
-        "puppeteer-extra-plugin-stealth": "^2.7.5",
+        "puppeteer-extra": "^3.1.18",
+        "puppeteer-extra-plugin-recaptcha": "^3.3.5",
+        "puppeteer-extra-plugin-stealth": "^2.7.6",
         "rimraf": "^3.0.2",
         "us-zips": "^4.0.2"
     },
@@ -25,10 +25,16 @@
         "chai-subset": "^1.6.0",
         "mocha": "^8.3.0",
         "mock-require": "^3.0.3",
-        "nock": "^13.0.7"
+        "nock": "^13.0.7",
+        "prettier": "^2.2.1"
+    },
+    "engines": {
+        "node": ">= 14.0.0",
+        "npm": ">= 7.0.0"
     },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",
-        "test": "mocha"
+        "test": "mocha",
+        "verifyLockfile": "node -e \"if(require('./package-lock.json').lockfileVersion !== 2) {process.exit(1);};\""
     }
 }
