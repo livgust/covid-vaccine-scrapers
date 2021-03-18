@@ -1,36 +1,21 @@
-const chromium = require("chrome-aws-lambda");
-const { addExtra } = require("puppeteer-extra");
-const Puppeteer = addExtra(chromium.puppeteer);
-const chai = require("chai");
-
 const trinityEms = require("../site-scrapers/TrinityEMS/index");
 const site = require("../site-scrapers/TrinityEMS/config");
 
-let browser;
-
+/** Generator to feed filenames sequentially to the "with availability" test. */
 function* filenames() {
     yield "TrinityEMS-2021-February-activedays.html";
     yield "TrinityEMS-2021-March-activedays.html";
     yield "TrinityEMS-2021-April-activedays.html";
 }
+/** Generator for creating an ascending sequence of slot counts. */
 function* generateSequence(start, end) {
     for (let i = start; i <= end; i++) yield i;
 }
 
-before(async function () {
-    browser = await Puppeteer.launch({
-        executablePath: process.env.CHROMEPATH,
-        headless: true,
-    });
-});
-
-after(async function () {
-    await browser.close();
-});
-
 describe(`${site.name} :: test 3 months with availability`, function () {
     const filenameGenerator = filenames();
     const sequence = generateSequence(1, 20); // the mock files only have 13 active days
+    /** slotTotal is the expected value of slots found in the availability test. */
     let slotTotal = 0;
 
     async function loadPage(page) {
@@ -83,14 +68,14 @@ describe(`${site.name} :: test 3 months with availability`, function () {
             activeDayPageService,
             testNotificationService
         );
-        chai.expect(Object.keys(results.availability).length).equals(13);
+        expect(Object.keys(results.availability).length).equals(13);
 
         const total = Object.values(results.availability)
             .map((value) => value.numberAvailableAppointments)
             .reduce(function (total, number) {
                 return total + number;
             }, 0);
-        chai.expect(total).to.equal(slotTotal);
+        expect(total).to.equal(slotTotal);
     });
 });
 
@@ -119,7 +104,7 @@ describe("TrinityEMS :: test with 'no-dates-available' class present", function 
     it("should return no availability", async function () {
         const results = await trinityEms(browser, noDatesPageService);
 
-        chai.expect(Object.keys(results.availability).length).to.equal(0);
+        expect(Object.keys(results.availability).length).to.equal(0);
 
         console.log(`results reported would be: \n ${JSON.stringify(results)}`);
     });
