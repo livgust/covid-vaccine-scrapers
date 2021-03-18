@@ -9,7 +9,7 @@ describe("FaunaDB Utils", function () {
     const dbUtils = require("../lib/db-utils");
     this.timeout(5000);
 
-    it("can create, retrieve, replace, and delete docs from Locations collection", async () => {
+    it("can create, retrieve, and delete docs from Locations collection", async () => {
         const randomName = Math.random().toString(36).substring(7);
         const collectionName = "locations";
         const data = {
@@ -23,7 +23,6 @@ describe("FaunaDB Utils", function () {
             city: data.address.city,
             zip: data.address.zip,
         });
-        console.log("got generatedId", generatedId);
 
         await expect(
             dbUtils.retrieveItemByRefId(collectionName, generatedId)
@@ -57,49 +56,14 @@ describe("FaunaDB Utils", function () {
             data,
         });
 
-        const modifiedData = {
-            name: `NewRandomName-${randomName}`,
-            address: { street: "1 Main St", city: "Newton", zip: "02458" },
-            signUpLink: "www.google.com",
-        };
-
-        await dbUtils.replaceLocationByRefId({
-            refId: generatedId,
-            ...modifiedData,
-        });
-
-        const retrieveResult2 = await dbUtils.retrieveItemByRefId(
-            collectionName,
-            generatedId
-        );
-        expect(retrieveResult2).to.be.shallowDeepEqual({
-            ref: {
-                value: {
-                    collection: {
-                        value: {
-                            collection: {
-                                value: {
-                                    id: "collections",
-                                },
-                            },
-                            id: "locations",
-                        },
-                    },
-                    id: generatedId,
-                },
-            },
-            data: modifiedData,
-        });
-
         await dbUtils.deleteItemByRefId(collectionName, generatedId);
         await expect(
             dbUtils.retrieveItemByRefId(collectionName, generatedId)
         ).to.eventually.be.rejectedWith("instance not found");
     });
 
-    it("can perform the operations we need for adding data for a given scraper run", async () => {
+    it("given one scraper's output, can create, retrieve, and delete docs from Locations, ScraperRuns, and Appointments collections", async () => {
         const randomName = Math.random().toString(36).substring(7);
-        console.log("randomName is", randomName);
         const scraperOutput = {
             name: `RandomName-${randomName}`,
             street: "2240 Iyannough Road",
@@ -254,7 +218,6 @@ describe("FaunaDB Utils", function () {
         const appointmentRefIds = retrieveAppointmentsResult.data.map(
             (entry) => entry.ref.value.id
         );
-        console.log(`appointmentRefIds`, appointmentRefIds);
 
         // clean up
         await dbUtils.deleteItemByRefId("locations", locationId);
@@ -263,5 +226,10 @@ describe("FaunaDB Utils", function () {
         appointmentRefIds.map(async (id) => {
             await dbUtils.deleteItemByRefId("appointments", id);
         });
+    });
+
+    it("can get the availability for all locations' most recent scraper runs", async () => {
+        await dbUtils.getAppointmentsForAllLocations()
+        // the logic isn't here yet. 
     });
 });
