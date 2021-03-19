@@ -1,5 +1,4 @@
 const chai = require("chai");
-const { random } = require("lodash");
 chai.use(require("chai-as-promised"));
 chai.use(require("chai-shallow-deep-equal"));
 const expect = chai.expect;
@@ -7,8 +6,6 @@ const lodash = require("lodash");
 
 describe("FaunaDB Utils", function () {
     const dbUtils = require("../lib/db-utils");
-    this.timeout(5000);
-
     it("can create, retrieve, and delete docs from Locations collection", async () => {
         const randomName = Math.random().toString(36).substring(7);
         const collectionName = "locations";
@@ -95,7 +92,7 @@ describe("FaunaDB Utils", function () {
             signUpLink: "fake-signup-link",
         };
 
-        // Write the appopriate location (if it's not there), scaperRun, and appointment(s)
+        // Write the appopriate location (if it's not already there), scaperRun, and appointment(s)
         await dbUtils.writeScrapedData(scraperOutput);
 
         // sleep while the DB writing happens...
@@ -219,14 +216,13 @@ describe("FaunaDB Utils", function () {
             (entry) => entry.ref.value.id
         );
 
-        // clean up
+        // clean up - delete it all
         await dbUtils.deleteItemByRefId("locations", locationId);
         await dbUtils.deleteItemByRefId("scraperRuns", scraperRunRef);
-        // delete all the appointments
         appointmentRefIds.map(async (id) => {
             await dbUtils.deleteItemByRefId("appointments", id);
         });
-    });
+    }).timeout(4000);
 
     it("can get the availability for all locations' most recent scraper runs", async () => {
         await dbUtils.getAppointmentsForAllLocations();
