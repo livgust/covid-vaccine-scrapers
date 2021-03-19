@@ -173,9 +173,11 @@ async function getActiveDays(page) {
  * @returns response text of available times XHR query
  */
 async function getSlotsForDate(page, dateStr, pageService) {
-    const slotResponse = await pageService.getActiveDayResponse(page, dateStr);
-
-    return pageService.parseSlotCountFromResponse(page, slotResponse);
+    const slotCountResponse = await pageService.fetchSlotsResponse(
+        page,
+        dateStr
+    );
+    return parseHTMLforSlotCount(page, slotCountResponse);
 }
 
 async function fetchSlotsResponse(page, dateStr) {
@@ -194,6 +196,7 @@ async function fetchSlotsResponse(page, dateStr) {
         const response = await fetch(url);
         const text = await response.text();
     }, url);
+
     return slotResponse;
 }
 
@@ -209,12 +212,12 @@ async function advanceMonth(page) {
         await Promise.all([
             await page.click(nextMonthLinkClass),
             /*
-            For some unexplainable reason, using the default timeout (30000 ms) 
-            results in a timeout! No results will be returned. 
-            
+            For some unexplainable reason, using the default timeout (30000 ms)
+            results in a timeout! No results will be returned.
+
             Setting the timeout to something shorter yields results.
 
-            5000 seems to be too much time because the page update 
+            5000 seems to be too much time because the page update
             returns nearly instantaneously.
 
             No clear way to determine what is the optimal value, so will leave
@@ -245,12 +248,8 @@ function defaultPageService() {
             return advanceMonth(page);
         },
 
-        async getActiveDayResponse(page, dateString) {
+        async fetchSlotsResponse(page, dateString) {
             return fetchSlotsResponse(page, dateString);
-        },
-
-        parseSlotCountFromResponse(page, responseText) {
-            parseHTMLforSlotCount(page, responseText);
         },
     };
 }
@@ -260,16 +259,17 @@ function defaultPageService() {
  * @param {String} responseText
  */
 function parseHTMLforSlotCount(page, responseText) {
-    console.log(`response text: ${responseText}`);
     if (!parseSlotHtmlPageContentSavedToS3) {
-        notificationService.handleAvailabilityContentUpdate(page);
+        notificationService.handleAvailabilityContentUpdate(page, responseText);
         parseSlotHtmlPageContentSavedToS3 = true;
     }
-    return 0;
+    // TODO: insert parsing here
+
+    return isNaN(responseText) ? 0 : responseText;
 }
 
-async function notifyAvailabilityContentUpdate(page) {
-    const msg = `${site.name} - possible appointments`;
+async function notifyAvailabilityContentUpdate(page, responseText) {
+    const msg = `${site.name} - possible appointments:\n${responseText}`;
     console.log(msg);
     await sendSlackMsg("bot", msg);
     await s3.savePageContent(site.name, page);

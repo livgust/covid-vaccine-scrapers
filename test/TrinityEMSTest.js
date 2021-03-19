@@ -1,5 +1,11 @@
 const trinityEms = require("../site-scrapers/TrinityEMS/index");
-const site = require("../site-scrapers/TrinityEMS/config");
+
+/**
+ * When working in VS Code, you will need to temporarily add the following in order
+ * to run and debug. Remove it but maintain this javadoc comment for future maintainers.
+ *
+ * const bootsrap = require("./bootstrap");
+ */
 
 /** Generator to feed filenames sequentially to the "with availability" test. */
 function* filenames() {
@@ -12,11 +18,14 @@ function* generateSequence(start, end) {
     for (let i = start; i <= end; i++) yield i;
 }
 
-describe(`${site.name} :: test 3 months with availability`, function () {
+describe("TrinityEMS :: test 3 months with availability", function () {
     const filenameGenerator = filenames();
-    const sequence = generateSequence(1, 20); // the mock files only have 13 active days
-    /** slotTotal is the expected value of slots found in the availability test. */
+    const sequence = generateSequence(1, 13); // the mock files only have 13 active days
+
+    /** expected value for various events */
     let slotTotal = 0;
+    let notifyPageContentChangeCount = 0;
+    let notifyAvailabilityContentChangeCount = 0;
 
     async function loadPage(page) {
         const html = loadTestHtmlFromFile(filenameGenerator.next().value);
@@ -30,7 +39,6 @@ describe(`${site.name} :: test 3 months with availability`, function () {
         async getHomePage(browser) {
             const page = await browser.newPage();
             loadPage(page);
-            console.log("getting home page");
             return page;
         },
         /**
@@ -40,43 +48,49 @@ describe(`${site.name} :: test 3 months with availability`, function () {
             loadPage(page);
         },
         /**
-         * mock test HTML response
+         * mock slot count response
          */
-        async getActiveDayResponse(/*page*/) {
+        async fetchSlotsResponse(/*page, dateString*/) {
             const slotCount = sequence.next().value;
             slotTotal += slotCount;
-            console.log(`slotCount: ${slotCount}; slotTotal: ${slotTotal}`);
             return slotCount;
-        },
-        parseSlotCountFromResponse(page, responseText) {
-            return responseText;
         },
     };
     /** Notfication service which does not write to s3 or send Slack messages. */
     const testNotificationService = {
         async handlePageContentChange(/*page*/) {
-            console.log("no-op notification of page content change");
+            console.log("\tno-op notification of page content change");
+            notifyPageContentChangeCount += 1;
         },
         async handleAvailabilityContentUpdate(/*page*/) {
-            console.log("no-op notification of availability change");
+            console.log("\tno-op notification of availability change");
+            notifyAvailabilityContentChangeCount += 1;
         },
     };
 
-    it("use 3 mock pages with 13 slots total", async () => {
-        const results = await trinityEms(
-            browser,
-            activeDayPageService,
-            testNotificationService
-        );
-        expect(Object.keys(results.availability).length).equals(13);
+    it(
+        "Should return 13 slots with an ascending number of available slots, total = 91. " +
+            "Should also send s3 and slackMsg notifications once.",
+        async () => {
+            const results = await trinityEms(
+                browser,
+                activeDayPageService,
+                testNotificationService
+            );
+            expect(Object.keys(results.availability).length).equals(13);
 
-        const total = Object.values(results.availability)
-            .map((value) => value.numberAvailableAppointments)
-            .reduce(function (total, number) {
-                return total + number;
-            }, 0);
-        expect(total).to.equal(slotTotal);
-    });
+            const total = Object.values(results.availability)
+                .map((value) => value.numberAvailableAppointments)
+                .reduce(function (total, number) {
+                    return total + number;
+                }, 0);
+            expect(total).to.equal(slotTotal);
+
+            // s3 and slackMsg notifications should be sent once
+            expect(notifyAvailabilityContentChangeCount).to.equal(1);
+            expect(notifyPageContentChangeCount).to.equal(1);
+        }
+    );
 });
 
 describe("TrinityEMS :: test with 'no-dates-available' class present", function () {
@@ -90,7 +104,6 @@ describe("TrinityEMS :: test with 'no-dates-available' class present", function 
         async getHomePage(browser) {
             page = await browser.newPage();
             loadPageNoAvailabilityPage(page);
-            console.log("noDatesPageService :: getting home page");
             return page;
         },
         async getNextMonthCalendar(/*page*/) {
@@ -105,22 +118,18 @@ describe("TrinityEMS :: test with 'no-dates-available' class present", function 
         const results = await trinityEms(browser, noDatesPageService);
 
         expect(Object.keys(results.availability).length).to.equal(0);
-
-        console.log(`results reported would be: \n ${JSON.stringify(results)}`);
     });
 });
 
 /* utilities */
 
 /**
- * Loads the saved HTML of the website. The file is expected to be in the /TrinityEMS/ folder.
+ * Loads the saved HTML of the website. The file is expected to be in the test/TrinityEMS/ folder.
  *
- * @param {String} filename The filename only, include its extension. E.g., TrinityEMS.html`
+ * @param {String} filename The filename only, include its extension: e.g., TrinityEMS.html`
  */
 function loadTestHtmlFromFile(filename) {
     const fs = require("fs");
     const path = `${process.cwd()}/test/TrinityEMS/${filename}`;
-    console.log(`path: ${JSON.stringify(path)}`);
-    var contentHtml = fs.readFileSync(path, "utf8");
-    return contentHtml;
+    return fs.readFileSync(path, "utf8");
 }
