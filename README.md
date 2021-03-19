@@ -29,7 +29,7 @@ to run `site-scrapers/MAImmunizations.js`
 
 ## Adding a scraper
 To scrape data from a site, you either need to:
-- figure out which API calls are made (Chrome devtools > Network tab) and make these calls yourself to fetch availability. This is preferable since the underlying APIs are less likely to change than the HTML on a given page.
+- figure out which API calls are made (Chrome devtools > Network tab) and make these calls yourself to fetch availability
 - interact with the site (clicking buttons, inspecting HTML elements, etc) using puppeteer
 
 It's often the case that at the time you're trying to write a scraper, there is no availability to scrape. This makes it hard to know what to do in the case of availability.
