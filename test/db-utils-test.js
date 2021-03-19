@@ -229,7 +229,7 @@ describe("FaunaDB Utils", function () {
     });
 
     it("can get the availability for all locations' most recent scraper runs", async () => {
-        await dbUtils.getAppointmentsForAllLocations()
-        // the logic isn't here yet. 
+        await dbUtils.getAppointmentsForAllLocations();
+        // the logic isn't here yet.
     });
 });
