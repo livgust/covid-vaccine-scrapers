@@ -2,7 +2,9 @@
 
 ## Overview
 
-This is the open-source portion of the back-end, website scraping software that powers www.macovidvaccines.com. Technologies used are Node JS and Puppeteer. In production, this code is run every 5 minutes via AWS Lambda, posting its results to a JSON file in an AWS S3 bucket.
+This is the open-source portion of the back-end, website scraping software that powers www.macovidvaccines.com. Technologies used are Node JS and Puppeteer. In production, this code is run every minute via AWS Lambda, posting its results to a JSON file in an AWS S3 bucket.
+
+[Our project board](https://github.com/users/livgust/projects/2) is the definitive source for work in progress and work that needs to be done.
 
 ## Setup
 
