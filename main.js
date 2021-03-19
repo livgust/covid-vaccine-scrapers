@@ -31,6 +31,12 @@ async function execute() {
         })
     );
 
+    let clientIpAddress = null;
+
+    fetch("https://ifconfig.me/ip")
+        .then(res => res.text())
+        .then(body => clientIpAddress = body);
+
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
               executablePath: process.env.CHROMEPATH,
@@ -96,6 +102,10 @@ async function execute() {
         const responseJson = {
             // Version number of the file
             version: 1,
+
+            debug: {
+                clientIpAddress
+            },
 
             // Timestamp for the archived data.json file.
             timestamp: s3.getTimestampForFile(),
