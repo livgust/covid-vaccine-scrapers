@@ -24,7 +24,7 @@ jobs:
       - name: Make .env
         uses: SpicyPizza/create-envfile@v1
         with:
-          FAUNA_DB_DEV: ${{ secrets.FAUNA_DB_DEV }}
+          FAUNA_DB_DEV: ${{ secrets.envkey_FAUNA_DB_DEV }}
       - run: npm ci
       - name: Run test suite
         env:
