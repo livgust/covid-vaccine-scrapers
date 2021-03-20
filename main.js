@@ -34,8 +34,8 @@ async function execute() {
     let clientIpAddress = null;
 
     fetch("https://ifconfig.me/ip")
-        .then(res => res.text())
-        .then(body => clientIpAddress = body);
+        .then((res) => res.text())
+        .then((body) => (clientIpAddress = body));
 
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
@@ -65,11 +65,28 @@ async function execute() {
                         return null;
                     })
                     .then(async (result) => {
+                        let numberAppointments = 0;
+                        if (result.availability) {
+                            numberAppointments = Object.values(
+                                result.availability
+                            ).reduce(
+                                (cum, cur) =>
+                                    cum +
+                                    (cur.numberAvailableAppointments || 0),
+                                0
+                            );
+                        } else if (result.hasAvailability) {
+                            numberAppointments = 1;
+                        }
+                        console.log(
+                            `NUMBER APPOINTMENTS: ${numberAppointments}`
+                        );
                         await logScraperRun(
                             scraper.name,
                             isSuccess,
                             new Date() - startTime,
-                            startTime
+                            startTime,
+                            numberAppointments
                         );
                         return result;
                     });
@@ -104,7 +121,7 @@ async function execute() {
             version: 1,
 
             debug: {
-                clientIpAddress
+                clientIpAddress,
             },
 
             // Timestamp for the archived data.json file.
