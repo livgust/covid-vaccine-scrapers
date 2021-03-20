@@ -1,12 +1,5 @@
 const trinityEms = require("../site-scrapers/TrinityEMS/index");
 
-/**
- * When working in VS Code, you will need to temporarily add the following in order
- * to run and debug. Remove it but maintain this javadoc comment for future maintainers.
- *
- * const bootsrap = require("./bootstrap");
- */
-
 /** Generator to feed filenames sequentially to the "with availability" test. */
 function* filenames() {
     yield "TrinityEMS-2021-February-activedays.html";
