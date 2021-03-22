@@ -93,7 +93,7 @@ Resources:
             BucketName: "*"
       Events:
         GetMACovidVaccineScraperDataApi:
-          Type: HttpApi
+          Type: Api
           Properties:
             ApiId: !Ref MACovidVaccinesApi
             Method: GET
