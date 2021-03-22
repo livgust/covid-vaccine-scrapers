@@ -102,7 +102,7 @@ Resources:
         - S3ReadPolicy:
             BucketName: "*"
       Events:
-        MACovidVaxHelpBotPhoneIntakeApi:
+        GetMACovidVaccineScraperDataApi:
           Type: HttpApi
           Properties:
             ApiId: !Ref MACovidVaccinesHttpApi
