@@ -12,7 +12,7 @@ exports.handler = async () => {
 
     const response = {
         statusCode: 200,
-        body: data.Body,
+        body: JSON.parse(data.Body.toString("utf-8")),
     };
     return response;
 };
