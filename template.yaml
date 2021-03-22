@@ -68,6 +68,7 @@ Resources:
       Timeout: 180
       Policies:
         - AWSLambdaBasicExecutionRole
+        - CloudWatchPutMetricPolicy
         - S3CrudPolicy:
             BucketName: "*"
       Environment:
