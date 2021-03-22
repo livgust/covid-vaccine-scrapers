@@ -95,6 +95,6 @@ Resources:
         GetMACovidVaccineScraperDataApi:
           Type: Api
           Properties:
-            ApiId: !Ref MACovidVaccinesApi
+            RestApiId: !Ref MACovidVaccinesApi
             Method: GET
             Path: /get_data
