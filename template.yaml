@@ -44,7 +44,7 @@ Resources:
       Cors:
         AllowMethods: "'*'"
         AllowHeaders: "'*'"
-        AllowOrigin: "'*"
+        AllowOrigin: "'*'"
         AllowCredentials: True
 
   MACovidVaccineScraper:
