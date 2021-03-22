@@ -1,0 +1,17 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "ma-covid-vax-help-stage"
+region = "us-east-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repository = "640473101746.dkr.ecr.us-east-2.amazonaws.com/macovidvaxhelpdev"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-kl2pfbrjm1lc"
+
+[prod.deploy.parameters]
+stack_name = "ma-covid-vax-help-prod"
+parameter_overrides = "Environment=prod"
+region = "us-east-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repository = "640473101746.dkr.ecr.us-east-2.amazonaws.com/macovidvaxhelpdev"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-kl2pfbrjm1lc"
