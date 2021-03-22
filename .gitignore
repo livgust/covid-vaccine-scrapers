@@ -7,3 +7,4 @@ out.json
 .eslintrc.json
 .vscode/
 .DS_Store
+.aws-sam/
