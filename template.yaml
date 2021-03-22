@@ -45,7 +45,6 @@ Resources:
         AllowMethods: "'*'"
         AllowHeaders: "'*'"
         AllowOrigin: "'*'"
-        AllowCredentials: True
 
   MACovidVaccineScraper:
     Type: AWS::Serverless::Function
