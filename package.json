@@ -1,4 +1,6 @@
 {
+    "name": "macovidvaccines.com",
+    "version": "1.0.0",
     "dependencies": {
         "@googlemaps/google-maps-services-js": "^3.1.16",
         "axios": "^0.21.1",
