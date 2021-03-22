@@ -2,18 +2,24 @@ const { site } = require("./config");
 const https = require("https");
 const moment = require("moment");
 
-module.exports = async function GetAvailableAppointments() {
+module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const {
         name,
         website,
+        signUpDotComLink,
         signUpLink,
         restrictedWebsite,
+        restrictedSignUpDotComLink,
         restrictedSignUpLink,
         ...restHarrington
     } = site;
-    const webData = await ScrapeWebsiteData(website);
-    const restrictedWebData = await ScrapeWebsiteData(restrictedWebsite);
+    const webData = await ScrapeWebsiteData(website, signUpDotComLink, browser);
+    const restrictedWebData = await ScrapeWebsiteData(
+        restrictedWebsite,
+        restrictedSignUpDotComLink,
+        browser
+    );
     console.log(`${site.name} done.`);
 
     return [
@@ -36,7 +42,7 @@ module.exports = async function GetAvailableAppointments() {
     ];
 };
 
-async function ScrapeWebsiteData(website) {
+async function ScrapeWebsiteData(website, signUpDotComLink, browser) {
     const p = new Promise((resolve) => {
         let response = "";
         //todayDate looks like "2020%2F12%2F16"
@@ -51,6 +57,7 @@ async function ScrapeWebsiteData(website) {
             });
             res.on("end", () => {
                 response = JSON.parse(body);
+                console.log(response);
                 resolve(response.data);
             });
         });
@@ -71,6 +78,19 @@ async function ScrapeWebsiteData(website) {
         if (slotsAvailable) {
             results.hasAvailability = true;
         }
+    }
+    // check if the event is locked via the UI
+    if (results.hasAvailability && signUpDotComLink) {
+        const page = await browser.newPage();
+        await page.goto(signUpDotComLink);
+        await page
+            .waitForSelector("#error_page")
+            .then(() => {
+                //if we hit the error page, the event is locked.
+                results.availability = {};
+                results.hasAvailability = false;
+            })
+            .catch(() => {}); //if this times out, then we're good!
     }
     return results;
 }
