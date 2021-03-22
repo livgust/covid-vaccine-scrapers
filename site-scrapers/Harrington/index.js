@@ -57,7 +57,6 @@ async function ScrapeWebsiteData(website, signUpDotComLink, browser) {
             });
             res.on("end", () => {
                 response = JSON.parse(body);
-                console.log(response);
                 resolve(response.data);
             });
         });
@@ -84,7 +83,9 @@ async function ScrapeWebsiteData(website, signUpDotComLink, browser) {
         const page = await browser.newPage();
         await page.goto(signUpDotComLink);
         await page
-            .waitForSelector("#error_page")
+            .waitForSelector("#error_page", {
+                timeout: 20000, //20s
+            })
             .then(() => {
                 //if we hit the error page, the event is locked.
                 results.availability = {};
