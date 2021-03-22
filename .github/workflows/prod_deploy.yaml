@@ -62,4 +62,5 @@ jobs:
           NodeEnv=production \
           BucketName=${{ secrets.AWSS3BUCKETNAME }} \
           RecaptchaToken=${{ secrets.RECAPTCHA_TOKEN }} \
-          SlackWebhook=${{ secrets.SLACK_WEBHOOK_BOT_CHANNEL }}
+          SlackWebhook=${{ secrets.SLACK_WEBHOOK_BOT_CHANNEL }} \
+          Environment=prod
