@@ -36,26 +36,15 @@ Globals:
     Timeout: 180
 
 Resources:
-  MACovidVaccinesHttpApi:
-    Type: AWS::Serverless::HttpApi
+  MACovidVaccinesApi:
+    Type: AWS::Serverless::Api
     Properties:
       StageName: !Sub "${Environment}"
-      CorsConfiguration:
-        AllowMethods:
-          - DELETE
-          - GET
-          - HEAD
-          - PATCH
-          - POST
-          - PUT
-        AllowHeaders:
-          - Content-Type
-          - X-Amz-Date
-          - Authorization
-          - X-Api-Key
-          - X-Amz-Security-Token
-        AllowOrigins:
-          - "*"
+      Cors:
+        AllowMethods: "'DELETE','GET','HEAD','PATCH','POST','PUT'"
+        AllowHeaders: "'Content-Type','X-Amz-Date','Authorization','X-Api-Key','X-Amz-Security-Token'"
+        AllowOrigin: "'*"
+        AllowCredentials: True
 
   MACovidVaccineScraper:
     Type: AWS::Serverless::Function
@@ -105,6 +94,6 @@ Resources:
         GetMACovidVaccineScraperDataApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref MACovidVaccinesHttpApi
+            ApiId: !Ref MACovidVaccinesApi
             Method: GET
             Path: /get_data
