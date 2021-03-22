@@ -42,8 +42,8 @@ Resources:
       StageName: !Sub "${Environment}"
       MinimumCompressionSize: 1000
       Cors:
-        AllowMethods: "'DELETE','GET','HEAD','PATCH','POST','PUT'"
-        AllowHeaders: "'Content-Type','X-Amz-Date','Authorization','X-Api-Key','X-Amz-Security-Token'"
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
         AllowOrigin: "'*"
         AllowCredentials: True
 
