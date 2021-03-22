@@ -10,6 +10,26 @@ Parameters:
       - stage
       - prod
     Default: stage
+  GoogleApiKey:
+    Type: String
+  WalgreensEmail:
+    Type: String
+  WalgreensPassword:
+    Type: String
+  WalgreensChallenge:
+    Type: String
+  WalgreensApiKey:
+    Type: String
+  DbKeySecret:
+    Type: String
+  NodeEnv:
+    Type: String
+  BucketName:
+    Type: String
+  RecaptchaToken:
+    Type: String
+  SlackWebhook:
+    Type: String
 
 Globals:
   Function:
@@ -41,79 +61,49 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "MACovidVaccineScraperFunction-${Environment}"
-      Handler: main.handler
+      Handler: scraper.handler
+      Runtime: nodejs14.x
+      CodeUri: .
       MemorySize: 2048
       Timeout: 180
       Policies:
         - AWSLambdaBasicExecutionRole
-        - S3CrudPolicy
+        - S3CrudPolicy:
+            BucketName: "*"
+      Environment:
+        Variables:
+          GOOGLE_API_KEY: !Ref GoogleApiKey
+          WALGREENS_EMAIL: !Ref WalgreensEmail
+          WALGREENS_PASSWORD: !Ref WalgreensPassword
+          WALGREENS_CHALLENGE: !Ref WalgreensChallenge
+          WALGREENS_API_KEY: !Ref WalgreensApiKey
+          DB_KEY_SECRET: !Ref DbKeySecret
+          NODE_ENV: !Ref NodeEnv
+          AWSS3BUCKETNAME: !Ref BucketName
+          RECAPTCHATOKEN: !Ref RecaptchaToken
+          SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+
       Events:
         ScraperSchedule:
           Type: Schedule
           Properties:
             Schedule: rate(1 minute)
 
-  MACovidVaxHelpPhoneIntakeFunction:
+  GetMACovidVaccineScraperData:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "MACovidVaxHelpPhoneIntakeFunction-${Environment}"
-      PackageType: Image
+      FunctionName: !Sub "GetMACovidVaccineScraperDataFunction-${Environment}"
+      Handler: getScraperData.handler
+      Runtime: nodejs14.x
+      CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: "*"
       Events:
         MACovidVaxHelpBotPhoneIntakeApi:
           Type: HttpApi
           Properties:
-            ApiId: !Ref MACovidVaxHelpHttpApi
-            Method: POST
-            Path: /phone_intake
-    Metadata:
-      DockerTag: python3.8-v1
-      DockerContext: ./
-      Dockerfile: PhoneIntake.Dockerfile
-
-  MACovidVaxHelpFullIntakeFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "MACovidVaxHelpFullIntakeFunction-${Environment}"
-      PackageType: Image
-      Policies:
-        - AWSLambdaBasicExecutionRole
-      Timeout: 60
-      VpcConfig:
-        SecurityGroupIds:
-          - sg-57b02725
-        SubnetIds:
-          - subnet-02d798c9e00ce3e8c
-          - subnet-0c20295596c392c41
-          - subnet-0794326484e5570fa
-      Events:
-        MACovidVaxHelpBotFullIntakeApi:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref MACovidVaxHelpHttpApi
-            Method: POST
-            Path: /full_intake
-    Metadata:
-      DockerTag: python3.8-v1
-      DockerContext: ./
-      Dockerfile: FullIntake.Dockerfile
-
-  MACovidVaxHelpCancelFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "MACovidVaxHelpCancelFunction-${Environment}"
-      PackageType: Image
-      Policies:
-        - AWSLambdaBasicExecutionRole
-      Events:
-        MACovidVaxHelpBotCancelApi:
-          Type: HttpApi
-          Properties:
-            ApiId: !Ref MACovidVaxHelpHttpApi
-            Method: POST
-            Path: /cancel
-    Metadata:
-      DockerTag: python3.8-v1
-      DockerContext: ./
-      Dockerfile: Cancel.Dockerfile
+            ApiId: !Ref MACovidVaccinesHttpApi
+            Method: GET
+            Path: /get_data
