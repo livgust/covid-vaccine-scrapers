@@ -7,7 +7,10 @@ const { addExtra } = require("puppeteer-extra");
 const Puppeteer = addExtra(chromium.puppeteer);
 
 const { getAllCoordinates } = require("./getGeocode");
-const { logScraperRun } = require("./lib/metrics");
+const {
+    logScraperRun,
+    getTotalNumberOfAppointments,
+} = require("./lib/metrics");
 const dataDefaulter = require("./data/dataDefaulter");
 const fetch = require("node-fetch");
 const file = require("./lib/file");
@@ -65,21 +68,8 @@ async function execute() {
                         return null;
                     })
                     .then(async (result) => {
-                        let numberAppointments = 0;
-                        if (result.availability) {
-                            numberAppointments = Object.values(
-                                result.availability
-                            ).reduce(
-                                (cum, cur) =>
-                                    cum +
-                                    (cur.numberAvailableAppointments || 0),
-                                0
-                            );
-                        } else if (result.hasAvailability) {
-                            numberAppointments = 1;
-                        }
-                        console.log(
-                            `NUMBER APPOINTMENTS: ${numberAppointments}`
+                        const numberAppointments = getTotalNumberOfAppointments(
+                            result
                         );
                         await logScraperRun(
                             scraper.name,
@@ -134,8 +124,8 @@ async function execute() {
         const webData = JSON.stringify(responseJson);
 
         if (process.env.DEVELOPMENT) {
-            console.log("The following data would be published:");
-            console.dir(responseJson, { depth: null });
+            //console.log("The following data would be published:");
+            //console.dir(responseJson, { depth: null });
             file.write("out.json", webData);
             return responseJson;
         } else {
