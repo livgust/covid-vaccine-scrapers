@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: macovidvaccines
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Which environment do you want to deploy to? (stage or prod)
+    AllowedValues:
+      - stage
+      - prod
+    Default: stage
+  GoogleApiKey:
+    Type: String
+  WalgreensEmail:
+    Type: String
+  WalgreensPassword:
+    Type: String
+  WalgreensChallenge:
+    Type: String
+  WalgreensApiKey:
+    Type: String
+  DbKeySecret:
+    Type: String
+  NodeEnv:
+    Type: String
+  BucketName:
+    Type: String
+  RecaptchaToken:
+    Type: String
+  SlackWebhook:
+    Type: String
+
+Globals:
+  Function:
+    Timeout: 180
+
+Resources:
+  MACovidVaccinesHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Sub "${Environment}"
+      CorsConfiguration:
+        AllowMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - PATCH
+          - POST
+          - PUT
+        AllowHeaders:
+          - Content-Type
+          - X-Amz-Date
+          - Authorization
+          - X-Api-Key
+          - X-Amz-Security-Token
+        AllowOrigins:
+          - "*"
+
+  MACovidVaccineScraper:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "MACovidVaccineScraperFunction-${Environment}"
+      Handler: scraper.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 2048
+      Timeout: 180
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - CloudWatchPutMetricPolicy: {}
+        - S3CrudPolicy:
+            BucketName: "*"
+      Environment:
+        Variables:
+          GOOGLE_API_KEY: !Ref GoogleApiKey
+          WALGREENS_EMAIL: !Ref WalgreensEmail
+          WALGREENS_PASSWORD: !Ref WalgreensPassword
+          WALGREENS_CHALLENGE: !Ref WalgreensChallenge
+          WALGREENS_API_KEY: !Ref WalgreensApiKey
+          DB_KEY_SECRET: !Ref DbKeySecret
+          NODE_ENV: !Ref NodeEnv
+          AWSS3BUCKETNAME: !Ref BucketName
+          RECAPTCHATOKEN: !Ref RecaptchaToken
+          SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+
+      Events:
+        ScraperSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+
+  GetMACovidVaccineScraperData:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetMACovidVaccineScraperDataFunction-${Environment}"
+      Handler: getScraperData.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: "*"
+      Events:
+        GetMACovidVaccineScraperDataApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MACovidVaccinesHttpApi
+            Method: GET
+            Path: /get_data
