@@ -1,0 +1,66 @@
+name: SAM Validate, Build, Test, Deploy
+on:
+  push:
+    branches: [master]
+
+jobs:
+  sam-validate-build-test-deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      env-name: ${{ steps.env-name.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies with Apt Get
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3.8 jq -y
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Configure variables
+        shell: bash
+        id: vars
+        env:
+          REPO: ${{ github.repository }}
+          HASH: ${{ github.sha }}
+          REF: ${{ github.ref }}
+        run: |
+          # Set variables
+          BRANCH=${REF#refs/heads/}
+          REPOSITORY=`echo $REPO | tr "/" "-"`
+          ENVIRONMENT=$BRANCH-$REPOSITORY-${{ secrets.AWS_REGION }}
+          # In this step we are setting variables and persistenting them
+          # into the environment so that they can be utilized in other steps
+          echo "::set-output name=branch::$BRANCH"
+          echo "::set-output name=repository::$REPOSITORY"
+          echo "::set-output name=environment::$ENVIRONMENT"
+          # Output variables to ensure their values are set correctly when run
+          echo "The region is ${{ secrets.AWS_REGION }}"
+          echo "The repository is $REPOSITORY"
+          echo "The environment is $ENVIRONMENT"
+          echo "The branch is $BRANCH"
+      - name: SAM Build
+        run: |
+          sam build
+      - name: SAM Validate
+        run: |
+          sam validate -t ./.aws-sam/build/template.yaml
+      - name: SAM Deploy
+        run: |
+          # Run SAM Deploy
+          sam deploy --config-env prod --no-fail-on-empty-changeset --no-confirm-changeset \
+          --parameter-overrides GoogleApiKey=${{ secrets.GOOGLE_API_KEY }} \
+          WalgreensEmail=${{ secrets.WALGREENS_EMAIL }} \
+          WalgreensPassword=${{ secrets.WALGREENS_PASSWORD }} \
+          WalgreensChallenge=${{ secrets.WALGREENS_CHALLENGE }} \
+          WalgreensApiKey=${{ secrets. WALGREENS_API_KEY }} \
+          DbKeySecret=${{ secrets.FAUNA_DB_PROD }} \
+          NodeEnv=production \
+          BucketName=${{ secrets.AWSS3BUCKETNAME }} \
+          RecaptchaToken=${{ secrets.RECAPTCHA_TOKEN }} \
+          SlackWebhook=${{ secrets.SLACK_WEBHOOK_BOT_CHANNEL }} \
+          Environment=prod

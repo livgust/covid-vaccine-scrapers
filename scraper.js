@@ -7,7 +7,10 @@ const { addExtra } = require("puppeteer-extra");
 const Puppeteer = addExtra(chromium.puppeteer);
 
 const { getAllCoordinates } = require("./getGeocode");
-const { logScraperRun } = require("./lib/metrics");
+const {
+    logScraperRun,
+    getTotalNumberOfAppointments,
+} = require("./lib/metrics");
 const dataDefaulter = require("./data/dataDefaulter");
 const fetch = require("node-fetch");
 const file = require("./lib/file");
@@ -30,6 +33,12 @@ async function execute() {
             provider: { id: "2captcha", token: process.env.RECAPTCHATOKEN },
         })
     );
+
+    let clientIpAddress = null;
+
+    fetch("https://ifconfig.me/ip")
+        .then((res) => res.text())
+        .then((body) => (clientIpAddress = body));
 
     const browser = process.env.DEVELOPMENT
         ? await Puppeteer.launch({
@@ -59,11 +68,15 @@ async function execute() {
                         return null;
                     })
                     .then(async (result) => {
+                        const numberAppointments = getTotalNumberOfAppointments(
+                            result
+                        );
                         await logScraperRun(
                             scraper.name,
                             isSuccess,
                             new Date() - startTime,
-                            startTime
+                            startTime,
+                            numberAppointments
                         );
                         return result;
                     });
@@ -97,6 +110,10 @@ async function execute() {
             // Version number of the file
             version: 1,
 
+            debug: {
+                clientIpAddress,
+            },
+
             // Timestamp for the archived data.json file.
             timestamp: s3.getTimestampForFile(),
 
@@ -107,8 +124,8 @@ async function execute() {
         const webData = JSON.stringify(responseJson);
 
         if (process.env.DEVELOPMENT) {
-            console.log("The following data would be published:");
-            console.dir(responseJson, { depth: null });
+            //console.log("The following data would be published:");
+            //console.dir(responseJson, { depth: null });
             file.write("out.json", webData);
             return responseJson;
         } else {

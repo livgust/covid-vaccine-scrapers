@@ -1,0 +1,17 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "ma-covid-vaccines-stage"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1qgo7tfzt9818"
+s3_prefix = "ma-covid-vaccines-stage"
+
+[prod.deploy.parameters]
+stack_name = "ma-covid-vaccines-prod"
+parameter_overrides = "Environment=prod"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1qgo7tfzt9818"
+s3_prefix = "ma-covid-vaccines-prod"
