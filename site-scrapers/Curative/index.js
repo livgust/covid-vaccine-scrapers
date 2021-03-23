@@ -26,7 +26,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} (basically) done.`);
     return site.locations.map((loc) => {
         const data = rawData[loc.id];
-        const mappedData = {
+        const results = {
             id: loc.id,
             name: data.name,
             street: (
@@ -37,50 +37,53 @@ module.exports = async function GetAvailableAppointments(browser) {
             city: data.city,
             zip: data.postal_code,
             signUpLink: site.linkWebsite + loc.id,
+            massVax: !!loc.massVax, // This is a MassVax site that only allows preregistration
             hasAvailability: false,
             availability: {}, //date (MM/DD/YYYY) => hasAvailability, numberAvailableAppointments
             timestamp: new Date(),
         };
-        /* COMMENTING OUT BELOW BECAUSE APPTS ARE INVITE-ONLY */
-        // data.appointment_windows.forEach((appointment) => {
-        //     const dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
-        //     const { year, month, day } = appointment.start_time.match(
-        //         dateRegexp
-        //     ).groups;
-        //     const date = `${month}/${day}/${year}`;
-        //     let newNumberAvailable =
-        //         appointment.status !== "Disabled"
-        //             ? appointment.slots_available
-        //             : 0;
+        // If this is a massVax site that is invite-only, then we don't
+        // need availability data.
+        if (!results.massVax) {
+            data.appointment_windows.forEach((appointment) => {
+                const dateRegexp = /(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})/;
+                const { year, month, day } = appointment.start_time.match(
+                    dateRegexp
+                ).groups;
+                const date = `${month}/${day}/${year}`;
+                let newNumberAvailable =
+                    appointment.status !== "Disabled"
+                        ? appointment.slots_available
+                        : 0;
 
-        //     if (newNumberAvailable) {
-        //         mappedData.hasAvailability = true;
-        //     }
+                if (newNumberAvailable) {
+                    results.hasAvailability = true;
+                }
 
-        //     if (mappedData.availability[date]) {
-        //         newNumberAvailable +=
-        //             mappedData.availability[date].numberAvailableAppointments;
-        //     }
+                if (results.availability[date]) {
+                    newNumberAvailable +=
+                        results.availability[date].numberAvailableAppointments;
+                }
 
-        //     // Only add date keys if there are appointments
-        //     if (newNumberAvailable) {
-        //         mappedData.availability[date] = {
-        //             numberAvailableAppointments: newNumberAvailable,
-        //             hasAvailability: true,
-        //         };
-        //     }
-        // });
+                // Only add date keys if there are appointments
+                if (newNumberAvailable) {
+                    results.availability[date] = {
+                        numberAvailableAppointments: newNumberAvailable,
+                        hasAvailability: true,
+                    };
+                }
+            });
 
-        // if (
-        //     data.hasOwnProperty("visible_in_search") &&
-        //     !data.visible_in_search
-        // ) {
-        //     // Commented out the following line because there is currently a
-        //     // waiting room for people to join for an event that starts at 8:30am.
-        //     // We should revisit this later after the appointments are gone.
-        //     //mappedData.hasAvailability = false;
-        // }
-
-        return mappedData;
+            if (
+                data.hasOwnProperty("visible_in_search") &&
+                !data.visible_in_search
+            ) {
+                // Commented out the following line because there is currently a
+                // waiting room for people to join for an event that starts at 8:30am.
+                // We should revisit this later after the appointments are gone.
+                //results.hasAvailability = false;
+            }
+        }
+        return results;
     });
 };
