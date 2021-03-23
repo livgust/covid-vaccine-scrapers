@@ -8,7 +8,11 @@ async function GetAvailableAppointments() {
     const finalSites = [];
     for (const site of originalSites) {
         const { siteUrl, ...rest } = site;
-        const webData = await ScrapeWebsiteData(rest.name, siteUrl);
+        const webData = await ScrapeWebsiteData(
+            rest.name,
+            siteUrl,
+            rest.massVax
+        );
         finalSites.push({
             ...rest,
             ...webData,
@@ -19,7 +23,7 @@ async function GetAvailableAppointments() {
     return finalSites;
 }
 
-async function ScrapeWebsiteData(siteName, siteUrl) {
+async function ScrapeWebsiteData(siteName, siteUrl, massVax) {
     const availabilityUrl = `https://home.color.com/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=${siteUrl}`;
     const availabilityPromise = new Promise((resolve) => {
         https
@@ -41,20 +45,19 @@ async function ScrapeWebsiteData(siteName, siteUrl) {
     });
 
     const availabilityResponse = await availabilityPromise;
-    return formatResponse(availabilityResponse);
+    return formatResponse(availabilityResponse, massVax);
 }
 
-function formatResponse(availabilityResponse) {
+function formatResponse(availabilityResponse, massVax) {
     const availability = JSON.parse(availabilityResponse).results;
     const results = {
-        massVax: true, // This is a MassVax site that only allows preregistration
         hasAvailability: false,
         availability: {},
     };
 
     // If this is a massVax site that is invite-only, then we don't
     // need availability data.
-    if (!results.massVax) {
+    if (!massVax) {
         // Collect availability count by date
         availability.reduce((memo, currentValue) => {
             /* The availability returns an array of appointments like this:
