@@ -49,7 +49,9 @@ async function ScrapeWebsiteData(browser) {
             const rawData = [];
             for (const element of rawDataElements) {
                 const text = await element.evaluate((node) => node.innerText);
-                rawData.push(text);
+                if (text?.length) {
+                    rawData.push(text);
+                }
             }
             const [title, address, ...rawExtraData] = rawData;
 

@@ -10,9 +10,9 @@ const s3 = require("../../lib/s3");
  * @return JSON blob with { hasAppointments: Bool, totalAvailability: Int }
  */
 module.exports = async function GetAvailableAppointments(browser) {
-    await console.log(`${site.name} starting.`);
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    await console.log(`${site.name} done.`);
+    console.log(`${site.name} done.`);
     return {
         ...site,
         ...webData,
@@ -34,7 +34,7 @@ async function ScrapeWebsiteData(browser) {
     let totalAvailability = 0;
     if (!alert) {
         const msg = `${site.name} may have appointments...`;
-        await console.log(msg);
+        console.log(msg);
         await s3.savePageContent(site.name, page);
         await sendSlackMsg("bot", msg);
     }
