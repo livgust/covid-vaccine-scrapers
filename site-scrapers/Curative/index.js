@@ -37,7 +37,7 @@ module.exports = async function GetAvailableAppointments(browser) {
             city: data.city,
             zip: data.postal_code,
             signUpLink: site.linkWebsite + loc.id,
-            massVax: true, // This is a MassVax site that only allows preregistration
+            massVax: !!loc.massVax, // This is a MassVax site that only allows preregistration
             hasAvailability: false,
             availability: {}, //date (MM/DD/YYYY) => hasAvailability, numberAvailableAppointments
             timestamp: new Date(),
