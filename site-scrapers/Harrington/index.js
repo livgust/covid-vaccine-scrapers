@@ -3,45 +3,47 @@ const https = require("https");
 const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
-    console.log(`${site.name} starting.`);
-    const {
-        name,
-        website,
-        signUpDotComLink,
-        signUpLink,
-        restrictedWebsite,
-        restrictedSignUpDotComLink,
-        restrictedSignUpLink,
-        ...restHarrington
-    } = site;
-    const webData = await ScrapeWebsiteData(website, signUpDotComLink, browser);
-    const restrictedWebData = await ScrapeWebsiteData(
-        restrictedWebsite,
-        restrictedSignUpDotComLink,
-        browser
-    );
-    console.log(`${site.name} done.`);
+    return null;
+    // THIS SITE NO LONGER USES SIGNUP.COM. SEE GITHUB ISSUE 165
+    // console.log(`${site.name} starting.`);
+    // const {
+    //     name,
+    //     website,
+    //     signUpDotComLink,
+    //     signUpLink,
+    //     restrictedWebsite,
+    //     restrictedSignUpDotComLink,
+    //     restrictedSignUpLink,
+    //     ...restHarrington
+    // } = site;
+    // const webData = await ScrapeWebsiteData(website, signUpDotComLink, browser);
+    // const restrictedWebData = await ScrapeWebsiteData(
+    //     restrictedWebsite,
+    //     restrictedSignUpDotComLink,
+    //     browser
+    // );
+    // console.log(`${site.name} done.`);
 
-    return [
-        {
-            ...restHarrington,
-            ...webData,
-            name: `${name} (All MA residents)`,
-            signUpLink: signUpLink,
-            timestamp: moment().format(),
-        },
-        {
-            ...restHarrington,
-            ...restrictedWebData,
-            name: `${name} (Local residents)`,
-            signUpLink: restrictedSignUpLink,
-            timestamp: moment().format(),
-            restrictions:
-                "Residents of the following towns, no exceptions: Auburn, Leicester, Southbridge, Sturbridge, Charlton, Spencer, Brookfield (North, East, West), Brimfield, Wales, Holland, Warren, Dudley, Webster, Oxford, and Sutton",
-        },
-    ];
+    // return [
+    //     {
+    //         ...restHarrington,
+    //         ...webData,
+    //         name: `${name} (All MA residents)`,
+    //         signUpLink: signUpLink,
+    //         timestamp: moment().format(),
+    //     },
+    //     {
+    //         ...restHarrington,
+    //         ...restrictedWebData,
+    //         name: `${name} (Local residents)`,
+    //         signUpLink: restrictedSignUpLink,
+    //         timestamp: moment().format(),
+    //         restrictions:
+    //             "Residents of the following towns, no exceptions: Auburn, Leicester, Southbridge, Sturbridge, Charlton, Spencer, Brookfield (North, East, West), Brimfield, Wales, Holland, Warren, Dudley, Webster, Oxford, and Sutton",
+    //     },
+    // ];
 };
-
+/*
 async function ScrapeWebsiteData(website, signUpDotComLink, browser) {
     const p = new Promise((resolve) => {
         let response = "";
@@ -95,3 +97,4 @@ async function ScrapeWebsiteData(website, signUpDotComLink, browser) {
     }
     return results;
 }
+*/
