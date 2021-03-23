@@ -65,7 +65,7 @@ describe("FaunaDB Utils", function () {
         await expect(
             dbUtils.retrieveItemByRefId(collectionName, generatedId)
         ).to.eventually.be.rejectedWith("instance not found");
-    });
+    }).timeout(3000);
 
     it("given one scraper's output, can create, retrieve, and delete docs from Locations, ScraperRuns, and Appointments collections", async () => {
         const randomName = Math.random().toString(36).substring(7);
