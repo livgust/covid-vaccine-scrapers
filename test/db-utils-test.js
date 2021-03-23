@@ -25,10 +25,18 @@ describe("FaunaDB Utils", function () {
             dbUtils.retrieveItemByRefId(collectionName, generatedId)
         ).to.eventually.be.rejectedWith("instance not found");
 
+        await expect(
+            dbUtils.checkItemExistsByRefId(collectionName, generatedId)
+        ).to.eventually.be.false;
+
         await dbUtils.writeLocationByRefId({
             refId: generatedId,
             ...data,
         });
+
+        await expect(
+            dbUtils.checkItemExistsByRefId(collectionName, generatedId)
+        ).to.eventually.be.true;
 
         const retrieveResult = await dbUtils.retrieveItemByRefId(
             collectionName,
@@ -177,7 +185,7 @@ describe("FaunaDB Utils", function () {
 
         const scraperRunRef = retrieveScraperRunResult.data[0].ref.value.id;
 
-        // aseert that the appointmentAvailability is there
+        // assert that the appointmentAvailability is there
         const retrieveAppointmentsResult = await dbUtils.getAppointmentsByScraperRun(
             scraperRunRef
         );
