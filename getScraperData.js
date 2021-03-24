@@ -9,10 +9,13 @@ exports.handler = async () => {
             Key: "data.json",
         })
         .promise();
-
+    const bodyData = JSON.parse(data.Body.toString());
     const response = {
         statusCode: 200,
-        body: JSON.parse(data.Body.toString()),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bodyData)
     };
     return response;
 };

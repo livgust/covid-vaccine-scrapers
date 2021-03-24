@@ -37,14 +37,11 @@ Globals:
 
 Resources:
   MACovidVaccinesApi:
-    Type: AWS::Serverless::Api
+    Type: AWS::Serverless::HttpApi
     Properties:
       StageName: !Sub "${Environment}"
-      MinimumCompressionSize: 1000
-      Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
-        AllowOrigin: "'*'"
+      CorsConfiguration:
+        AllowOrigins: true
 
   MACovidVaccineScraper:
     Type: AWS::Serverless::Function
@@ -93,8 +90,8 @@ Resources:
             BucketName: "*"
       Events:
         GetMACovidVaccineScraperDataApi:
-          Type: Api
+          Type: HttpApi
           Properties:
-            RestApiId: !Ref MACovidVaccinesApi
+            ApiId: !Ref MACovidVaccinesApi
             Method: GET
             Path: /get_data
