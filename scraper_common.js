@@ -18,6 +18,10 @@ const file = require("./lib/file");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
+const dbUtils = require("./lib/db-utils");
+const moment = require("moment");
+
+WRITE_TO_FAUNA = false;
 
 async function execute(usePuppeteer, scrapers) {
     const globalStartTime = new Date();
@@ -75,6 +79,29 @@ async function execute(usePuppeteer, scrapers) {
                     return result;
                 });
             results.push(returnValue);
+            // Coerce the results into the format we want.
+            let returnValueArray = [];
+            if (Array.isArray(returnValue)) {
+                returnValueArray = returnValue;
+            } else if (returnValue) {
+                returnValueArray = [returnValue];
+            }
+            // Write the data to FaunaDB.
+            if (WRITE_TO_FAUNA) {
+                await Promise.all(
+                    returnValueArray.map(async (res) => {
+                        await dbUtils.writeScrapedData({
+                            name: res.name,
+                            street: res.street,
+                            city: res.city,
+                            zip: res.zip,
+                            availability: res.availability,
+                            hasAvailability: res.availability,
+                            timestamp: moment().utc().format(),
+                        });
+                    })
+                );
+            }
         }
         if (usePuppeteer) {
             await browser.close();
