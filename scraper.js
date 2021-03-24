@@ -71,6 +71,7 @@ async function execute() {
                     const numberAppointments = getTotalNumberOfAppointments(
                         result
                     );
+                    // TODO - call FaunaDB util method here!
                     await logScraperRun(
                         scraper.name,
                         isSuccess,
