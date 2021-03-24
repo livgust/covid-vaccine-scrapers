@@ -20,12 +20,6 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 
 async function execute() {
-    const cachedResults = await fetch(
-        "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
-    )
-        .then((res) => res.json())
-        .then((unpack) => JSON.parse(unpack.body).results);
-
     Puppeteer.use(StealthPlugin());
 
     Puppeteer.use(
@@ -93,6 +87,12 @@ async function execute() {
                 scrapedResultsArray.push(result);
             }
         }
+
+        const cachedResults = await fetch(
+            "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
+        )
+            .then((res) => res.json())
+            .then((unpack) => JSON.parse(unpack.body).results);
 
         let finalResultsArray = [];
         if (process.argv.length <= 2) {
