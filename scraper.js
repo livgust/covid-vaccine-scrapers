@@ -19,6 +19,10 @@ const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const scrapers = require("./site-scrapers").reverse();
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
+const dbUtils = require("./lib/db-utils");
+const moment = require("moment");
+
+const WRITE_TO_FAUNA = true;
 
 async function execute() {
     const globalStartTime = new Date();
@@ -61,7 +65,6 @@ async function execute() {
                     const numberAppointments = getTotalNumberOfAppointments(
                         result
                     );
-                    // TODO - call FaunaDB util method here!
                     await logScraperRun(
                         scraper.name,
                         isSuccess,
@@ -72,6 +75,27 @@ async function execute() {
                     return result;
                 });
             results.push(returnValue);
+            if (WRITE_TO_FAUNA) {
+                let returnValueArray = [];
+                if (Array.isArray(returnValue)) {
+                    returnValueArray = returnValue;
+                } else if (returnValue) {
+                    returnValueArray = [returnValue];
+                }
+                await Promise.all(
+                    returnValueArray.map(async (res) => {
+                        await dbUtils.writeScrapedData({
+                            name: res.name,
+                            street: res.street,
+                            city: res.city,
+                            zip: res.zip,
+                            availability: res.availability,
+                            hasAvailability: res.availability,
+                            timestamp: moment().utc().format(),
+                        });
+                    })
+                );
+            }
         }
         await browser.close();
         let scrapedResultsArray = [];

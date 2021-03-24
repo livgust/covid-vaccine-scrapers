@@ -7,6 +7,7 @@
         "axios-retry": "^3.1.9",
         "bestzip": "^2.1.7",
         "chrome-aws-lambda": "^8.0.0",
+        "deep-equal-in-any-order": "^1.0.28",
         "dotenv": "^8.2.0",
         "faunadb": "^4.1.1",
         "jsdom": "^16.4.0",
