@@ -11,12 +11,18 @@ module.exports = async function GetAvailableAppointments(
     if (customNotificationService) {
         notificationService = customNotificationService;
     }
-    const availability = await ScrapeWebsiteData(browser, pageService);
+    const [availability, extraData] = await ScrapeWebsiteData(
+        browser,
+        pageService
+    );
     console.log(`${site.name} done.`);
     const results = {
         ...site,
         ...availability,
     };
+    if (extraData) {
+        results["extraData"] = extraData;
+    }
     return results;
 };
 
@@ -43,26 +49,38 @@ async function ScrapeWebsiteData(browser, pageService) {
         hasAvailability: false,
     };
 
+    let extraData = null;
+
     const monthCount = await getMonthCount(page);
 
-    for (const key of new Array(monthCount).keys()) {
-        // Don't advance the calendar if it's the first month
-        if (key > 0) {
-            await pageService.getNextMonthCalendar(page);
+    if (monthCount == 0) {
+        extraData = await getExtraData(page);
+    } else {
+        // If TrinityEMS ever moves back to offering scheduling on their page, we need to capture the change.
+        // Any such change may result in a sufficiently different calendar that we need to notify here, instead
+        // of depending on notifications further into the page scraping, none of which may no longer be valid.
+        await notificationService.handlePageContentChange(page);
+        activeDayPageContentSavedToS3 = true;
+
+        for (const key of new Array(monthCount).keys()) {
+            // Don't advance the calendar if it's the first month
+            if (key > 0) {
+                await pageService.getNextMonthCalendar(page);
+            }
+            const dailySlotsForMonth = await getDailyAvailabilityCountsForMonth(
+                page,
+                pageService
+            );
+            // Add all day objects to results.availability
+            dailySlotsForMonth.forEach((value, key) => {
+                results.availability[key] = value;
+            });
         }
-        const dailySlotsForMonth = await getDailyAvailabilityCountsForMonth(
-            page,
-            pageService
-        );
-        // Add all day objects to results.availability
-        dailySlotsForMonth.forEach(
-            (value, key) => (results.availability[key] = value)
-        );
     }
 
     results.hasAvailability = !!Object.keys(results.availability).length;
 
-    return results;
+    return [results, extraData];
 }
 
 /**
@@ -73,12 +91,28 @@ async function ScrapeWebsiteData(browser, pageService) {
  * @returns number of months in month chooser
  */
 async function getMonthCount(page) {
+    let monthsList = [];
     const selectElement = await page.$("#chooseMonthSched");
-    const optionValues = await selectElement.$$eval("option", (options) =>
-        options.map((option) => option.getAttribute("value"))
-    );
+    if (selectElement) {
+        monthsList = await selectElement.$$eval("option", (options) =>
+            options.map((option) => option.getAttribute("value"))
+        );
+    }
 
-    return optionValues.length;
+    return monthsList.length;
+}
+
+async function getExtraData(page) {
+    const selector = "div.alert.alert-danger.dynamic-alert";
+
+    const node = await page.$(selector);
+    const text = await node.evaluate((node) => node.innerText);
+    const buttonText = await page.$eval(
+        `${selector} > button`,
+        (node) => node.innerText
+    );
+    // remove the button text and any punctuation
+    return `${text.slice(buttonText.length).replace(/^\s*/, "")}`;
 }
 
 /**
@@ -235,7 +269,7 @@ async function advanceMonth(page) {
 function defaultPageService() {
     return {
         async getHomePage(browser) {
-            const classToWaitFor = ".scheduleday";
+            const classToWaitFor = "#appointment-form";
             const page = await browser.newPage();
             await Promise.all([
                 page.goto(site.website),

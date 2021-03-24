@@ -1,3 +1,4 @@
+const { expect } = require("chai");
 const trinityEms = require("../site-scrapers/TrinityEMS/index");
 
 /** Generator to feed filenames sequentially to the "with availability" test. */
@@ -10,6 +11,23 @@ function* filenames() {
 function* generateSequence(start, end) {
     for (let i = start; i <= end; i++) yield i;
 }
+
+describe("TrinityEMS :: test all appointments are private", function () {
+    it("the results object should contain restriction entry", async () => {
+        const privateAppts = "TrinityEMS-private-appointments-only.html";
+        const pageService = {
+            async getHomePage(browser) {
+                const page = await browser.newPage();
+                const html = loadTestHtmlFromFile(privateAppts);
+                await page.setContent(html);
+                return page;
+            },
+        };
+        const results = await trinityEms(browser, pageService);
+
+        expect(results).to.have.property("extraData");
+    });
+});
 
 describe("TrinityEMS :: test 3 months with availability", function () {
     const filenameGenerator = filenames();
@@ -62,7 +80,7 @@ describe("TrinityEMS :: test 3 months with availability", function () {
     };
 
     it(
-        "Should return 13 slots with an ascending number of available slots, total = 91. " +
+        "Should return 13 days with an ascending number of available slots each day; total = 91. " +
             "Should also send s3 and slackMsg notifications once.",
         async () => {
             const results = await trinityEms(
@@ -70,7 +88,10 @@ describe("TrinityEMS :: test 3 months with availability", function () {
                 activeDayPageService,
                 testNotificationService
             );
-            expect(Object.keys(results.availability).length).equals(13);
+            expect(Object.keys(results.availability).length).equals(
+                13,
+                "expect 13 days/keys in results"
+            );
 
             const total = Object.values(results.availability)
                 .map((value) => value.numberAvailableAppointments)

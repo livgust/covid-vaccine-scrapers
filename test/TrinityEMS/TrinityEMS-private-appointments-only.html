@@ -1,0 +1,468 @@
+<html lang="en">
+
+<head>
+    <style type="text/css">
+        .algolia-places {
+            width: 100%;
+        }
+
+        .ap-input,
+        .ap-hint {
+            width: 100%;
+            padding-right: 35px;
+            padding-left: 16px;
+            line-height: 40px;
+            height: 40px;
+            border: 1px solid #CCC;
+            border-radius: 3px;
+            outline: none;
+            font: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+            box-sizing: border-box;
+        }
+
+        .ap-input::-webkit-search-decoration {
+            -webkit-appearance: none;
+        }
+
+        .ap-input::-ms-clear {
+            display: none;
+        }
+
+        .ap-input:hover~.ap-input-icon svg,
+        .ap-input:focus~.ap-input-icon svg,
+        .ap-input-icon:hover svg {
+            fill: #aaaaaa;
+        }
+
+        .ap-dropdown-menu {
+            width: 100%;
+            background: #ffffff;
+            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+
+        .ap-suggestion {
+            cursor: pointer;
+            height: 46px;
+            line-height: 46px;
+            padding-left: 18px;
+            overflow: hidden;
+        }
+
+        .ap-suggestion em {
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        .ap-address {
+            font-size: smaller;
+            margin-left: 12px;
+            color: #aaaaaa;
+        }
+
+        .ap-suggestion-icon {
+            margin-right: 10px;
+            width: 14px;
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        .ap-suggestion-icon svg {
+            -webkit-transform: scale(0.9) translateY(2px);
+            transform: scale(0.9) translateY(2px);
+            fill: #cfcfcf;
+        }
+
+        .ap-input-icon {
+            border: 0;
+            background: transparent;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 16px;
+            outline: none;
+        }
+
+        .ap-input-icon.ap-icon-pin {
+            cursor: initial;
+        }
+
+        .ap-input-icon svg {
+            fill: #cfcfcf;
+            position: absolute;
+            top: 50%;
+            right: 0;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .ap-cursor {
+            background: #efefef;
+        }
+
+        .ap-cursor .ap-suggestion-icon svg {
+            -webkit-transform: scale(1) translateY(2px);
+            transform: scale(1) translateY(2px);
+            fill: #aaaaaa;
+        }
+
+        .ap-footer {
+            opacity: .8;
+            text-align: right;
+            padding: .5em 1em .5em 0;
+            font-size: 12px;
+            line-height: 12px;
+        }
+
+        .ap-footer a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .ap-footer a svg {
+            vertical-align: text-bottom;
+            max-width: 60px;
+        }
+
+        .ap-footer:hover {
+            opacity: 1;
+        }
+    </style>
+    <link rel="canonical" href="https://app.acuityscheduling.com/schedule.php?owner=21713854">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Schedule Appointment with Trinity EMS, Inc.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+    <meta name="referrer" content="same-origin">
+    <meta name="format-detection" content="date=no">
+    <meta name="description" content="Schedule your appointment online  Trinity EMS, Inc.">
+    <meta property="fb:app_id" content="465400520261032">
+    <meta property="og:type" content="website">
+    <meta property="og:url"
+        content="https://app.acuityscheduling.com/schedule.php?owner=21713854&amp;calendarID=5109380">
+    <meta property="og:title" content="Trinity EMS, Inc.">
+    <meta name="fb:extensions:title" content="Choose Appointment">
+    <meta property="og:description" content="Schedule your appointment online  Trinity EMS, Inc.">
+    <meta property="og:image"
+        content="https://cdn-s.acuityscheduling.com/logo21713854.jpg?1610559222&amp;whiteBg=1&amp;rectangular=1">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" value="https://app.acuityscheduling.com/schedule.php?owner=21713854">
+    <meta name="twitter:title" value="Trinity EMS, Inc.">
+    <meta name="twitter:description" value="Schedule your appointment online  Trinity EMS, Inc.">
+    <meta name="fb:extensions:title" content="Choose Appointment">
+
+
+    <meta name="twitter:image"
+        content="https://cdn-s.acuityscheduling.com/logo21713854.jpg?1610559222&amp;whiteBg=1&amp;rectangular=1">
+    <!-- inject:css -->
+    <link href="https://cdn-marketing.acuityscheduling.com/built/csp/schedule.css?v=eebf7c" rel="stylesheet">
+    <!-- endinject -->
+    <link href="https://cdn-marketing.acuityscheduling.com/built/csp/uppy.css?v=eebf7c" rel="stylesheet">
+    <style type="text/css" media="all"
+        nonce="dc0ee15bb1035afdb157c905ab92a659cc066756ee931485ee593b385ffcf8546251a2cf61cca28268b5ed2e320b2bf956f91632e359bbf4d91b8c7a90462ed1">
+        @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+
+        body {
+            font-family: 'Source Sans Pro', Helvetica, sans-serif;
+        }
+
+        a,
+        a:hover,
+        a:focus,
+        a.btn-link {
+            color: #c60d0d;
+        }
+
+        .btn-inverse {
+            border-color: #c60d0d;
+        }
+
+        .btn-inverse:active,
+        .btn-inverse:hover {
+            background-color: #c60d0d;
+        }
+
+        .choose-time-container label:hover,
+        .choose-time-container label.checked,
+        .btn-info,
+        .btn-primary.disabled,
+        .btn-primary[disabled],
+        .btn-primary,
+        .btn-primary:focus,
+        .btn.btn-primary.btn-block.btn-next-step,
+        .btn.btn-primary.submit-forms-payment,
+        .btn.btn-primary:hover,
+        .btn.btn-primary:active {
+            background: #c60d0d;
+            background-image: none;
+        }
+
+        .calendar .scheduleday.activeday:hover,
+        .choose-time-container label.checked,
+        .choose-time-container label:hover,
+        .choose-date .calendar .activeday:hover,
+        .choose-date .calendar .selectedday {
+            background: #c60d0d;
+            background-image: none;
+        }
+
+        .choose-date-time .choose-date-times .choose-time input[type="radio"]+label:hover,
+        .reschedule-choose-date-time .choose-time input[type="radio"]+label:hover,
+        .choose-date-time .date .choose-time-actions,
+        .date .choose-time input[type="radio"]:checked+label,
+        .reschedule-choose-date-time .date .choose-time input[type="radio"]:checked+label,
+        .reschedule-choose-date-time .date .choose-time-actions,
+        .choose-date-time .date-head-text,
+        .reschedule-choose-date-time .date-head-text {
+            border-color: #c60d0d;
+            color: #c60d0d;
+        }
+
+        .steps li.active {
+            border-bottom-color: #c60d0d;
+        }
+
+        .form-control:focus,
+        .sq-input--focus {
+            border-color: #c60d0d;
+            box-shadow: none;
+        }
+
+        .step-number {
+            background-color: #c60d0d;
+        }
+    </style>
+</head>
+
+<body class="no-touch  business-logo-white template-monthly locale-en_US has-transforms" style="">
+    <div class="business-container fb-extensions-remove">
+        <img src="//cdn-s.acuityscheduling.com/logo21713854.jpg?1610559222&amp;whiteBg=1&amp;rectangular=1"
+            class="business-logo" alt="Trinity EMS, Inc.">
+    </div>
+
+    <div class="content ">
+        <div id="popup" style="display:none">
+            <button type="button" class="close close-popup pull-right"><span aria-hidden="true">×</span><span
+                    class="sr-only">Close</span></button>
+            <div class="pane" id="popup-content">
+                <!-- dynamic -->
+            </div>
+        </div>
+
+        <div id="page-loading" style="display: none;">
+            <div class="progress-spinner"></div>
+            <h2>Loading...</h2>
+        </div>
+        <form id="appointment-form" class="content-scheduling-steps" style="" novalidate="">
+            <input type="hidden" name="owner" id="owner" value="21713854">
+            <input type="hidden" name="isIntegratedSquarespace" id="isIntegratedSquarespace" value="false">
+            <input type="hidden" id="free" value="">
+            <input type="hidden" name="linkAppointmentType" value="null">
+            <input type="hidden" name="linkCalendar" value="&quot;5109380&quot;">
+            <input type="hidden" id="upgradeUrl" name="upgradeUrl"
+                value="https://secure.acuityscheduling.com/preferences.php?action=myaccount&amp;from=free-embed-popup">
+
+            <div class="header">
+                <ol class="steps">
+                    <li class="step-pick-appointment active"><a
+                            href="/schedule.php?owner=21713854&amp;calendarID=5109380">
+                            Choose Appointment
+                        </a></li>
+                    <li class="step-forms"><a href="#">Your Info</a></li>
+                    <li class="step-confirmation"><a href="#">Confirmation</a></li>
+                </ol>
+                <div class="heading-actions">
+                    <div class="login-container client-login">
+                        Returning? <a
+                            href="client-login.php?owner=21713854&amp;PHPSESSID=fo5ihnudsmrdiivki542s7l35b&amp;returnUrl=%2Fschedule.php%3Fowner%3D21713854%26calendarID%3D5109380"
+                            class="client-login-btn branded" data-qa="client-login-button">Log in</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="alert alert-danger dynamic-alert " data-qa="error-notice"><button type="button" class="close"
+                    data-dismiss="alert" aria-hidden="true">×</button>All appointment types are private, none are
+                available for scheduling.</div>
+
+            <div class="pane error-flash alert alert-danger hidden" style="display:none;" data-qa="error-notice"></div>
+            <div class="step-container" data-step="pick-appointment" id="step-pick-appointment" style="">
+
+                <div class="pane business-description-container" style="display:none">
+                    <div class="babel-ignore business-description" style="display:none">
+
+                    </div>
+                </div>
+
+                <input type="text" id="jump-to-top"
+                    style="display:none;height:10px;width:10px;border:none;background:transparent;opacity:0;overflow:hidden;"
+                    class="safari-input">
+
+                <div class="pane pick-appointment-pane">
+
+                    <div class="select select-category">
+                        <span class="reopen-dropdown fa fa-chevron-down"></span>
+                        <div id="category-title" class="select-label select-category-schedule-title">Choose a
+                            category... </div>
+
+                    </div>
+
+                    <div class="select select-type ">
+                        <span class="reopen-dropdown fa fa-chevron-down"></span>
+                        <div class="select-label select-type-schedule-title"
+                            data-schedule-text="I would like to schedule... "
+                            data-purchase-text="I would like to purchase... " style="display: none;">I would like to
+                            schedule... </div>
+                        <div class="group-quantity-container">
+                            Quantity: <input type="number" id="group-quantity" class="form-control inline-field" min="1"
+                                value="1" size="1">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div id="addons-container">
+                    </div>
+
+                    <div class="select select-calendar" style="display:none">
+                        <span class="reopen-dropdown fa fa-chevron-down"></span>
+                        <div class="select-label">With...</div>
+                        <div id="select-calendar-options">
+                            <!-- dynamic -->
+                        </div>
+                    </div>
+
+
+                    <div class="choose-date-time" style="display:none">
+                        <input type="hidden" name="date[]" id="date" value="">
+                        <div class="choose-date">
+                            Loading...
+                        </div>
+                        <div class="choose-time-container" style="display:none">
+                            <h1></h1>
+                            <div class="choose-time">
+                                <!-- times go here -->
+                            </div>
+                            <div class="choose-time-actions" style="display:none">
+                                <ul>
+                                    <li>
+                                        <a href="#" class="btn btn-primary btn-block btn-next-step"
+                                            data-qa="continue-button">Continue »</a>
+                                    </li>
+                                    <li>
+                                        <a href="#selectedTimes" class="btn btn-default btn-block btn-additional"
+                                            data-qa="additional-time-button">Add a Time...</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="btn btn-default btn-block btn-recurring"
+                                            data-qa="recurring-time-button">Recurring...</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="selected-times-container" style="display: none;">
+                        <a href="#" class="btn btn-primary btn-next-step-top btn-next-step"
+                            style="display:none">Continue »</a>
+                        <div id="selected-times"></div>
+                        <a href="#" class="btn btn-primary btn-next-step">Continue »</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-container" data-qa="step-your-info" data-step="forms" id="step-forms" style="display:none">
+                <div class="pane appt-summary-pane">
+                    <div id="forms-appt-summary" class="babel-ignore"></div>
+                    <a href="#" class="text-muted change-pick-appointment branded" aria-expanded="true">« Change</a>
+                </div>
+
+                <div class="pane your-info">
+                    <div class="form-group required-field is-focused">
+                        <label for="first-name" class="control-label hide-if-no-placeholder">Name <span
+                                class="error">*</span> <span class="show-on-error">(required)</span></label>
+                        <div>
+                            <span class="hide-if-placeholder">First Name <span class="error">*</span></span>
+                            <input type="text" class="form-control safari-input" name="firstName" id="first-name"
+                                value="" placeholder="First Name" autocomplete="given-name" data-qa="first-name-input">
+                            <span class="hide-if-placeholder">Last Name <span class="error">*</span></span>
+                            <input type="text" class="form-control safari-input" name="lastName" id="last-name" value=""
+                                placeholder="Last Name" autocomplete="family-name" data-qa="last-name-input">
+                        </div>
+                    </div>
+                    <div class="form-group required-field">
+                        <label for="phone" class="control-label">Phone <span class="error">*</span> <span
+                                class="show-on-error">(required)</span></label>
+                        <input type="text" class="form-control safari-input" name="phone" id="phone" value=""
+                            autocomplete="tel" data-qa="phone-input">
+                        <p class="small babel-ignore is-send-sms">You will receive a text message reminder before your
+                            appointment</p>
+                    </div>
+                    <div class="form-group required-field">
+                        <label for="email" class="control-label">Email <span class="error">*</span> <span
+                                class="show-on-error">(required)</span></label>
+                        <input type="email" class="form-control safari-input" name="email" id="email" value=""
+                            autocorrect="off" autocomplete="email" data-qa="email-input">
+                        <div class="help-block" id="email-error-help" style="display:none">Your email address is
+                            invalid<span id="email-error-domain">. Did you type the domain correctly?</span></div>
+                    </div>
+                </div>
+
+                <div class="pane" id="custom-forms"></div>
+            </div>
+
+            <div class="step-container" data-step="confirmation" id="step-confirmation" style="display:none">
+            </div>
+
+            <div class="clearfix"></div>
+
+        </form>
+    </div>
+
+    <div id="acuity-footer">
+        <div class="poweredby-content">
+            <a href="https://www.acuityscheduling.com/?utm_campaign=acuity&amp;utm_medium=referral&amp;utm_source=scheduling"
+                target="_blank">
+                <span class="powered-by">Powered By</span>
+                <img alt="Powered By Acuity Scheduling" class="poweredby-logo " src="/img/brand/logo-01.svg">
+            </a>
+        </div>
+    </div>
+
+    <style type="text/css"
+        nonce="dc0ee15bb1035afdb157c905ab92a659cc066756ee931485ee593b385ffcf8546251a2cf61cca28268b5ed2e320b2bf956f91632e359bbf4d91b8c7a90462ed1"
+        media="all">
+        .select-type .duration,
+        .select-type .at-desc,
+        #forms-appt-summary .duration-container,
+        .class-duration,
+        .addon-duration,
+        .addon-at-divider {
+            display: none;
+        }
+
+        .many-types .duration-container:before,
+        .many-types .duration-container:after,
+        #forms-appt-summary .duration-container:before,
+        #forms-appt-summary .duration-container:after {
+            content: "";
+            display: none;
+        }
+
+        #additional-time-link,
+        #recurring-time-link,
+        .btn-recurring,
+        .btn-additional {
+            display: none
+        }
+
+        #acuity-footer {
+            display: none !important;
+        }
+    </style>
+
+</body>
+
+</html>
