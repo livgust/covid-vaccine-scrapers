@@ -69,9 +69,12 @@ async function fetchResponse({ url, method, headers, body }) {
         headers,
     })
         .then(
+            (res) => {
+                console.log("logging res from fetch", res);
+                return res;
+            },
             (res) => res.json(),
             (err) => {
-                console.log("logging res from fetch", res);
                 console.error(err);
                 return null;
             }
