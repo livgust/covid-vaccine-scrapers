@@ -29,6 +29,7 @@ async function GetAllAvailability(availabilityService) {
     const rawAvailability = await availabilityService.getAvailabilityResponse(
         accessToken
     );
+    console.log("rawAvail", rawAvailability);
     return rawAvailability.response.reduce((acc, appointment) => {
         const zip = appointment.facility.postcode;
         const date = appointment.date.split("T")[0]; // get 2021-03-08 from 2021-03-08T22:40:00.000Z
@@ -68,17 +69,12 @@ async function fetchResponse({ url, method, headers, body }) {
         body,
         headers,
     })
-        .then(
-            (res) => {
-                console.log("logging res from fetch", res);
-                return res;
-            },
-            (res) => res.json(),
-            (err) => {
-                console.error(err);
-                return null;
-            }
-        );
+        .then((res) => res.text())
+        .then((textRes) => {
+            console.log("Received:", textRes);
+            return JSON.parse(textRes);
+        })
+        .catch(console.error);
 }
 
 function getAvailabilityService() {
