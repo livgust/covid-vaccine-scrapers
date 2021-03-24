@@ -29,7 +29,6 @@ async function GetAllAvailability(availabilityService) {
     const rawAvailability = await availabilityService.getAvailabilityResponse(
         accessToken
     );
-    console.log("rawAvail", rawAvailability);
     return rawAvailability.response.reduce((acc, appointment) => {
         const zip = appointment.facility.postcode;
         const date = appointment.date.split("T")[0]; // get 2021-03-08 from 2021-03-08T22:40:00.000Z
@@ -71,8 +70,12 @@ async function fetchResponse({ url, method, headers, body }) {
     })
         .then((res) => res.text())
         .then((textRes) => {
-            console.log("Received:", textRes);
-            return JSON.parse(textRes);
+            try {
+                return JSON.parse(textRes);
+            } catch (err) {
+                console.error("Failed to parse response", textRes, err);
+                throw err;
+            }
         })
         .catch(console.error);
 }
