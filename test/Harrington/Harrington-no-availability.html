@@ -1,0 +1,496 @@
+<html lang="en">
+
+<head>
+    <style type="text/css">
+        .algolia-places {
+            width: 100%;
+        }
+
+        .ap-input,
+        .ap-hint {
+            width: 100%;
+            padding-right: 35px;
+            padding-left: 16px;
+            line-height: 40px;
+            height: 40px;
+            border: 1px solid #CCC;
+            border-radius: 3px;
+            outline: none;
+            font: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+            box-sizing: border-box;
+        }
+
+        .ap-input::-webkit-search-decoration {
+            -webkit-appearance: none;
+        }
+
+        .ap-input::-ms-clear {
+            display: none;
+        }
+
+        .ap-input:hover~.ap-input-icon svg,
+        .ap-input:focus~.ap-input-icon svg,
+        .ap-input-icon:hover svg {
+            fill: #aaaaaa;
+        }
+
+        .ap-dropdown-menu {
+            width: 100%;
+            background: #ffffff;
+            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+
+        .ap-suggestion {
+            cursor: pointer;
+            height: 46px;
+            line-height: 46px;
+            padding-left: 18px;
+            overflow: hidden;
+        }
+
+        .ap-suggestion em {
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        .ap-address {
+            font-size: smaller;
+            margin-left: 12px;
+            color: #aaaaaa;
+        }
+
+        .ap-suggestion-icon {
+            margin-right: 10px;
+            width: 14px;
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        .ap-suggestion-icon svg {
+            -webkit-transform: scale(0.9) translateY(2px);
+            transform: scale(0.9) translateY(2px);
+            fill: #cfcfcf;
+        }
+
+        .ap-input-icon {
+            border: 0;
+            background: transparent;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 16px;
+            outline: none;
+        }
+
+        .ap-input-icon.ap-icon-pin {
+            cursor: initial;
+        }
+
+        .ap-input-icon svg {
+            fill: #cfcfcf;
+            position: absolute;
+            top: 50%;
+            right: 0;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .ap-cursor {
+            background: #efefef;
+        }
+
+        .ap-cursor .ap-suggestion-icon svg {
+            -webkit-transform: scale(1) translateY(2px);
+            transform: scale(1) translateY(2px);
+            fill: #aaaaaa;
+        }
+
+        .ap-footer {
+            opacity: .8;
+            text-align: right;
+            padding: .5em 1em .5em 0;
+            font-size: 12px;
+            line-height: 12px;
+        }
+
+        .ap-footer a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .ap-footer a svg {
+            vertical-align: text-bottom;
+            max-width: 60px;
+        }
+
+        .ap-footer:hover {
+            opacity: 1;
+        }
+    </style>
+    <link rel="canonical" href="https://app.acuityscheduling.com/schedule.php?owner=22192301">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Schedule Appointment with Harrington HealthCare System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+    <meta name="referrer" content="same-origin">
+    <meta name="format-detection" content="date=no">
+    <meta name="description" content="Schedule your appointment online  Harrington HealthCare System">
+    <meta property="fb:app_id" content="465400520261032">
+    <meta property="og:type" content="website">
+    <meta property="og:url"
+        content="https://app.acuityscheduling.com/schedule.php?owner=22192301&amp;calendarID=5202050">
+    <meta property="og:title" content="Harrington HealthCare System">
+    <meta name="fb:extensions:title" content="Choose Appointment">
+    <meta property="og:description" content="Schedule your appointment online  Harrington HealthCare System">
+    <meta property="og:image" content="https://cdn-s.acuityscheduling.com/logo22192301.png?1614525244&amp;hasAlpha=1">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" value="https://app.acuityscheduling.com/schedule.php?owner=22192301">
+    <meta name="twitter:title" value="Harrington HealthCare System">
+    <meta name="twitter:description" value="Schedule your appointment online  Harrington HealthCare System">
+    <meta name="fb:extensions:title" content="Choose Appointment">
+    <meta name="twitter:image" content="https://cdn-s.acuityscheduling.com/logo22192301.png?1614525244&amp;hasAlpha=1">
+    <link href="https://cdn-marketing.acuityscheduling.com/built/csp/schedule-weekly.css?v=75c2b0" rel="stylesheet">
+    <link href="https://cdn-marketing.acuityscheduling.com/built/csp/uppy.css?v=75c2b0" rel="stylesheet">
+    <style type="text/css" media="all"
+        nonce="5c9afce92ff5fd60586331d5a61dd09d87ce4ffc7fb0caf9a11b8c1750ac8d7142f5b2b70f4a87c867955c25ddeaf12ccba1edb968a23126a002b06274a08d8a">
+        @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+
+        body {
+            font-family: 'Source Sans Pro', Helvetica, sans-serif;
+        }
+
+        a,
+        a:hover,
+        a:focus,
+        a.btn-link {
+            color: #8339b0;
+        }
+
+        .btn-inverse {
+            border-color: #8339b0;
+        }
+
+        .btn-inverse:active,
+        .btn-inverse:hover {
+            background-color: #8339b0;
+        }
+
+        .choose-time-container label:hover,
+        .choose-time-container label.checked,
+        .btn-info,
+        .btn-primary.disabled,
+        .btn-primary[disabled],
+        .btn-primary,
+        .btn-primary:focus,
+        .btn.btn-primary.btn-block.btn-next-step,
+        .btn.btn-primary.submit-forms-payment,
+        .btn.btn-primary:hover,
+        .btn.btn-primary:active {
+            background: #8339b0;
+            background-image: none;
+        }
+
+        .calendar .scheduleday.activeday:hover,
+        .choose-time-container label.checked,
+        .choose-time-container label:hover,
+        .choose-date .calendar .activeday:hover,
+        .choose-date .calendar .selectedday {
+            background: #8339b0;
+            background-image: none;
+        }
+
+        .choose-date-time .choose-date-times .choose-time input[type="radio"]+label:hover,
+        .reschedule-choose-date-time .choose-time input[type="radio"]+label:hover,
+        .choose-date-time .date .choose-time-actions,
+        .date .choose-time input[type="radio"]:checked+label,
+        .reschedule-choose-date-time .date .choose-time input[type="radio"]:checked+label,
+        .reschedule-choose-date-time .date .choose-time-actions,
+        .choose-date-time .date-head-text,
+        .reschedule-choose-date-time .date-head-text {
+            border-color: #8339b0;
+            color: #8339b0;
+        }
+
+        .steps li.active {
+            border-bottom-color: #8339b0;
+        }
+
+        .form-control:focus,
+        .sq-input--focus {
+            border-color: #8339b0;
+            box-shadow: none;
+        }
+
+        .step-number {
+            background-color: #8339b0;
+        }
+    </style>
+    <style type="text/css">
+        .-b-translate-hover {
+            box-shadow: 0 0 24px rgba(0, 0, 0, 0.7);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="no-touch  business-logo-transparent template-weekly locale-en_US has-transforms">
+    <noscript
+        nonce="5c9afce92ff5fd60586331d5a61dd09d87ce4ffc7fb0caf9a11b8c1750ac8d7142f5b2b70f4a87c867955c25ddeaf12ccba1edb968a23126a002b06274a08d8a">
+        &lt;p class="alert alert-danger"&gt;Javascript must be enabled to use this. &lt;a
+        href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank"&gt;Learn how to enable
+        Javascript&lt;/a&gt;&lt;/p&gt;
+    </noscript>
+    <div class="content">
+        <div id="popup" style="display: none;">
+            <button type="button" class="close close-popup pull-right"><span aria-hidden="true">×</span><span
+                    class="sr-only">Close</span></button>
+            <div class="pane" id="popup-content"></div>
+        </div>
+        <div id="page-loading" style="display: none;">
+            <div class="progress-spinner"></div>
+            <h2>Loading...</h2>
+        </div>
+        <form id="appointment-form" class="content-scheduling-steps" novalidate="">
+            <input type="hidden" name="owner" id="owner" value="22192301">
+            <input type="hidden" name="isIntegratedSquarespace" id="isIntegratedSquarespace" value="false">
+            <input type="hidden" id="free" value="">
+            <input type="hidden" name="linkAppointmentType" value="null">
+            <input type="hidden" name="linkCalendar" value="&quot;5202050&quot;">
+            <input type="hidden" id="upgradeUrl" name="upgradeUrl"
+                value="https://secure.acuityscheduling.com/preferences.php?action=myaccount&amp;from=free-embed-popup">
+            <input type="hidden" class="certificate-field" id="certificate" name="certificate" value="" size="16">
+            <div class="business-container all-steps-visible step-pane logo-is-visible">
+                <div class="business-logo-container" style="margin-bottom: -80px;">
+                    <img src="//cdn-s.acuityscheduling.com/logo22192301.png?1614525244&amp;hasAlpha=1"
+                        class="business-logo" alt="Harrington HealthCare System">
+                </div>
+                <div class="business-content-logo-adjust-container">
+                    <div class="heading-actions">
+                        <div class="login-container client-login">
+                            Returning? <a
+                                href="client-login.php?owner=22192301&amp;PHPSESSID=ep2h2nrfcuru1kj463f4a4m35s&amp;returnUrl=%2Fschedule.php%3Fowner%3D22192301%26calendarID%3D5202050"
+                                class="client-login-btn branded" data-qa="client-login-button">Log in</a>
+                        </div>
+                    </div>
+                    <div class="babel-ignore business-description">
+                        <p><strong><span style="font-size:14px;">Harrington HealthCare System is currently offering
+                                    vaccination for all those who qualify for vaccination under Massachusetts Covid-19
+                                    Vaccine Distribution Timeline Please visit <a
+                                        href="https://www.mass.gov/covid-19-vaccine">https://www.mass.gov/covid-19-vaccine</a>
+                                    prior to registering for an appointment to determine if you qualify - no exceptions
+                                    are made<br></span></strong></p>
+                        <p><strong><span style="font-size:14px;"><br><br>At your appointment, you may be asked for the
+                                    following information:</span></strong></p>
+                        <p><strong><span style="font-size:14px;">Insurance card. Vaccination is free whether you have
+                                    insurance or not, if you have insurance, please bring that information with
+                                    you.</span></strong></p>
+                        <p><strong><span style="font-size:14px;">Identification, examples include:</span></strong></p>
+                        <ul>
+                            <li><strong><span style="font-size:14px;">Employer-issued ID card that includes your name
+                                        and title; or</span></strong></li>
+                            <li><strong><span style="font-size:14px;">Government-issues identification or license;
+                                        or</span></strong></li>
+                            <li><strong><span style="font-size:14px;">Recent pay stub</span></strong></li>
+                        </ul>
+                        <p><strong><span style="font-size:14px;">You may get a vaccination even if you do not have a
+                                    driver’s license or social security number</span></strong></p>
+                        <p><strong><span style="font-size:14px;"><br>***This form is for initial immunization sign-up
+                                    only. If you have already received the initial vaccine you would have been given
+                                    your return appointment. An appointment reminder for your 2nd vaccine dose will be
+                                    sent via call/text message to your phone number on file.***</span></strong></p>
+                        <p><strong><span style="font-size:14px;">***For those who have a history of anaphylactic
+                                    reactions, please contact the vaccination center at 508-765-8160, as your visit may
+                                    need to be vaccinated in a hospital setting. </span></strong></p>
+                        <p><strong><span style="font-size:14px;">***Vaccination is only offered to those 18 years of age
+                                    and older</span></strong><br></p>
+                    </div>
+                </div>
+            </div>
+            <div class="pane error-flash alert alert-danger hidden" style="display:none;" data-qa="error-notice"></div>
+            <div class="step-pane" id="step-pick-appointment" data-step="pick-appointment">
+                <h2 class="step-title">
+                    <span class="step-number">1</span>
+                    <a style="color:inherit;text-decoration: none"
+                        href="/schedule.php?owner=22192301&amp;calendarID=5202050">Choose Appointment</a>
+                </h2>
+                <input type="text" id="jump-to-top"
+                    style="display:none;height:10px;width:10px;border:none;background:transparent;opacity:0;overflow:hidden;"
+                    class="safari-input">
+                <div class="pane-content choose-appointment-pane">
+                    <div class="select select-type  closed" data-value="20926295">
+                        <span class="reopen-dropdown fa fa-chevron-down" style="display: none;"></span>
+                        <div class="group-quantity-container">
+                            Quantity: <input type="number" id="group-quantity" class="form-control inline-field" min="1"
+                                value="1" size="1">
+                        </div>
+                        <input type="radio" name="appointmentType" data-is-group="0" id="appointmentType-20926295"
+                            value="20926295">
+                        <div class="select-item-box select-item " data-qa="appointment-20926295-select" tabindex="0">
+                            <label class="babel-ignore" for="appointmentType-20926295">
+                                <span class="appointment-type-name">Covid-19 Vaccination - Town Restricted</span>
+                            </label>
+                            <img src="//cdn-s.acuityscheduling.com/appointmentType-thumb-20819310.png?1614524962"
+                                class="appointment-image">
+                            <div class="duration-container">
+                                <span class="duration">15 minutes</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="select select-calendar" style="display: none;" data-value="5202050">
+                        <span class="reopen-dropdown fa fa-chevron-down"></span>
+                        <div class="select-label">With...</div>
+                        <div id="select-calendar-options"><input type="radio" name="calendar" value="5202050"
+                                checked="checked"></div>
+                    </div>
+                    <div class="choose-date-time" role="radiogroup" aria-labelledby="dates-and-times">
+                        <div id="selected-times-container" style="display: none;">
+                            <a name="selectedTimes"></a>
+                            <a href="#" class="btn btn-primary btn-next-step-top btn-next-step"
+                                style="display:none">Continue »</a>
+                            <div id="selected-times"></div>
+                            <a href="#" class="btn btn-primary btn-next-step">Continue »</a>
+                        </div>
+                        <div class="choose-date choose-date-times" id="dates-and-times">
+                            <div class="calendar-prev-next" id="calendar-prev-next">
+                                <a name="calendar-top"></a>
+                                <a href="javascript:self.showCalendar('2021-04-23', %7B%22nextprev%22%3A%7B%222021-04-23%22%3A%222021-03-24%22%7D%7D)"
+                                    class="calendar-next"><span>More Times</span> <i
+                                        class="fa fa-chevron-right"></i></a>
+                            </div>
+                            <div class="clearfix calendar"></div>
+                            <span id="no-times-available-message" data-original-text="No times are available">No times
+                                are available in the next month (from March 24, 2021 to April 23, 2021)</span>
+                        </div>
+                        <div class="choose-time-actions" style="display:none">
+                            <ul>
+                                <li>
+                                    <a href="#" class="btn btn-primary btn-block btn-next-step"
+                                        data-qa="continue-button">Continue »</a>
+                                </li>
+                                <li>
+                                    <a href="#selectedTimes" class="btn btn-default btn-block btn-additional"
+                                        data-qa="additional-time-button">Add a Time...</a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn btn-default btn-block btn-recurring"
+                                        data-qa="recurring-time-button">Recurring...</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <div class="pane-collapsed" style="display:none">
+                    <a href="#" class="change-pick-appointment" aria-expanded="true"
+                        aria-label="Change Appointment Type or Time"><i class="fa fa-chevron-down"></i></a>
+                    <div class="pane appt-summary-pane">
+                        <div id="forms-appt-summary" class="babel-ignore"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-pane" id="step-forms-pane" data-step="forms">
+                <h2 class="step-title">
+                    <span class="step-number">2</span>
+                    Your Information
+                </h2>
+                <div class="pane-content" data-qa="step-your-info" id="step-forms" style="display:none">
+                    <div class="form-group required-field is-focused">
+                        <label for="first-name" class="control-label hide-if-no-placeholder">Name <span
+                                class="error">*</span> <span class="show-on-error">(required)</span></label>
+                        <div>
+                            <span class="hide-if-placeholder">First Name <span class="error">*</span></span>
+                            <input type="text" class="form-control safari-input" name="firstName" id="first-name"
+                                value="" placeholder="First Name" autocomplete="given-name" data-qa="first-name-input">
+                            <span class="hide-if-placeholder">Last Name <span class="error">*</span></span>
+                            <input type="text" class="form-control safari-input" name="lastName" id="last-name" value=""
+                                placeholder="Last Name" autocomplete="family-name" data-qa="last-name-input">
+                        </div>
+                    </div>
+                    <div class="form-group required-field">
+                        <label for="phone" class="control-label">Phone <span class="error">*</span> <span
+                                class="show-on-error">(required)</span></label>
+                        <input type="text" class="form-control safari-input" name="phone" id="phone" value=""
+                            autocomplete="tel" data-qa="phone-input">
+                    </div>
+                    <div class="form-group required-field">
+                        <label for="email" class="control-label">Email <span class="error">*</span> <span
+                                class="show-on-error">(required)</span></label>
+                        <input type="email" class="form-control safari-input" name="email" id="email" value=""
+                            autocorrect="off" autocomplete="email" data-qa="email-input">
+                        <div class="help-block" id="email-error-help" style="display:none">Your email address is
+                            invalid<span id="email-error-domain">. Did you type the domain correctly?</span></div>
+                    </div>
+                    <div class="pane" id="custom-forms"></div>
+                </div>
+                <div class="pane-collapsed" style="display:none">
+                </div>
+            </div>
+        </form>
+        <div class="step-pane payment-container" data-step="forms" style="display:none">
+            <div class="pane-content">
+            </div>
+        </div>
+        <a name="completed"></a>
+        <div class="step-pane" id="step-confirmation-pane" data-step="confirmation">
+            <h2 class="step-title">
+                <span class="step-number">3</span>
+                Confirmation
+            </h2>
+            <div class="pane-content" style="display:none" id="step-confirmation">
+            </div>
+        </div>
+    </div>
+    <div id="acuity-footer">
+        <div class="poweredby-content">
+            <a href="https://www.acuityscheduling.com/?utm_campaign=acuity&amp;utm_medium=referral&amp;utm_source=scheduling"
+                target="_blank">
+                <span class="powered-by">Powered By</span>
+                <img alt="Powered By Acuity Scheduling" class="poweredby-logo " src="/img/brand/logo-01.svg">
+            </a>
+        </div>
+    </div>
+    <style type="text/css"
+        nonce="5c9afce92ff5fd60586331d5a61dd09d87ce4ffc7fb0caf9a11b8c1750ac8d7142f5b2b70f4a87c867955c25ddeaf12ccba1edb968a23126a002b06274a08d8a"
+        media="all">
+        .select-type .duration,
+        .select-type .at-desc,
+        #forms-appt-summary .duration-container,
+        .class-duration,
+        .addon-duration,
+        .addon-at-divider {
+            display: none;
+        }
+
+        .many-types .duration-container:before,
+        .many-types .duration-container:after,
+        #forms-appt-summary .duration-container:before,
+        #forms-appt-summary .duration-container:after {
+            content: "";
+            display: none;
+        }
+
+        #additional-time-link,
+        #recurring-time-link,
+        .btn-recurring,
+        .btn-additional {
+            display: none
+        }
+
+        .client-login,
+        .client-register {
+            display: none;
+        }
+
+        #acuity-footer {
+            display: none !important;
+        }
+    </style>
+</body>
+
+</html>
