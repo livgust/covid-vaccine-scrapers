@@ -47,7 +47,7 @@ describe("Harrington Health Care :: test with availability", function () {
         },
     };
 
-    it("Should return 6 days with 18 total available slots across 2 months. ", async () => {
+    it("Should return 7 days with 19 total available slots across 3 months. ", async () => {
         const results = await harringtonScraper(
             browser,
             hasAvailabilityPageService,
