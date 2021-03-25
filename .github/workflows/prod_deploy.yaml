@@ -5,6 +5,7 @@ on:
 
 jobs:
   sam-validate-build-test-deploy:
+    if: ${{ github.repository_owner == 'livgust' }}
     runs-on: ubuntu-latest
     outputs:
       env-name: ${{ steps.env-name.outputs.environment }}

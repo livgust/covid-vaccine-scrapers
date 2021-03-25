@@ -36,7 +36,7 @@ const fakeAvailabilityResponse = {
         },
         {
             facility: {
-                _id: "6011f3c1fa2b92009a1c0e28",
+                _id: "6011f3c1fa2b92009a1c0e26",
                 name: "COVID19 VACCINE REVERE",
                 postcode: "02151",
             },
@@ -81,7 +81,7 @@ describe("East Boston NHC Availability Scraper", function () {
                     "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
                 restrictions:
                     "Open to eligible residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)",
-                street: "10 Garofalo St",
+                street: "1290 N Shore Road",
                 city: "Revere",
                 zip: "02151",
             },

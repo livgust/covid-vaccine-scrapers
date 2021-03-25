@@ -8,6 +8,7 @@
         "bestzip": "^2.1.7",
         "chrome-aws-lambda": "^7.0.0",
         "dotenv": "^8.2.0",
+        "faunadb": "^4.1.1",
         "jsdom": "^16.4.0",
         "lodash": "^4.17.21",
         "moment": "^2.29.1",
@@ -24,6 +25,7 @@
         "aws-sdk": "^2.840.0",
         "chai": "^4.3.0",
         "chai-as-promised": "^7.1.1",
+        "chai-shallow-deep-equal": "^1.4.6",
         "chai-subset": "^1.6.0",
         "mocha": "^8.3.0",
         "mock-require": "^3.0.3",
@@ -36,7 +38,7 @@
     },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",
-        "test": "mocha",
+        "test": "mocha --exit",
         "verifyLockfile": "node -e \"if(require('./package-lock.json').lockfileVersion !== 2) {process.exit(1);};\""
     }
 }

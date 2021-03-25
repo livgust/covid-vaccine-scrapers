@@ -1,6 +1,4 @@
 const { site } = require("./config");
-const { sendSlackMsg } = require("../../lib/slack");
-const s3 = require("../../lib/s3");
 
 const noAppointmentMatchString =
     "All appointment types are private, none are available for scheduling.";
@@ -13,9 +11,9 @@ const noAppointmentMatchString =
  * @return JSON blob with { hasAppointments: Bool, totalAvailability: Int }
  */
 module.exports = async function GetAvailableAppointments(browser) {
-    await console.log(`${site.name} starting.`);
+    console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
-    await console.log(`${site.name} done.`);
+    console.log(`${site.name} done.`);
     return {
         ...site,
         ...webData,

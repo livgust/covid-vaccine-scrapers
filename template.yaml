@@ -72,7 +72,6 @@ Resources:
           AWSS3BUCKETNAME: !Ref BucketName
           RECAPTCHATOKEN: !Ref RecaptchaToken
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
-
       Events:
         ScraperSchedule:
           Type: Schedule
@@ -86,6 +85,8 @@ Resources:
       Handler: getScraperData.handler
       Runtime: nodejs14.x
       CodeUri: .
+      MemorySize: 256
+      Timeout: 5
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:

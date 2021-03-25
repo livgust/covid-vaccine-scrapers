@@ -20,12 +20,6 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 
 async function execute() {
-    const cachedResults = await fetch(
-        "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
-    )
-        .then((res) => res.json())
-        .then((unpack) => JSON.parse(unpack.body).results);
-
     Puppeteer.use(StealthPlugin());
 
     Puppeteer.use(
@@ -54,34 +48,35 @@ async function execute() {
           });
 
     const gatherData = async () => {
-        const results = await Promise.all(
-            scrapers.map((scraper) => {
-                const startTime = new Date();
-                let isSuccess = true;
-                return scraper
-                    .run(browser)
-                    .catch((error) => {
-                        //print out the issue but don't fail, this way we still publish updates
-                        //for other locations even if this website's scrape doesn't work
-                        console.log(error);
-                        isSuccess = false;
-                        return null;
-                    })
-                    .then(async (result) => {
-                        const numberAppointments = getTotalNumberOfAppointments(
-                            result
-                        );
-                        await logScraperRun(
-                            scraper.name,
-                            isSuccess,
-                            new Date() - startTime,
-                            startTime,
-                            numberAppointments
-                        );
-                        return result;
-                    });
-            })
-        );
+        const results = [];
+        for (const scraper of scrapers) {
+            const startTime = new Date();
+            let isSuccess = true;
+            const returnValue = await scraper
+                .run(browser)
+                .catch((error) => {
+                    //print out the issue but don't fail, this way we still publish updates
+                    //for other locations even if this website's scrape doesn't work
+                    console.log(error);
+                    isSuccess = false;
+                    return null;
+                })
+                .then(async (result) => {
+                    const numberAppointments = getTotalNumberOfAppointments(
+                        result
+                    );
+                    // TODO - call FaunaDB util method here!
+                    await logScraperRun(
+                        scraper.name,
+                        isSuccess,
+                        new Date() - startTime,
+                        startTime,
+                        numberAppointments
+                    );
+                    return result;
+                });
+            results.push(returnValue);
+        }
         browser.close();
         let scrapedResultsArray = [];
         for (const result of results) {
@@ -92,6 +87,12 @@ async function execute() {
                 scrapedResultsArray.push(result);
             }
         }
+
+        const cachedResults = await fetch(
+            "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
+        )
+            .then((res) => res.json())
+            .then((unpack) => JSON.parse(unpack.body).results);
 
         let finalResultsArray = [];
         if (process.argv.length <= 2) {
