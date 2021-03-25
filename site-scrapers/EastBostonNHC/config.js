@@ -4,10 +4,10 @@ const site = {
         "https://patient.lumahealth.io/survey?patientFormTemplate=601d6aec4f308f00128eb4cd&user=600f45213901d90012deb171",
     locations: [
         {
-            street: "10 Garofalo St",
+            street: "1290 N Shore Road",
             city: "Revere",
             zip: "02151",
-            // facility_id: "6011f3c1fa2b92009a1c0e28", // Leaving facility_id in case we want to query by location in the future.
+            // facility_id: "6011f3c1fa2b92009a1c0e26", // Leaving facility_id in case we want to query by location in the future.
         },
         {
             street: "318 Broadway",

@@ -67,13 +67,17 @@ async function fetchResponse({ url, method, headers, body }) {
         method,
         body,
         headers,
-    }).then(
-        (res) => res.json(),
-        (err) => {
-            console.error(err);
-            return null;
-        }
-    );
+    })
+        .then((res) => res.text())
+        .then((textRes) => {
+            try {
+                return JSON.parse(textRes);
+            } catch (err) {
+                console.error("Failed to parse response", textRes, err);
+                throw err;
+            }
+        })
+        .catch(console.error);
 }
 
 function getAvailabilityService() {
@@ -99,21 +103,22 @@ function getAvailabilityService() {
             return await fetchResponse({
                 url: [
                     "https://api.lumahealth.io/api/scheduler/availabilities?appointmentType=6011f3c4fa2b92009a1c0f43",
-                    `date=%3E${startDate}T00%3A00%3A00-05%3A00`,
+                    `date=%3E${startDate}T00%3A00%3A00-04%3A00`,
                     `date=%3C${endDate}T23%3A59%3A59-04%3A00`,
-                    "facility=6011f3c1fa2b92009a1c0e28%2C6011f3c1fa2b92009a1c0e24%2C601a236ff7f880001333e993%2C601a236ff7f880001333e993%2C6011f3c1fa2b92009a1c0e2a",
+                    "facility=6011f3c1fa2b92009a1c0e26%2C6011f3c1fa2b92009a1c0e24%2C601a236ff7f880001333e993%2C601a236ff7f880001333e993%2C6011f3c1fa2b92009a1c0e2a",
                     "includeNullApptTypes=true",
                     "limit=100",
                     "page=1",
-                    "patientForm=603fd7026345ba0013a476ef",
+                    "patientForm=605b942348503f001279a0e6",
                     "populate=true",
-                    "provider=601a24ac98d5e900120d2582%2C6011f3c2fa2b92009a1c0e59%2C6011f3c2fa2b92009a1c0e69%2C6011f3c2fa2b92009a1c0e6d",
+                    "provider=601a24ac98d5e900120d2582%2C6011f3c2fa2b92009a1c0e59%2C6011f3c2fa2b92009a1c0e6b%2C6011f3c2fa2b92009a1c0e6d",
                     "sort=date",
                     "sortBy=asc",
                     "status=available",
                 ].join("&"),
                 method: "GET",
                 headers: {
+                    "Content-Type": "application/json;charset=UTF-8",
                     "x-access-token": accessToken,
                 },
             });
