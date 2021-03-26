@@ -1,7 +1,7 @@
-name: SAM Validate, Build, Test, Deploy
+name: Workflow 2 - SAM Validate, Build, Test, Deploy
 on:
-  push:
-    branches: [master]
+  repository_dispatch:
+    types: [trigger-workflow-2]
 
 jobs:
   sam-validate-build-test-deploy: # todo - rename this
@@ -11,6 +11,8 @@ jobs:
       env-name: ${{ steps.env-name.outputs.environment }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.sha }}
       - name: Install Dependencies with Apt Get
         run: |
           sudo apt-get update

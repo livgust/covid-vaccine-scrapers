@@ -1,11 +1,11 @@
-name: Test workflow
+name: Workflow 1 - Test
 on:
   pull_request:
     branches:
       - master
   push:
-    branches: 
-      - tj/runTestsOnPRMerge
+    branches:
+      - tj/runTestsOnPRMerge # todo - change to master
 jobs:
   build:
     runs-on: ubuntu-18.04
@@ -30,7 +30,7 @@ jobs:
           envkey_FAUNA_DB_DEV: ${{ secrets.FAUNA_DB_DEV }}
       - run: npm ci
       # todo: if FAUNA_DB_DEV isn't set
-        # -  don't run fauna tests.
+      # -  don't run fauna tests.
       - name: Run test suite
         env:
           DEVELOPMENT: true
@@ -38,3 +38,11 @@ jobs:
         run: npm test
       - run: npx prettier --check ./
       - run: npm run verifyLockfile
+      - name: Trigger next workflow (if pushing to master)
+        if: success() # also check that this is a push to master
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GH_ACTION_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: trigger-workflow-2
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
