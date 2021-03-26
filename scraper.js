@@ -19,6 +19,7 @@ const scrapers = require("./site-scrapers");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 
+// This is a comment!
 async function execute() {
     Puppeteer.use(StealthPlugin());
 
