@@ -2,12 +2,9 @@ name: Workflow 2 - SAM Validate, Build, Test, Deploy
 on:
   repository_dispatch:
     types: [trigger-workflow-2]
-  push:
-    branches:
-      - tj/runTestsOnPRMerge # todo - change to master
 
 jobs:
-  sam-validate-build-test-deploy: # todo - rename this
+  sam-validate-build-deploy:
     if: ${{ github.repository_owner == 'livgust' }}
     runs-on: ubuntu-latest
     outputs:
