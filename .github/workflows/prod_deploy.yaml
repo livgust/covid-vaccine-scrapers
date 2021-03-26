@@ -4,7 +4,7 @@ on:
     branches: [master]
 
 jobs:
-  sam-validate-build-test-deploy:
+  sam-validate-build-test-deploy: # todo - rename this
     if: ${{ github.repository_owner == 'livgust' }}
     runs-on: ubuntu-latest
     outputs:
