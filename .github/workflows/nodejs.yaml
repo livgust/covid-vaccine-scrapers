@@ -39,7 +39,7 @@ jobs:
       - run: npx prettier --check ./
       - run: npm run verifyLockfile
       - name: Trigger next workflow (if pushing to master)
-        if: success() # also check that this is a push to master
+        if: always() # also check that this is a push to master
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.GH_ACTION_TOKEN }}
