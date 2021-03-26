@@ -1,6 +1,9 @@
-name: node.js
+name: Workflow 1 - Test
 on:
   pull_request:
+    branches:
+      - master
+  push:
     branches:
       - master
 jobs:
@@ -26,6 +29,7 @@ jobs:
         with:
           envkey_FAUNA_DB_DEV: ${{ secrets.FAUNA_DB_DEV }}
       - run: npm ci
+      # todo: if FAUNA_DB_DEV isn't set, don't run the fauna tests
       - name: Run test suite
         env:
           DEVELOPMENT: true
@@ -33,3 +37,11 @@ jobs:
         run: npm test
       - run: npx prettier --check ./
       - run: npm run verifyLockfile
+      - name: Trigger next workflow (this only happens on the default branch, master)
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GH_ACTION_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: trigger-workflow-2
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
