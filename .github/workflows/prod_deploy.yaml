@@ -10,7 +10,7 @@ jobs:
   testing:
     runs-on: ubuntu-18.04
     steps:
-      run: echo "it works"
+      - run: echo "it works"
 
   # sam-validate-build-deploy:
   #   if: ${{ github.repository_owner == 'livgust' }}
