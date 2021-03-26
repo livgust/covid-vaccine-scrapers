@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const harringtonScraper = require("../site-scrapers/Harrington-acuity/index");
+const harringtonScraper = require("../site-scrapers/Harrington/index");
 
 /** Generator to feed filenames sequentially to the "with availability" test. */
 function* filenames() {
