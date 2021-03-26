@@ -20,7 +20,6 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 
 // This is a comment!
-// Another comment to trigger workflow?
 async function execute() {
     Puppeteer.use(StealthPlugin());
 
@@ -127,7 +126,7 @@ async function execute() {
         const webData = JSON.stringify(responseJson);
 
         if (process.env.DEVELOPMENT) {
-            //console.log("The following data would be published:");
+            console.log("The following data would be published:");
             //console.dir(responseJson, { depth: null });
             file.write("out.json", webData);
             return responseJson;
