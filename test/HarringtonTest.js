@@ -1,14 +1,21 @@
-const { expect } = require("chai");
 const harringtonScraper = require("../site-scrapers/Harrington/index");
-
-/** Generator to feed filenames sequentially to the "with availability" test. */
-function* filenames() {
-    yield "Harrington-with-availability-March-April.html";
-    yield "Harrington-with-availability-April-May.html";
-    yield "Harrington-with-fieldset.html";
-}
+const { expect } = require("chai");
+const fs = require("fs");
 
 describe("Harrington Health Care :: test with availability", function () {
+    /**
+     * Generator to feed filenames sequentially to the "with availability" test.
+     * The second month for restricted and unrestricted has no availability.
+     */
+    function* filenames() {
+        // restricted
+        yield "Harrington-with-availability-March-April.html";
+        yield "Harrington-no-availability.html";
+        // unrestricted
+        yield "Harrington-unrestricted-availability.html";
+        yield "Harrington-no-availability.html";
+    }
+
     const filenameGenerator = filenames();
 
     async function loadPage(page) {
@@ -47,47 +54,53 @@ describe("Harrington Health Care :: test with availability", function () {
         },
     };
 
-    it("Should return 7 days with 19 total available slots across 3 months. ", async () => {
+    it("Should return available slots for restricted and unrestricted sites. ", async () => {
         const results = await harringtonScraper(
             browser,
             hasAvailabilityPageService,
             testNotificationService
         );
 
-        const expectedDayCount = 7;
-        const expectedSlotTotal = 19;
-
         /*
-            These "have.property" tests may be unnecessary because subsequent
-            count tests would fail if these properties were not found.
+        These "have.property" tests may be unnecessary because subsequent
+        count tests would fail if these properties were not found.
         */
-        expect(results).to.have.property("availability");
-        expect(results).to.have.property("hasAvailability");
+        expect(results[0]).to.have.property("availability");
+        expect(results[0]).to.have.property("hasAvailability");
 
-        const firstAvailability = Object.values(results.availability)[0];
+        const firstAvailability = Object.values(results[0].availability)[0];
         expect(firstAvailability).to.have.property(
             "numberAvailableAppointments"
         );
         expect(firstAvailability).to.have.property("hasAvailability");
 
-        expect(Object.keys(results.availability).length).equals(
-            expectedDayCount,
-            `expected ${expectedDayCount} date keys in results`
+        const expectedDayCounts = [3, 2];
+        const expectedSlotTotals = [9, 2];
+
+        expect(Object.keys(results[0].availability).length).equals(
+            expectedDayCounts[0],
+            `expected ${expectedDayCounts[0]} date keys in results`
         );
 
-        const totalSlots = Object.values(results.availability)
-            .map((value) => value.numberAvailableAppointments)
-            .reduce(function (total, number) {
-                return total + number;
-            }, 0);
-        expect(totalSlots).to.equal(expectedSlotTotal);
+        const totalSlots = results.map((result) => {
+            const total = Object.values(result.availability)
+                .map((value) => value.numberAvailableAppointments)
+                .reduce(function (total, number) {
+                    return total + number;
+                }, 0);
+            return total;
+        });
+        expect(totalSlots).to.deep.equal(expectedSlotTotals);
 
-        const asAvailabilityTrueTotal = Object.values(results.availability)
-            .map((value) => value.hasAvailability)
-            .reduce(function (total, number) {
-                return total + number;
-            }, 0);
-        expect(asAvailabilityTrueTotal).to.equal(expectedDayCount);
+        const hasAvailabilityTrueTotal = results.map((result) => {
+            const total = Object.values(result.availability)
+                .map((value) => value.hasAvailability)
+                .reduce(function (total, number) {
+                    return total + number;
+                }, 0);
+            return total;
+        });
+        expect(hasAvailabilityTrueTotal).to.deep.equal(expectedDayCounts);
     });
 });
 
@@ -95,9 +108,7 @@ describe("Harrington Health Care :: test with 'no-dates-available' class present
     let page;
 
     async function loadPageNoAvailabilityPage(page) {
-        const html = loadTestHtmlFromFile(
-            "Harrington Health Care-no-availability.html"
-        );
+        const html = loadTestHtmlFromFile("Harrington-no-availability.html");
         await page.setContent(html);
     }
     const noAvailabilityPageService = {
@@ -107,7 +118,9 @@ describe("Harrington Health Care :: test with 'no-dates-available' class present
             return page;
         },
         async getNextMonthCalendar(/*page*/) {
-            console.log("noDatesPageService :: getting next month's calendar");
+            console.log(
+                "    noDatesPageService :: getting next month's calendar"
+            );
         },
     };
 
@@ -117,10 +130,10 @@ describe("Harrington Health Care :: test with 'no-dates-available' class present
             noAvailabilityPageService
         );
 
-        expect(results).to.have.property("availability");
-        expect(results).to.have.property("hasAvailability");
+        expect(results[0]).to.have.property("availability");
+        expect(results[0]).to.have.property("hasAvailability");
 
-        expect(Object.keys(results.availability).length).to.equal(0);
+        expect(Object.keys(results[0].availability).length).to.equal(0);
     });
 });
 
@@ -132,7 +145,6 @@ describe("Harrington Health Care :: test with 'no-dates-available' class present
  * @param {String} filename The filename only, include its extension: e.g., Harrington.html`
  */
 function loadTestHtmlFromFile(filename) {
-    const fs = require("fs");
     const path = `${process.cwd()}/test/Harrington/${filename}`;
     return fs.readFileSync(path, "utf8");
 }
