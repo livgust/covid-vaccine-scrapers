@@ -40,7 +40,7 @@ async function execute() {
               headless: true,
           })
         : await Puppeteer.launch({
-              args: chromium.args,
+              args: [...chromium.args, "--single-process"],
               defaultViewport: chromium.defaultViewport,
               executablePath: await chromium.executablePath,
               headless: chromium.headless,
