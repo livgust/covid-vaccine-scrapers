@@ -1,0 +1,82 @@
+An alternative to using Puppeteer, which seems to be quite flaky, is
+the following.
+
+/** **/
+
+const fetch = require("node-fetch");
+const htmlParser = require("node-html-parser");
+
+
+async function getDailyAvailabilityCountsForMonth(page) {
+    function reformatDate(date) {
+        const dateObj = new Date(date + "T00:00:00");
+        return new Intl.DateTimeFormat("en-US").format(dateObj);
+    }
+
+    const noTimesAvailable = await page.$("#no-times-available-message");
+    const alertDanger = await page.$("#alert-danger");
+    if (noTimesAvailable || alertDanger) {
+        return new Map();
+    }
+    let dailySlotCountsMap; // keyed by date, value accumulates slot counts per date.
+    const cookies = await page.cookies();
+    console.log(`cookies: ${JSON.stringify(cookies)}`);
+
+    /*
+        The fetch cookie property includes only device and PHPSESSID.
+
+
+    */
+
+    const moment = require("moment");
+    const midnightToday = moment().local().startOf("day");
+    console.log(`${midnightToday.format("YYYY-MM-DD")}`);
+
+    const html = await fetch(
+        "https://app.acuityscheduling.com/schedule.php?action=showCalendar&fulldate=1&owner=22192301&template=weekly",
+        {
+            headers: {
+                accept: "*/*",
+                "accept-language": "en-US,en;q=0.9",
+                "content-type":
+                    "application/x-www-form-urlencoded; charset=UTF-8",
+                "sec-ch-ua":
+                    '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+                "sec-ch-ua-mobile": "?0",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "x-requested-with": "XMLHttpRequest",
+                cookie:
+                    "device_id=b7edec36-9f66-42ce-b93d-1981d9aee39e; PHPSESSID=731oholt85l2a8m2ccdttmi9bk",
+            },
+            referrer:
+                "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202050",
+            referrerPolicy: "same-origin",
+            body: [
+                "type=20926295",
+                "calendar=5202050",
+                `month=${midnightToday}`,
+                "skip=true",
+                "options%5Bnextprev%5D%5B2021-04-26%5D=2021-03-27",
+                "options%5BnumDays%5D=3",
+                "ignoreAppointment=",
+                "appointmentType=",
+                "calendarID=5202050",
+            ].join("&"),
+            method: "POST",
+            mode: "cors",
+        }
+    )
+        .then((response) => response.text())
+        .then((text) => {
+            return text;
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+    console.log(`html returned from fetch: ${html}`);
+    const parsed = htmlParser.parse(html);
+    const notTimesMessage = parsed.querySelector("#no-times-available-message");
+    console.log(`no times message: ${notTimesMessage.innerHTML}`);
+}
