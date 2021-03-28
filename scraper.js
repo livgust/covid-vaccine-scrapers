@@ -8,6 +8,7 @@ const Puppeteer = addExtra(chromium.puppeteer);
 
 const { getAllCoordinates } = require("./getGeocode");
 const {
+    logGlobalMetric,
     logScraperRun,
     getTotalNumberOfAppointments,
 } = require("./lib/metrics");
@@ -20,6 +21,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 
 async function execute() {
+    const globalStartTime = new Date();
     Puppeteer.use(StealthPlugin());
 
     Puppeteer.use(
@@ -118,11 +120,23 @@ async function execute() {
             //console.log("The following data would be published:");
             //console.dir(responseJson, { depth: null });
             file.write("out.json", webData);
+            logGlobalMetric("SuccessfulRun", 1, new Date());
+            logGlobalMetric(
+                "Duration",
+                new Date() - globalStartTime,
+                new Date()
+            );
             return responseJson;
         } else {
             const uploadResponse = await s3.saveWebData(
                 webData,
                 responseJson.timestamp
+            );
+            logGlobalMetric("SuccessfulRun", 1, new Date());
+            logGlobalMetric(
+                "Duration",
+                new Date() - globalStartTime,
+                new Date()
             );
             return uploadResponse;
         }
