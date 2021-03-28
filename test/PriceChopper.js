@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 describe("GetAvailabilities", () => {
     it("should return availabilities when there are availabilities", async () => {
-        const scraper = require("../site-scrapers/PriceChopper");
+        const scraper = require("../no-browser-site-scrapers/PriceChopper");
 
         const apiResponse = [
             {
