@@ -2,10 +2,6 @@ const dotenv = require("dotenv");
 //note: this only works locally; in Lambda we use environment variables set manually
 dotenv.config();
 
-const chromium = require("chrome-aws-lambda");
-const { addExtra } = require("puppeteer-extra");
-const Puppeteer = addExtra(chromium.puppeteer);
-
 const { getAllCoordinates } = require("./getGeocode");
 const {
     logGlobalMetric,
@@ -15,33 +11,11 @@ const {
 const dataDefaulter = require("./data/dataDefaulter");
 const fetch = require("node-fetch");
 const file = require("./lib/file");
-const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
-const scrapers = require("./site-scrapers").reverse();
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const scrapers = require("./no-browser-site-scrapers");
 const s3 = require("./lib/s3");
 
 async function execute() {
     const globalStartTime = new Date();
-    Puppeteer.use(StealthPlugin());
-
-    Puppeteer.use(
-        Recaptcha({
-            provider: { id: "2captcha", token: process.env.RECAPTCHATOKEN },
-        })
-    );
-
-    const browser = process.env.DEVELOPMENT
-        ? await Puppeteer.launch({
-              executablePath: process.env.CHROMEPATH,
-              headless: true,
-          })
-        : await Puppeteer.launch({
-              args: [...chromium.args, "--single-process"],
-              defaultViewport: chromium.defaultViewport,
-              executablePath: await chromium.executablePath,
-              headless: chromium.headless,
-              ignoreHTTPSErrors: true,
-          });
 
     const gatherData = async () => {
         const results = [];
@@ -49,7 +23,7 @@ async function execute() {
             const startTime = new Date();
             let isSuccess = true;
             const returnValue = await scraper
-                .run(browser)
+                .run()
                 .catch((error) => {
                     //print out the issue but don't fail, this way we still publish updates
                     //for other locations even if this website's scrape doesn't work
@@ -73,7 +47,6 @@ async function execute() {
                 });
             results.push(returnValue);
         }
-        await browser.close();
         let scrapedResultsArray = [];
         for (const result of results) {
             if (Array.isArray(result)) {
@@ -119,7 +92,7 @@ async function execute() {
         if (process.env.DEVELOPMENT) {
             //console.log("The following data would be published:");
             //console.dir(responseJson, { depth: null });
-            file.write("out_no_browser.json", webData);
+            file.write("out.json", webData);
             logGlobalMetric("SuccessfulRun", 1, new Date());
             logGlobalMetric(
                 "Duration",
@@ -132,9 +105,9 @@ async function execute() {
                 webData,
                 responseJson.timestamp
             );
-            logGlobalMetric("SuccessfulRun", 1, new Date());
+            logGlobalMetric("SuccessfulNoBrowserRun", 1, new Date());
             logGlobalMetric(
-                "Duration",
+                "NoBrowserDuration",
                 new Date() - globalStartTime,
                 new Date()
             );

@@ -78,6 +78,33 @@ Resources:
           Properties:
             Schedule: rate(1 minute)
 
+  MACovidVaccineNoBrowserScraper:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "MACovidVaccineNoBrowserScraperFunction-${Environment}"
+      Handler: scrapers_no_browser.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 2048
+      Timeout: 180
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - CloudWatchPutMetricPolicy: {}
+        - S3CrudPolicy:
+            BucketName: "*"
+      Environment:
+        Variables:
+          GOOGLE_API_KEY: !Ref GoogleApiKey
+          DB_KEY_SECRET: !Ref DbKeySecret
+          NODE_ENV: !Ref NodeEnv
+          AWSS3BUCKETNAME: !Ref BucketName
+          SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+      Events:
+        ScraperSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+
   GetMACovidVaccineScraperData:
     Type: AWS::Serverless::Function
     Properties:
