@@ -73,7 +73,7 @@ async function execute() {
                 });
             results.push(returnValue);
         }
-        browser.close();
+        await browser.close();
         let scrapedResultsArray = [];
         for (const result of results) {
             if (Array.isArray(result)) {
