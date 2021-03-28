@@ -13,7 +13,7 @@ const townRestricted = {
         "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202050",
 };
 const unRestricted = {
-    name: "Harrington Healthcare (not town-restricted)",
+    name: "Harrington Healthcare (unrestricted)",
     street: "153 Chestnut Street",
     city: "Southbridge",
     zip: "01550",

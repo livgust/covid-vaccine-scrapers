@@ -1,6 +1,12 @@
 const harringtonScraper = require("../site-scrapers/Harrington/index");
 const { expect } = require("chai");
 const fs = require("fs");
+const {
+    entity,
+    townRestricted,
+    unRestricted,
+    monthCount,
+} = require("../site-scrapers/Harrington/config.js");
 
 describe("Harrington Health Care :: test with availability", function () {
     /**
@@ -65,10 +71,14 @@ describe("Harrington Health Care :: test with availability", function () {
         These "have.property" tests may be unnecessary because subsequent
         count tests would fail if these properties were not found.
         */
-        expect(results[0]).to.have.property("availability");
-        expect(results[0]).to.have.property("hasAvailability");
+        expect(results[townRestricted.name]).to.have.property("availability");
+        expect(results[townRestricted.name]).to.have.property(
+            "hasAvailability"
+        );
 
-        const firstAvailability = Object.values(results[0].availability)[0];
+        const firstAvailability = Object.values(
+            results[townRestricted.name].availability
+        )[0];
         expect(firstAvailability).to.have.property(
             "numberAvailableAppointments"
         );
@@ -77,12 +87,14 @@ describe("Harrington Health Care :: test with availability", function () {
         const expectedDayCounts = [3, 2];
         const expectedSlotTotals = [9, 2];
 
-        expect(Object.keys(results[0].availability).length).equals(
+        expect(
+            Object.keys(results[townRestricted.name].availability).length
+        ).equals(
             expectedDayCounts[0],
             `expected ${expectedDayCounts[0]} date keys in results`
         );
 
-        const totalSlots = results.map((result) => {
+        const totalSlots = Object.values(results).map((result) => {
             const total = Object.values(result.availability)
                 .map((value) => value.numberAvailableAppointments)
                 .reduce(function (total, number) {
@@ -92,14 +104,16 @@ describe("Harrington Health Care :: test with availability", function () {
         });
         expect(totalSlots).to.deep.equal(expectedSlotTotals);
 
-        const hasAvailabilityTrueTotal = results.map((result) => {
-            const total = Object.values(result.availability)
-                .map((value) => value.hasAvailability)
-                .reduce(function (total, number) {
-                    return total + number;
-                }, 0);
-            return total;
-        });
+        const hasAvailabilityTrueTotal = Object.values(results).map(
+            (result) => {
+                const total = Object.values(result.availability)
+                    .map((value) => value.hasAvailability)
+                    .reduce(function (total, number) {
+                        return total + number;
+                    }, 0);
+                return total;
+            }
+        );
         expect(hasAvailabilityTrueTotal).to.deep.equal(expectedDayCounts);
     });
 });
@@ -130,10 +144,14 @@ describe("Harrington Health Care :: test with 'no-dates-available' class present
             noAvailabilityPageService
         );
 
-        expect(results[0]).to.have.property("availability");
-        expect(results[0]).to.have.property("hasAvailability");
+        expect(results[townRestricted.name]).to.have.property("availability");
+        expect(results[townRestricted.name]).to.have.property(
+            "hasAvailability"
+        );
 
-        expect(Object.keys(results[0].availability).length).to.equal(0);
+        expect(
+            Object.keys(results[townRestricted.name].availability).length
+        ).to.equal(0);
     });
 });
 
