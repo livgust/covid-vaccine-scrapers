@@ -16,7 +16,7 @@ const dataDefaulter = require("./data/dataDefaulter");
 const fetch = require("node-fetch");
 const file = require("./lib/file");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
-const scrapers = require("./site-scrapers");
+const scrapers = require("./site-scrapers").reverse();
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 
