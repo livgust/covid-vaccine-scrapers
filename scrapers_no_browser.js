@@ -90,7 +90,9 @@ async function execute() {
         const webData = JSON.stringify(responseJson);
 
         if (process.env.DEVELOPMENT) {
-            //console.log("The following data would be published:");
+            console.log(
+                "The data that would be published is in 'out_no_browser.json'"
+            );
             //console.dir(responseJson, { depth: null });
             file.write("out_no_browser.json", webData);
             logGlobalMetric("SuccessfulRun", 1, new Date());
