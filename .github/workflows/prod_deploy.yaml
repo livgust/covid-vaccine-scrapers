@@ -1,7 +1,7 @@
 name: Workflow 2 - SAM Validate, Build, Deploy
 on:
   workflow_run:
-    workflows: ["Workflow 1 - Test"]
+    workflows: ["Workflow 1 - Run Test Suite"]
     branches: [master]
     types:
       - completed
