@@ -3,7 +3,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const noBrowserScrapers = require("./no-browser-site-scrapers");
-//import { executeCommon } from "./scraper_common";
 const scraperCommon = require("./scraper_common.js");
 
 async function executeNoBrowserScrapers() {

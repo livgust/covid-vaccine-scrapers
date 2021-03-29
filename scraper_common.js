@@ -16,7 +16,6 @@ const dataDefaulter = require("./data/dataDefaulter");
 const fetch = require("node-fetch");
 const file = require("./lib/file");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
-//const scrapers = require("./site-scrapers").reverse();
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 
@@ -130,7 +129,8 @@ async function execute(usePuppeteer, scrapers) {
             //console.log("The following data would be published:");
             //console.dir(responseJson, { depth: null });
             file.write(outFile, webData);
-            /*
+
+            /* -- Don't record metrics in development --
             logGlobalMetric(
                 usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
                 1,
