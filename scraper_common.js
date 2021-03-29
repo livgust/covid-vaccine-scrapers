@@ -130,12 +130,18 @@ async function execute(usePuppeteer, scrapers) {
             //console.log("The following data would be published:");
             //console.dir(responseJson, { depth: null });
             file.write(outFile, webData);
-            logGlobalMetric("SuccessfulRun", 1, new Date());
+            /*
             logGlobalMetric(
-                "Duration",
+                usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
+                1,
+                new Date()
+            );
+            logGlobalMetric(
+                usePuppeteer ? "Duration" : "NoBrowserDuration",
                 new Date() - globalStartTime,
                 new Date()
             );
+            */
             return responseJson;
         } else {
             const uploadResponse = await s3.saveWebData(
