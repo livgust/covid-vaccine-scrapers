@@ -1,18 +1,19 @@
-name: Workflow 2 - SAM Validate, Build, Test, Deploy
+name: Workflow 2 - SAM Validate, Build, Deploy
 on:
-  repository_dispatch:
-    types: [trigger-workflow-2]
+  workflow_run:
+    workflows: ["Workflow 1 - Test"]
+    branches: [master]
+    types:
+      - completed
 
 jobs:
   sam-validate-build-deploy:
-    if: ${{ github.repository_owner == 'livgust' }}
+    if: ${{ github.repository_owner == 'livgust' && github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       env-name: ${{ steps.env-name.outputs.environment }}
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.client_payload.sha }}
       - name: Install Dependencies with Apt Get
         run: |
           sudo apt-get update
