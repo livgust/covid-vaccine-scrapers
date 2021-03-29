@@ -119,7 +119,7 @@ async function execute() {
         if (process.env.DEVELOPMENT) {
             //console.log("The following data would be published:");
             //console.dir(responseJson, { depth: null });
-            file.write("out_no_browser.json", webData);
+            file.write("out.json", webData);
             logGlobalMetric("SuccessfulRun", 1, new Date());
             logGlobalMetric(
                 "Duration",
