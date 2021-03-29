@@ -1,4 +1,4 @@
-name: Workflow 1 - Test
+name: Workflow 1 - Run Test Suite
 on:
   pull_request:
     branches:
