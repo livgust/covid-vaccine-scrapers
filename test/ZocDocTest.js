@@ -19,9 +19,9 @@ describe.skip("Config generator test", function () {
             providerDetailsJson
         );
 
-        Object.values(providerDetails).forEach((provider) =>
-            console.log(`${JSON.stringify(provider)}`)
-        );
+        // Object.values(providerDetails).forEach((provider) =>
+        //     console.log(`${JSON.stringify(provider)}`)
+        // );
 
         expect(Object.entries(providerDetails).length).equals(7);
     });
@@ -52,11 +52,11 @@ describe("Provider availability test using scraper and canned data", function ()
 
         expect(hasAvailability).is.deep.equal(expected);
 
-        console.log(`${JSON.stringify(results)}`);
+        // console.log(`${JSON.stringify(results)}`);
 
         if (process.env.DEVELOPMENT) {
             file.write(
-                `${process.cwd()}/out.json`,
+                `${process.cwd()}/out_no_browser.json`,
                 `${JSON.stringify(results, null, "   ")}`
             );
         }
@@ -71,9 +71,9 @@ describe.skip("Testing zocdocBase with canned data", function () {
             providerAvailabilityJson
         );
 
-        Object.entries(providerAvailability).forEach((provider) =>
-            console.log(`${JSON.stringify(provider)}`)
-        );
+        // Object.entries(providerAvailability).forEach((provider) =>
+        //     console.log(`${JSON.stringify(provider)}`)
+        // );
 
         expect(Object.keys(providerAvailability).length).equals(8);
     });
