@@ -2,9 +2,9 @@ const { site } = require("./config");
 const { toTitleCase } = require("../../lib/stringUtil");
 const https = require("https");
 
-module.exports = async function GetAvailableAppointments(browser) {
+module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
-    const webData = await ScrapeWebsiteData(browser);
+    const webData = await ScrapeWebsiteData();
     console.log(`${site.name} done.`);
     // Javascript is not good at timezones. CVS's timestamp arrives in
     // Mountain time ("America/Denver"), and we need to convert it to
@@ -79,7 +79,7 @@ function urlContent(url, options) {
     });
 }
 
-async function ScrapeWebsiteData(browser) {
+async function ScrapeWebsiteData() {
     // Simply retrieving
     //   https://www.cvs.com/immunizations/covid-19-vaccine.vaccine-status.ma.json?vaccineinfo
     // returns potentially stale data that varies based on the Akamai Edgekey server that you access.
