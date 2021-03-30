@@ -2,6 +2,7 @@ const { scraperName, sites } = require("./config");
 const helper = require("./zocdocBase");
 
 module.exports = async function GetAvailableAppointments(
+    _ignored,
     fetchService = liveFetchService()
 ) {
     console.log(`${scraperName} starting.`);

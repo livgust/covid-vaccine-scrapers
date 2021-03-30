@@ -34,7 +34,7 @@ describe("Provider availability test using scraper and canned data", function ()
         },
     };
     it("should provide availability for each site", async function () {
-        const results = await scraper(testFetchService);
+        const results = await scraper(false, testFetchService);
 
         const expected = [
             true,

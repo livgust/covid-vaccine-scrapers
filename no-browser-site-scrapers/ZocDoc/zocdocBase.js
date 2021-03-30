@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const moment = require("moment");
 
 async function fetchAvailability() {
     const response = await fetch("https://api.zocdoc.com/directory/v2/gql", {
@@ -49,8 +50,8 @@ async function fetchAvailability() {
  */
 function parseAvailability(availabilityResponses) {
     function reformatDate(date) {
-        const dateObj = new Date(date + "T00:00:00");
-        return new Intl.DateTimeFormat("en-US").format(dateObj);
+        var dateObj = moment(date + "T00:00:00");
+        return `${dateObj.month() + 1}/${dateObj.date()}/${dateObj.year()}`;
     }
 
     const data = availabilityResponses.data;
