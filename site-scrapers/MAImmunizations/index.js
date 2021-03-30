@@ -103,22 +103,7 @@ async function ScrapeWebsiteData(browser) {
                   )
                 : null;
             if (signUpLink) {
-                // See if the link has any real availability
-                // The page without availability contains:
-                //      <div class="danger-alert">
-                //          Clinic does not have any appointment slots available.
-                //      </div>
-                const testSignUpLink = site.testSignUpLinkWebsite + signUpLink;
-
-                const clinicPage = await browser.newPage();
-                await clinicPage.goto(testSignUpLink);
-                const dangerAlert = await clinicPage.$$("div.danger-alert");
-
-                if (dangerAlert?.length) {
-                    signUpLink = null; // no availability if there is an alert on the page
-                } else {
-                    signUpLink = site.baseWebsite + signUpLink;
-                }
+                signUpLink = site.baseWebsite + signUpLink;
             }
 
             results[uniqueID].availability[date] = {
