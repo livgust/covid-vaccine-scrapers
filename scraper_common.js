@@ -87,26 +87,32 @@ async function execute(usePuppeteer, scrapers) {
             }
             // Write the data to FaunaDB.
             if (WRITE_TO_FAUNA) {
-                await Promise.all(
-                    returnValueArray.map(async (res) => {
-                        await dbUtils.writeScrapedData({
-                            name: res.name,
-                            street: res.street,
-                            city: res.city,
-                            zip: res.zip,
-                            availability: res.availability,
-                            hasAvailability: res.availability,
-                            extraData: res.extraData,
-                            timestamp: moment().utc().format(),
-                            signUpLink: res.signUpLink,
-                            restrictions: res.restrictions,
-                            massVax: res.massVax,
-                            siteTimestamp: res.siteTimestamp
-                                ? JSON.parse(JSON.stringify(res.siteTimestamp))
-                                : null,
-                        });
-                    })
-                );
+                try {
+                    await Promise.all(
+                        returnValueArray.map(async (res) => {
+                            await dbUtils.writeScrapedData({
+                                name: res.name,
+                                street: res.street,
+                                city: res.city,
+                                zip: res.zip,
+                                availability: res.availability,
+                                hasAvailability: res.availability,
+                                extraData: res.extraData,
+                                timestamp: moment().utc().format(),
+                                signUpLink: res.signUpLink,
+                                restrictions: res.restrictions,
+                                massVax: res.massVax,
+                                siteTimestamp: res.siteTimestamp
+                                    ? JSON.parse(
+                                          JSON.stringify(res.siteTimestamp)
+                                      )
+                                    : null,
+                            });
+                        })
+                    );
+                } catch (e) {
+                    console.error("Failed to write to Fauna, got error:", e);
+                }
             }
         }
         if (usePuppeteer) {

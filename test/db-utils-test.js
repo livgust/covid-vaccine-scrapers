@@ -161,6 +161,12 @@ describe("FaunaDB Utils", function () {
                     numberAvailableAppointments: 1,
                     signUpLink: null,
                 },
+                "03/18/2021": true,
+                "03/19/2021": false,
+                "03/20/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 0,
+                },
             },
             hasAvailability: true,
             extraData: {
@@ -276,6 +282,10 @@ describe("FaunaDB Utils", function () {
             {
                 date: "03/17/2021",
                 numberAvailable: 1,
+                signUpLink: "fake-signup-link",
+            },
+            {
+                date: "03/18/2021",
                 signUpLink: "fake-signup-link",
             },
         ]);
