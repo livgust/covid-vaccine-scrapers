@@ -109,7 +109,7 @@ async function ScrapeWebsiteData(browser) {
                 //          Clinic does not have any appointment slots available.
                 //      </div>
                 const testSignUpLink = site.testSignUpLinkWebsite + signUpLink;
-                signUpLink = site.website + signUpLink;
+                signUpLink = site.baseWebsite + signUpLink;
 
                 const clinicPage = await browser.newPage();
                 try {
