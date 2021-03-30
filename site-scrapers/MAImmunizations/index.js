@@ -111,6 +111,10 @@ async function ScrapeWebsiteData(browser) {
                 numberAvailableAppointments: availableAppointments,
                 signUpLink: availableAppointments ? signUpLink : null,
             };
+            if (results[uniqueID].extraData["More Information"])
+                results[uniqueID].extraData["More Information"][date] =
+                    extraData["More Information"];
+
             if (availableAppointments) {
                 results[uniqueID].hasAvailability = true;
             }
