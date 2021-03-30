@@ -1,4 +1,4 @@
-name: Workflow 1 - Test
+name: Workflow 1 - Run Test Suite
 on:
   pull_request:
     branches:
@@ -24,24 +24,20 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Make .env
-        uses: SpicyPizza/create-envfile@v1
-        with:
-          envkey_FAUNA_DB_DEV: ${{ secrets.FAUNA_DB_DEV }}
       - run: npm ci
-      # todo: if FAUNA_DB_DEV isn't set, don't run the fauna tests
       - name: Run test suite
         env:
           DEVELOPMENT: true
           CHROMEPATH: /usr/bin/chromium-browser
-        run: npm test
+          FAUNA_DB_DEV: ${{ secrets.FAUNA_DB_DEV }}
+        run: |
+          if [ -z "${{ secrets.FAUNA_DB_DEV }}" ]
+          then
+            echo "\$FAUNA_DB_DEV secret does not exist, skipping Fauna tests"
+            npm test --  --exclude **/db-utils-test.js
+          else
+            echo "\$FAUNA_DB_DEV secret does exist, running all tests"
+            npm test
+          fi
       - run: npx prettier --check ./
       - run: npm run verifyLockfile
-      - name: Trigger next workflow (this only happens on the default branch, master)
-        if: success()
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.GH_ACTION_TOKEN }}
-          repository: ${{ github.repository }}
-          event-type: trigger-workflow-2
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

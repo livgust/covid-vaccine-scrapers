@@ -134,7 +134,7 @@ describe("TrinityEMS :: test with 'no-dates-available' class present", function 
         },
     };
 
-    it("should return no availability", async function () {
+    it.skip("should return no availability", async function () {
         const results = await trinityEms(browser, noDatesPageService);
 
         expect(results).to.have.property("availability");

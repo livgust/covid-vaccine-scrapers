@@ -41,7 +41,7 @@ let notificationService = function defaultNotificationService() {
 };
 
 async function ScrapeWebsiteData(browser, pageService) {
-    const page = await pageService.getHomePage(browser);
+    //    const page = await pageService.getHomePage(browser);
 
     // Initialize results to no availability
     const results = {
