@@ -2,7 +2,7 @@ const fs = require("fs");
 
 let scrapers = [];
 
-// args override directory list allowing single site runs, e.g. `node main.js LynnTech`
+// args override directory list allowing single site runs, e.g. `node scrapers_no_browser.js LynnTech`
 if (process.argv.length > 2) {
     for (let i = 2; i < process.argv.length; i++) {
         const scraper = require(`./${process.argv[i]}`);
@@ -23,8 +23,9 @@ if (process.argv.length > 2) {
     });
 }
 
-if (process.env.PROPRIETARY_SITE_SCRAPERS_PATH) {
-    const otherScrapers = require(process.env.PROPRIETARY_SITE_SCRAPERS_PATH);
+if (process.env.PROPRIETARY_NO_BROWSER_SITE_SCRAPERS_PATH) {
+    const otherScrapers = require(process.env
+        .PROPRIETARY_NO_BROWSER_SITE_SCRAPERS_PATH);
     scrapers.push(...otherScrapers);
 }
 

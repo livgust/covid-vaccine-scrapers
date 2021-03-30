@@ -20,12 +20,23 @@ This is the open-source portion of the back-end, website scraping software that 
 
 ## Using this code
 
+There are two separate lambdas -- scrapers that use Puppeteer browsers, and scrapers that don't use a browser.
 1. In your terminal, install dependencies with `npm install`
+
+### Puppeteer Scrapers
+
 1. To run all scrapers: `node scraper.js`
    To run an individual scraper, specify the base filename from site-scrapers, e.g.:
    `node scraper.js MAImmunizations`
    to run `site-scrapers/MAImmunizations`
 1. If you have your own scrapers you want to add, mimic the structure of `./site-scrapers/` inside a folder structure named `proprietary/site-scrapers`. In your .env file, have the field `PROPRIETARY_SITE_SCRAPERS_PATH` set `./../proprietary/site-scrapers`. This naming is recommended since the `.gitignore` lists the folder `proprietary`.
+
+### No-Browser Scrapers
+1. To run all scrapers: `node scrapers-no-browser.js`
+   To run an individual scraper, specify the base filename from no-browser-site-scrapers, e.g.:
+   `node scrapers-no-browser.js Color`
+   to run `no-browser-site-scrapers/Color`
+1. If you have your own scrapers you want to add, mimic the structure of `./no-browser-site-scrapers/` inside a folder structure named `proprietary/no-browser-site-scrapers`. In your .env file, have the field `PROPRIETARY_NO_BROWSER_SITE_SCRAPERS_PATH` set `./../proprietary/no-browser-site-scrapers`. This naming is recommended since the `.gitignore` lists the folder `proprietary`.
 
 ## Continuous Deployment
 
