@@ -24,10 +24,6 @@ describe.skip("Config generator test", function () {
         );
 
         expect(Object.entries(providerDetails).length).equals(7);
-
-        // Use this as the basis for config.js. You will need to manually add
-        // signUpLink URLs, and add the Tufts MC site info.
-        // writeFile("provider-details.json", providerDetails);
     });
 });
 
@@ -82,17 +78,3 @@ describe.skip("Testing zocdocBase with canned data", function () {
         expect(Object.keys(providerAvailability).length).equals(8);
     });
 });
-
-/*** utilty functions ***/
-
-function writeFile(filename, results) {
-    // During development, getting data such provider details (name, street, city, zip) is
-    // useful for constructing the config.js data. To turn this on, add COLLECT_DATA=true
-    // to your covid-vaccine-scrapers/.env file.
-    if (process.env.COLLECT_DATA) {
-        file.write(
-            `${process.cwd()}/${filename}`,
-            `${JSON.stringify(results, null, "   ")}`
-        );
-    }
-}

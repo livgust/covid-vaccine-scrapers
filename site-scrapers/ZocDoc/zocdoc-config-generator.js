@@ -1,5 +1,8 @@
 const fetch = require("node-fetch");
 
+// Use this as the basis for config.js. You will need to manually add
+// signUpLink URLs, and add the Tufts MC site info.
+// writeFile("/ZocDoc/ZocDoc-provider-details.json", providerDetails);
 /**
  * This function, and parseProviderDetails() are used for getting data to
  * construct config.js. These functions are not used by the scraper but
@@ -105,3 +108,18 @@ module.exports = {
     fetchProviderDetails,
     parseProviderDetails,
 };
+
+/*** utilty functions ***/
+
+function writeFile(filename, results) {
+    // During development, getting data such provider details (name, street, city, zip) is
+    // useful for constructing the config.js data. To turn this on, add COLLECT_DATA=true
+    // to your covid-vaccine-scrapers/.env file.
+    if (process.env.COLLECT_DATA) {
+        const file = require("../../lib/file");
+        file.write(
+            `${process.cwd()}/${filename}`,
+            `${JSON.stringify(results, null, "   ")}`
+        );
+    }
+}
