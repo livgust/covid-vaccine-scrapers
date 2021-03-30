@@ -1,6 +1,6 @@
-const scraper = require("../site-scrapers/ZocDoc/index");
-const helper = require("../site-scrapers/ZocDoc/zocdocBase");
-const generator = require("../site-scrapers/ZocDoc/zocdoc-config-generator");
+const scraper = require("../no-browser-site-scrapers/ZocDoc/index");
+const helper = require("../no-browser-site-scrapers/ZocDoc/zocdocBase");
+const generator = require("../no-browser-site-scrapers/ZocDoc/zocdoc-config-generator");
 const { expect } = require("chai");
 const file = require("../lib/file");
 
@@ -34,7 +34,7 @@ describe("Provider availability test using scraper and canned data", function ()
         },
     };
     it("should provide availability for each site", async function () {
-        const results = await scraper(browser, testFetchService);
+        const results = await scraper(testFetchService);
 
         const expected = [
             true,

@@ -6,7 +6,7 @@ module.exports = async function GetAvailableAppointments(
     fetchService = liveFetchService()
 ) {
     console.log(`${scraperName} starting.`);
-    const webData = await ScrapeWebsiteData(browser, fetchService);
+    const webData = await ScrapeWebsiteData(fetchService);
     console.log(`${scraperName} done.`);
     return webData;
 };
@@ -19,7 +19,7 @@ function liveFetchService() {
     };
 }
 
-async function ScrapeWebsiteData(browser, fetchService) {
+async function ScrapeWebsiteData(fetchService) {
     // Initialize results to no availability
     const results = [];
 
