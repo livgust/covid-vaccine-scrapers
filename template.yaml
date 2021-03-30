@@ -60,6 +60,8 @@ Resources:
         - CloudWatchPutMetricPolicy: {}
         - S3CrudPolicy:
             BucketName: "*"
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MACovidVaccineAlerts
       Environment:
         Variables:
           GOOGLE_API_KEY: !Ref GoogleApiKey
@@ -92,6 +94,8 @@ Resources:
         - CloudWatchPutMetricPolicy: {}
         - S3CrudPolicy:
             BucketName: "*"
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MACovidVaccineAlerts
       Environment:
         Variables:
           GOOGLE_API_KEY: !Ref GoogleApiKey
@@ -125,3 +129,21 @@ Resources:
             RestApiId: !Ref MACovidVaccinesApi
             Method: GET
             Path: /get_data
+
+  MACovidVaccineAlerts:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "MACovidVaccineAlertsFunction-${Environment}"
+      Handler: alerts/alerts.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 256
+      Timeout: 60
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - CloudWatchPutMetricPolicy: {}
+      Environment:
+        Variables:
+          GOOGLE_API_KEY: !Ref GoogleApiKey
+          DB_KEY_SECRET: !Ref DbKeySecret
+          SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
