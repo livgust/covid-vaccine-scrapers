@@ -123,7 +123,9 @@ async function ScrapeWebsiteData(browser) {
                     if (response?.url().match(/errors\?message/)) {
                         signUpLink = null; // no availability if there is an alert on the page
                     }
-                } catch (e) {}
+                } catch (e) {
+                    console.error(e);
+                }
             }
 
             results[uniqueID].availability[date] = {
