@@ -214,6 +214,7 @@ describe("FaunaDB Utils", function () {
                     zip: scraperOutput.zip,
                 },
                 signUpLink: scraperOutput.signUpLink,
+                extraData: scraperOutput.extraData,
             },
         });
         // assert that the scraper run is there (check index)
@@ -271,25 +272,11 @@ describe("FaunaDB Utils", function () {
                 date: "03/16/2021",
                 numberAvailable: 2,
                 signUpLink: "fake-signup-link-2",
-                extraData: {
-                    "Vaccinations offered": "Pfizer-BioNTech COVID-19 Vaccine",
-                    "Age groups served": "Adults",
-                    "Services offered": "Vaccination",
-                    "Additional Information": "Pfizer vaccine",
-                    "Clinic Hours": "10:00 am - 03:00 pm",
-                },
             },
             {
                 date: "03/17/2021",
                 numberAvailable: 1,
                 signUpLink: "fake-signup-link",
-                extraData: {
-                    "Vaccinations offered": "Pfizer-BioNTech COVID-19 Vaccine",
-                    "Age groups served": "Adults",
-                    "Services offered": "Vaccination",
-                    "Additional Information": "Pfizer vaccine",
-                    "Clinic Hours": "10:00 am - 03:00 pm",
-                },
             },
         ]);
         const appointmentRefIds = retrieveAppointmentsResult.data.map(

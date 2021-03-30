@@ -99,8 +99,11 @@ async function execute(usePuppeteer, scrapers) {
                             extraData: res.extraData,
                             timestamp: moment().utc().format(),
                             signUpLink: res.signUpLink,
+                            restrictions: res.restrictions,
                             massVax: res.massVax,
-                            siteTimestamp: res.siteTimestamp,
+                            siteTimestamp: res.siteTimestamp
+                                ? JSON.parse(JSON.stringify(res.siteTimestamp))
+                                : null,
                         });
                     })
                 );
