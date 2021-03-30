@@ -109,16 +109,21 @@ async function ScrapeWebsiteData(browser) {
                 //          Clinic does not have any appointment slots available.
                 //      </div>
                 const testSignUpLink = site.testSignUpLinkWebsite + signUpLink;
+                signUpLink = site.website + signUpLink;
 
                 const clinicPage = await browser.newPage();
-                await clinicPage.goto(testSignUpLink);
-                const dangerAlert = await clinicPage.$$("div.danger-alert");
+                try {
+                    const response = await clinicPage.goto(testSignUpLink, {
+                        timeout: 3000, // don't wait long though
+                        waitUntil: "load",
+                    });
 
-                if (dangerAlert?.length) {
-                    signUpLink = null; // no availability if there is an alert on the page
-                } else {
-                    signUpLink = site.baseWebsite + signUpLink;
-                }
+                    // If this redirected to an error page, then assume no signUpLink
+                    // https://clinics.maimmunizations.org/errors?message=Clinic+does+not+have+any+appointment+slots+available.
+                    if (response?.url().match(/errors\?message/)) {
+                        signUpLink = null; // no availability if there is an alert on the page
+                    }
+                } catch (e) {}
             }
 
             results[uniqueID].availability[date] = {
