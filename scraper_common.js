@@ -68,7 +68,6 @@ async function execute(usePuppeteer, scrapers) {
                     const numberAppointments = getTotalNumberOfAppointments(
                         result
                     );
-                    // TODO - call FaunaDB util method here!
                     await logScraperRun(
                         scraper.name,
                         isSuccess,
@@ -97,7 +96,11 @@ async function execute(usePuppeteer, scrapers) {
                             zip: res.zip,
                             availability: res.availability,
                             hasAvailability: res.availability,
+                            extraData: res.extraData,
                             timestamp: moment().utc().format(),
+                            signUpLink: res.signUpLink,
+                            massVax: res.massVax,
+                            siteTimestamp: res.siteTimestamp,
                         });
                     })
                 );
