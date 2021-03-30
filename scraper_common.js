@@ -21,7 +21,7 @@ const s3 = require("./lib/s3");
 const dbUtils = require("./lib/db-utils");
 const moment = require("moment");
 
-WRITE_TO_FAUNA = false;
+const WRITE_TO_FAUNA = false;
 
 async function execute(usePuppeteer, scrapers) {
     const globalStartTime = new Date();
@@ -55,29 +55,24 @@ async function execute(usePuppeteer, scrapers) {
         for (const scraper of scrapers) {
             const startTime = new Date();
             let isSuccess = true;
-            const returnValue = await scraper
-                .run(browser)
-                .catch((error) => {
-                    //print out the issue but don't fail, this way we still publish updates
-                    //for other locations even if this website's scrape doesn't work
-                    console.log(error);
-                    isSuccess = false;
-                    return null;
-                })
-                .then(async (result) => {
-                    const numberAppointments = getTotalNumberOfAppointments(
-                        result
-                    );
-                    await logScraperRun(
-                        scraper.name,
-                        isSuccess,
-                        new Date() - startTime,
-                        startTime,
-                        numberAppointments
-                    );
-                    return result;
-                });
+            const returnValue = await scraper.run(browser).catch((error) => {
+                //print out the issue but don't fail, this way we still publish updates
+                //for other locations even if this website's scrape doesn't work
+                console.log(error);
+                isSuccess = false;
+                return null;
+            });
             results.push(returnValue);
+            const numberAppointments = getTotalNumberOfAppointments(
+                returnValue
+            );
+            await logScraperRun(
+                scraper.name,
+                isSuccess,
+                new Date() - startTime,
+                startTime,
+                numberAppointments
+            );
             // Coerce the results into the format we want.
             let returnValueArray = [];
             if (Array.isArray(returnValue)) {
@@ -95,6 +90,7 @@ async function execute(usePuppeteer, scrapers) {
                                 street: res.street,
                                 city: res.city,
                                 zip: res.zip,
+                                bookableAppointmentsFound: numberAppointments,
                                 availability: res.availability,
                                 hasAvailability: res.availability,
                                 extraData: res.extraData,

@@ -145,5 +145,5 @@ Resources:
       Environment:
         Variables:
           GOOGLE_API_KEY: !Ref GoogleApiKey
-          DB_KEY_SECRET: !Ref DbKeySecret
+          FAUNA_DB: !Ref FaunaApiKey
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
