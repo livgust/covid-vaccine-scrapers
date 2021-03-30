@@ -68,3 +68,4 @@ const getAllCoordinates = async (locations, cachedResults) => {
 };
 
 exports.getAllCoordinates = getAllCoordinates;
+exports.getGeocode = getGeocode;
