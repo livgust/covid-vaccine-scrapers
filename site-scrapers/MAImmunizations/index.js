@@ -31,6 +31,7 @@ async function ScrapeWebsiteData(browser) {
     );
 
     const results = {};
+    const clinicPage = await browser.newPage();
 
     //for each page, scrape locations and available appointments.
     for (let pageNumber = 1; pageNumber <= maxPage; pageNumber++) {
@@ -111,7 +112,6 @@ async function ScrapeWebsiteData(browser) {
                 const testSignUpLink = site.testSignUpLinkWebsite + signUpLink;
                 signUpLink = site.baseWebsite + signUpLink;
 
-                const clinicPage = await browser.newPage();
                 try {
                     const response = await clinicPage.goto(testSignUpLink, {
                         timeout: 3000, // don't wait long though
