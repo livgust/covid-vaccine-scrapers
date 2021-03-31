@@ -20,7 +20,7 @@ Parameters:
     Type: String
   WalgreensApiKey:
     Type: String
-  DbKeySecret:
+  FaunaApiKey:
     Type: String
   NodeEnv:
     Type: String
@@ -67,7 +67,7 @@ Resources:
           WALGREENS_PASSWORD: !Ref WalgreensPassword
           WALGREENS_CHALLENGE: !Ref WalgreensChallenge
           WALGREENS_API_KEY: !Ref WalgreensApiKey
-          DB_KEY_SECRET: !Ref DbKeySecret
+          FAUNA_DB: !Ref FaunaApiKey
           NODE_ENV: !Ref NodeEnv
           AWSS3BUCKETNAME: !Ref BucketName
           RECAPTCHATOKEN: !Ref RecaptchaToken
@@ -95,7 +95,7 @@ Resources:
       Environment:
         Variables:
           GOOGLE_API_KEY: !Ref GoogleApiKey
-          DB_KEY_SECRET: !Ref DbKeySecret
+          FAUNA_DB: !Ref FaunaApiKey
           NODE_ENV: !Ref NodeEnv
           AWSS3BUCKETNAME: !Ref BucketName
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook

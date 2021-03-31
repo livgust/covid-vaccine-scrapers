@@ -18,6 +18,10 @@ const file = require("./lib/file");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
+const dbUtils = require("./lib/db-utils");
+const moment = require("moment");
+
+WRITE_TO_FAUNA = false;
 
 async function execute(usePuppeteer, scrapers) {
     const globalStartTime = new Date();
@@ -64,7 +68,6 @@ async function execute(usePuppeteer, scrapers) {
                     const numberAppointments = getTotalNumberOfAppointments(
                         result
                     );
-                    // TODO - call FaunaDB util method here!
                     await logScraperRun(
                         scraper.name,
                         isSuccess,
@@ -75,6 +78,42 @@ async function execute(usePuppeteer, scrapers) {
                     return result;
                 });
             results.push(returnValue);
+            // Coerce the results into the format we want.
+            let returnValueArray = [];
+            if (Array.isArray(returnValue)) {
+                returnValueArray = returnValue;
+            } else if (returnValue) {
+                returnValueArray = [returnValue];
+            }
+            // Write the data to FaunaDB.
+            if (WRITE_TO_FAUNA && process.env.FAUNA_DB) {
+                try {
+                    await Promise.all(
+                        returnValueArray.map(async (res) => {
+                            await dbUtils.writeScrapedData({
+                                name: res.name,
+                                street: res.street,
+                                city: res.city,
+                                zip: res.zip,
+                                availability: res.availability,
+                                hasAvailability: res.availability,
+                                extraData: res.extraData,
+                                timestamp: moment().utc().format(),
+                                signUpLink: res.signUpLink,
+                                restrictions: res.restrictions,
+                                massVax: res.massVax,
+                                siteTimestamp: res.siteTimestamp
+                                    ? JSON.parse(
+                                          JSON.stringify(res.siteTimestamp)
+                                      )
+                                    : null,
+                            });
+                        })
+                    );
+                } catch (e) {
+                    console.error("Failed to write to Fauna, got error:", e);
+                }
+            }
         }
         if (usePuppeteer) {
             await browser.close();
