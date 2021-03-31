@@ -1,7 +1,6 @@
 const harringtonScraper = require("../site-scrapers/Harrington/index");
 const { expect } = require("chai");
 const fs = require("fs");
-const { townRestricted } = require("../site-scrapers/Harrington/config.js");
 
 describe("Harrington Health Care :: test with availability", function () {
     /**
@@ -66,13 +65,12 @@ describe("Harrington Health Care :: test with availability", function () {
         These "have.property" tests may be unnecessary because subsequent
         count tests would fail if these properties were not found.
         */
-        expect(results[townRestricted.name]).to.have.property("availability");
-        expect(results[townRestricted.name]).to.have.property(
-            "hasAvailability"
-        );
+        const townRestricted = 0;
+        expect(results[townRestricted]).to.have.property("availability");
+        expect(results[townRestricted]).to.have.property("hasAvailability");
 
         const firstAvailability = Object.values(
-            results[townRestricted.name].availability
+            results[townRestricted].availability
         )[0];
         expect(firstAvailability).to.have.property(
             "numberAvailableAppointments"
@@ -82,9 +80,7 @@ describe("Harrington Health Care :: test with availability", function () {
         const expectedDayCounts = [3, 2];
         const expectedSlotTotals = [9, 2];
 
-        expect(
-            Object.keys(results[townRestricted.name].availability).length
-        ).equals(
+        expect(Object.keys(results[townRestricted].availability).length).equals(
             expectedDayCounts[0],
             `expected ${expectedDayCounts[0]} date keys in results`
         );
@@ -139,13 +135,12 @@ describe("Harrington Health Care :: test with 'no-dates-available' class present
             noAvailabilityPageService
         );
 
-        expect(results[townRestricted.name]).to.have.property("availability");
-        expect(results[townRestricted.name]).to.have.property(
-            "hasAvailability"
-        );
+        const townRestricted = 0;
+        expect(results[townRestricted]).to.have.property("availability");
+        expect(results[townRestricted]).to.have.property("hasAvailability");
 
         expect(
-            Object.keys(results[townRestricted.name].availability).length
+            Object.keys(results[townRestricted].availability).length
         ).to.equal(0);
     });
 });
