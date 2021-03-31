@@ -5,6 +5,7 @@ proprietary/
 *.zip
 lambda/
 out.json
+out_no_browser.json
 .eslintrc.json
 .vscode/
 .DS_Store

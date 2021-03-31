@@ -1,7 +1,7 @@
 const { site } = require("./config");
 const https = require("https");
 
-module.exports = async function GetAvailableAppointments(browser) {
+module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
     const locationIDs = site.locations.map((loc) => loc.id);
 

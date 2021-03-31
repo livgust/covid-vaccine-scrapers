@@ -1,11 +1,14 @@
-name: SAM Validate, Build, Test, Deploy
+name: Workflow 2 - SAM Validate, Build, Deploy
 on:
-  push:
+  workflow_run:
+    workflows: ["Workflow 1 - Run Test Suite"]
     branches: [master]
+    types:
+      - completed
 
 jobs:
-  sam-validate-build-test-deploy:
-    if: ${{ github.repository_owner == 'livgust' }}
+  sam-validate-build-deploy:
+    if: ${{ github.repository_owner == 'livgust' && github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       env-name: ${{ steps.env-name.outputs.environment }}
@@ -59,7 +62,7 @@ jobs:
           WalgreensPassword=${{ secrets.WALGREENS_PASSWORD }} \
           WalgreensChallenge=${{ secrets.WALGREENS_CHALLENGE }} \
           WalgreensApiKey=${{ secrets. WALGREENS_API_KEY }} \
-          DbKeySecret=${{ secrets.FAUNA_DB_PROD }} \
+          FaunaApiKey=${{ secrets.FAUNA_DB_PROD }} \
           NodeEnv=production \
           BucketName=${{ secrets.AWSS3BUCKETNAME }} \
           RecaptchaToken=${{ secrets.RECAPTCHA_TOKEN }} \
