@@ -1,6 +1,6 @@
 const s3 = require("../../lib/s3");
 const { sendSlackMsg } = require("../../lib/slack");
-const file = require("../../lib/file");
+const moment = require("moment");
 
 const {
     entity,
@@ -31,6 +31,7 @@ module.exports = async function GetAvailableAppointments(
         allResults[townRestricted.name] = {
             ...townRestricted,
             ...townRestrictedAvailability,
+            timestamp: moment().format(),
         };
 
         const unRestrictedAvailability = await ScrapeWebsiteData(
@@ -42,19 +43,14 @@ module.exports = async function GetAvailableAppointments(
         allResults[unRestricted.name] = {
             ...unRestricted,
             ...unRestrictedAvailability,
+            timestamp: moment().format(),
         };
     } catch (error) {
-        console.log(`Harrington :: GetAvailableAppointments(): ${error}`);
+        console.error(`Harrington :: GetAvailableAppointments(): ${error}`);
     }
 
     console.log(`${entity} done.`);
 
-    if (process.env.DEVELOPMENT) {
-        file.write(
-            `${process.cwd()}/out.json`,
-            `${JSON.stringify(allResults, null, "   ")}`
-        );
-    }
     return allResults;
 };
 
@@ -192,7 +188,7 @@ async function getDailyAvailabilityCountsForMonth(page) {
                 return acc;
             }, new Map());
     } catch (error) {
-        console.log(`error trying to get day numbers: ${error}`);
+        console.error(`error trying to get day numbers: ${error}`);
     }
 
     return dailySlotCountsMap ? dailySlotCountsMap : new Map();
@@ -218,7 +214,7 @@ async function advanceMonth(page, site) {
             ),
         ]);
     } catch (error) {
-        console.log(`${site.name} :: trouble advancing button: ${error}`);
+        console.error(`${site.name} :: trouble advancing button: ${error}`);
     }
 }
 
@@ -247,7 +243,6 @@ function defaultPageService() {
 
 async function notifyAvailabilityContentUpdate(page, responseText, site) {
     const msg = `${site.name} - possible appointments:\n${responseText}`;
-    console.log(msg);
     await sendSlackMsg("bot", msg);
     await s3.savePageContent(site.name, page);
 }

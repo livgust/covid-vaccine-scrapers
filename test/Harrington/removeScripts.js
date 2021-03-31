@@ -12,11 +12,11 @@ exports.handler = execute;
  * "cleaned" to the filename.
  */
 function execute() {
-    console.log(`${process.cwd()}`);
+    console.log(`removeScripts cwd: ${process.cwd()}`);
     fs.readdirSync(`${process.cwd()}`)
         .filter((filename) => filename.endsWith("html"))
         .forEach((filename) => {
-            console.log(`${filename}`);
+            console.log(`removeScripts: reading ${filename}`);
             const html = loadHtml(filename);
             const cleanedHtml = removeScripts(html);
             if (cleanedHtml) {
@@ -66,7 +66,7 @@ function writeCleanedHtml(filename, htmlAsString) {
     try {
         execute();
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
     process.exit();
 })();

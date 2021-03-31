@@ -1,12 +1,7 @@
 const harringtonScraper = require("../site-scrapers/Harrington/index");
 const { expect } = require("chai");
 const fs = require("fs");
-const {
-    entity,
-    townRestricted,
-    unRestricted,
-    monthCount,
-} = require("../site-scrapers/Harrington/config.js");
+const { townRestricted } = require("../site-scrapers/Harrington/config.js");
 
 describe("Harrington Health Care :: test with availability", function () {
     /**
