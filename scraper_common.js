@@ -86,7 +86,7 @@ async function execute(usePuppeteer, scrapers) {
                 returnValueArray = [returnValue];
             }
             // Write the data to FaunaDB.
-            if (WRITE_TO_FAUNA) {
+            if (WRITE_TO_FAUNA && process.env.FAUNA_DB) {
                 try {
                     await Promise.all(
                         returnValueArray.map(async (res) => {
