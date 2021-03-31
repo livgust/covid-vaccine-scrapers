@@ -61,7 +61,7 @@ describe("TrinityEMS :: test 3 months with availability", function () {
         },
     };
 
-    it(
+    it.skip(
         "Should return 13 slots with an ascending number of available slots, total = 91. " +
             "Should also send s3 and slackMsg notifications once.",
         async () => {
@@ -107,7 +107,7 @@ describe("TrinityEMS :: test with 'no-dates-available' class present", function 
         },
     };
 
-    it("should return no availability", async function () {
+    it.skip("should return no availability", async function () {
         const results = await trinityEms(browser, noDatesPageService);
 
         expect(Object.keys(results.availability).length).to.equal(0);

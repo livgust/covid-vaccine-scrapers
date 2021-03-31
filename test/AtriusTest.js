@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 describe("GetAvailabilities", () => {
     it("should return no availabilities when there is a redirect", () => {
-        const atrius = require("./../site-scrapers/Atrius");
+        const atrius = require("./../no-browser-site-scrapers/Atrius");
         // mock out the redirect that occurs when there Atrius doesn't want to show any slots.
         nock("https://myhealth.atriushealth.org")
             .get("/fr/")
@@ -61,7 +61,7 @@ describe("GetAvailabilities", () => {
             },
         });
         // specify the require here after the mock was created.
-        const atrius = require("./../site-scrapers/Atrius");
+        const atrius = require("./../no-browser-site-scrapers/Atrius");
         // run the test and assert that the result looks like:
         /*
           {

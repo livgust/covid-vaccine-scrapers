@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { formatResponse } = require("./../site-scrapers/Color");
+const { formatResponse } = require("./../no-browser-site-scrapers/Color");
 const chai = require("chai");
 const expect = chai.expect;
 

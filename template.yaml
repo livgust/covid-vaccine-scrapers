@@ -20,7 +20,7 @@ Parameters:
     Type: String
   WalgreensApiKey:
     Type: String
-  DbKeySecret:
+  FaunaApiKey:
     Type: String
   NodeEnv:
     Type: String
@@ -67,10 +67,37 @@ Resources:
           WALGREENS_PASSWORD: !Ref WalgreensPassword
           WALGREENS_CHALLENGE: !Ref WalgreensChallenge
           WALGREENS_API_KEY: !Ref WalgreensApiKey
-          DB_KEY_SECRET: !Ref DbKeySecret
+          FAUNA_DB: !Ref FaunaApiKey
           NODE_ENV: !Ref NodeEnv
           AWSS3BUCKETNAME: !Ref BucketName
           RECAPTCHATOKEN: !Ref RecaptchaToken
+          SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+      Events:
+        ScraperSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+
+  MACovidVaccineNoBrowserScraper:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "MACovidVaccineNoBrowserScraperFunction-${Environment}"
+      Handler: scrapers_no_browser.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 2048
+      Timeout: 180
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - CloudWatchPutMetricPolicy: {}
+        - S3CrudPolicy:
+            BucketName: "*"
+      Environment:
+        Variables:
+          GOOGLE_API_KEY: !Ref GoogleApiKey
+          FAUNA_DB: !Ref FaunaApiKey
+          NODE_ENV: !Ref NodeEnv
+          AWSS3BUCKETNAME: !Ref BucketName
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
       Events:
         ScraperSchedule:

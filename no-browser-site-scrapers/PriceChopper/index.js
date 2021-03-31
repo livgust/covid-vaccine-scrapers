@@ -2,9 +2,9 @@ const { site } = require("./config");
 const https = require("https");
 const crypto = require("crypto");
 
-module.exports = async function GetAvailableAppointments(browser) {
+module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
-    const webData = await ScrapeWebsiteData(browser);
+    const webData = await ScrapeWebsiteData();
     console.log(`${site.name} done.`);
     return site.locations.map((loc) => {
         const locHash = md5HashString(loc.street + loc.city);
@@ -46,7 +46,7 @@ function md5HashString(string) {
     return crypto.createHash("md5").update(string).digest("hex");
 }
 
-async function ScrapeWebsiteData(browser) {
+async function ScrapeWebsiteData() {
     const rawData = {};
     for (const [i, loc] of site.locations.entries()) {
         const url =

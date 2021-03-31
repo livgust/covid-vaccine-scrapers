@@ -35,7 +35,7 @@ let notificationService = function defaultNotificationService() {
 };
 
 async function ScrapeWebsiteData(browser, pageService) {
-    const page = await pageService.getHomePage(browser);
+    //    const page = await pageService.getHomePage(browser);
 
     // Initialize results to no availability
     const results = {
@@ -43,24 +43,26 @@ async function ScrapeWebsiteData(browser, pageService) {
         hasAvailability: false,
     };
 
-    const monthCount = await getMonthCount(page);
-
-    for (const key of new Array(monthCount).keys()) {
-        // Don't advance the calendar if it's the first month
-        if (key > 0) {
-            await pageService.getNextMonthCalendar(page);
+    /*
+        const monthCount = await getMonthCount(page);
+    
+        for (const key of new Array(monthCount).keys()) {
+            // Don't advance the calendar if it's the first month
+            if (key > 0) {
+                await pageService.getNextMonthCalendar(page);
+            }
+            const dailySlotsForMonth = await getDailyAvailabilityCountsForMonth(
+                page,
+                pageService
+            );
+            // Add all day objects to results.availability
+            dailySlotsForMonth.forEach(
+                (value, key) => (results.availability[key] = value)
+            );
         }
-        const dailySlotsForMonth = await getDailyAvailabilityCountsForMonth(
-            page,
-            pageService
-        );
-        // Add all day objects to results.availability
-        dailySlotsForMonth.forEach(
-            (value, key) => (results.availability[key] = value)
-        );
-    }
-
-    results.hasAvailability = !!Object.keys(results.availability).length;
+    
+        results.hasAvailability = !!Object.keys(results.availability).length;
+    */
 
     return results;
 }
