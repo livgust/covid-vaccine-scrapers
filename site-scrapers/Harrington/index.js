@@ -19,7 +19,7 @@ module.exports = async function GetAvailableAppointments(
         notificationService = customNotificationService;
     }
 
-    const allResults = {};
+    const allResults = [];
 
     try {
         const townRestrictedAvailability = await ScrapeWebsiteData(
@@ -28,11 +28,11 @@ module.exports = async function GetAvailableAppointments(
             townRestricted
         );
 
-        allResults[townRestricted.name] = {
+        allResults.push({
             ...townRestricted,
             ...townRestrictedAvailability,
             timestamp: moment().format(),
-        };
+        });
 
         const unRestrictedAvailability = await ScrapeWebsiteData(
             browser,
@@ -40,11 +40,11 @@ module.exports = async function GetAvailableAppointments(
             unRestricted
         );
 
-        allResults[unRestricted.name] = {
+        allResults.push({
             ...unRestricted,
             ...unRestrictedAvailability,
             timestamp: moment().format(),
-        };
+        });
     } catch (error) {
         console.error(`Harrington :: GetAvailableAppointments(): ${error}`);
     }
@@ -103,7 +103,7 @@ async function ScrapeWebsiteData(browser, pageService, site) {
 
     // Initialize results to no availability
     const results = {
-        availability: {},
+        availability: [],
         hasAvailability: false,
     };
 
