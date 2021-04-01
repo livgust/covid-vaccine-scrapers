@@ -30,13 +30,14 @@ jobs:
           DEVELOPMENT: true
           CHROMEPATH: /usr/bin/chromium-browser
           FAUNA_DB: ${{ secrets.FAUNA_DB_DEV }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          if [ -z "${{ secrets.FAUNA_DB_DEV }}" ]
+          if [ -z "${{ secrets.FAUNA_DB_DEV }}" ] || [ -z "${{ secrets.GOOGLE_API_KEY }}" ]
           then
-            echo "\$FAUNA_DB_DEV secret does not exist, skipping Fauna tests"
+            echo "\$FAUNA_DB_DEV or \$GOOGLE_API_KEY secret does not exist, skipping Fauna tests"
             npm test --  --exclude **/db-utils-test.js
           else
-            echo "\$FAUNA_DB_DEV secret does exist, running all tests"
+            echo "Necessary secrets exist, running all tests"
             npm test
           fi
       - run: npx prettier --check ./
