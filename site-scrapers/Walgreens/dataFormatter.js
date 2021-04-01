@@ -85,6 +85,10 @@ function formatData(data, website) {
     return data.map((entry) => {
         let hasAvailability = false;
         const availability = {};
+        /*
+    // QUICK FIX: Walgreens is showing FIRST DOSE availability but won't
+    // let the patient schedule anything because there are no SECOND DOSES available
+    // See Issue #200 (https://github.com/livgust/covid-vaccine-scrapers/issues/200)
         entry.appointmentAvailability.forEach((daySlot) => {
             const date = moment(daySlot.date).local().startOf("day");
             const midnightToday = moment().local().startOf("day");
@@ -107,6 +111,7 @@ function formatData(data, website) {
                 hasAvailability = hasAvailability || !!numSlots;
             }
         });
+*/
         return {
             name: `Walgreens (${toTitleCase(entry.address.city)})`, // NOTE: change to "entry.name" if we use the commented-out code above
             street: toTitleCase(
