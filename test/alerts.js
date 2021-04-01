@@ -1,8 +1,31 @@
 const sinon = require("sinon");
 const alerts = require("../alerts");
-const { expect } = require("chai");
+const dbUtils = require("../lib/db-utils");
+const chai = require("chai");
+chai.use(require("deep-equal-in-any-order"));
+const expect = chai.expect;
 const { StepFunctions } = require("aws-sdk");
 const moment = require("moment");
+
+async function createTestLocation() {
+    const newLocationId = await dbUtils.generateId();
+    await dbUtils.writeLocationByRefId({
+        refId: newLocationId,
+        name: "Test Location",
+        address: {},
+    });
+    return newLocationId;
+}
+
+async function createTestScraperRun(locationRef, bookableAppointmentsFound) {
+    const newScraperRunId = await dbUtils.generateId();
+    await dbUtils.writeScraperRunByRefId({
+        refId: newScraperRunId,
+        locationRefId: locationRef,
+        bookableAppointmentsFound,
+    });
+    return newScraperRunId;
+}
 
 describe("alerts behavior", () => {
     afterEach(() => {
@@ -79,10 +102,43 @@ describe("alerts behavior", () => {
         alerts.handler({
             locationRef: "123",
             scraperRunRef: "456",
-            bookableAppointmentsFound: 100,
+            bookableAppointmentsFound: 0,
         });
         for (const stub of actionStubs) {
             expect(stub.notCalled).to.be.true;
         }
     });
+});
+
+describe("setUpNewAlert", () => {
+    it("creates a new alert", async () => {
+        const locationRef = await createTestLocation();
+        const scraperRunRef = await createTestScraperRun(locationRef, 100);
+        const alertId = await alerts.setUpNewAlert(locationRef, scraperRunRef);
+
+        expect(
+            await dbUtils
+                .retrieveItemByRefId("appointmentAlerts", alertId)
+                .then((res) => res.data)
+        ).to.be.deep.equal({
+            firstScraperRunRef: scraperRunRef,
+            locationRef,
+        });
+        await dbUtils.deleteItemByRefId("locations", locationRef);
+        await dbUtils.deleteItemByRefId("scraperRuns", scraperRunRef);
+    }).timeout(10000);
+});
+
+describe("getActiveAlertRef", () => {
+    it("retrieves the active alert for a given location when it exists", async () => {
+        const locationRef = await createTestLocation();
+        const newAlertId = await dbUtils.generateId();
+        const alertId = await alerts.setUpNewAlert(locationRef, newAlertId);
+        console.log(
+            await dbUtils.retrieveItemByRefId("appointmentAlerts", alertId)
+        );
+
+        expect(await alerts.getActiveAlertRef(locationRef)).to.equal(alertId);
+        await dbUtils.deleteItemByRefId("locations", locationRef);
+    }).timeout(10000);
 });

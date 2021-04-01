@@ -10,17 +10,18 @@
 const moment = require("moment");
 const faunadb = require("faunadb"),
     fq = faunadb.query;
-const { faunaQuery } = require("../lib/db-utils");
+const { faunaQuery, generateId } = require("../lib/db-utils");
 
 const alerts = {
+    APPOINTMENT_NUMBER_THRESHOLD: () => 10,
+    REPEAT_ALERT_TIME: () => 15,
     activeAlertExists,
+    getActiveAlertRef,
     getLastAlertStartTime,
     handler,
     maybeContinueAlerting,
     setInactiveAlert,
     setUpNewAlert,
-    REPEAT_ALERT_TIME: () => 15,
-    APPOINTMENT_NUMBER_THRESHOLD: () => 10,
 };
 
 module.exports = alerts;
@@ -68,8 +69,8 @@ function activeAlertExists(locationRef) {
     return false;
 }
 
-async function getInactiveAlert(locationRef) {
-    return await faunaQuery(
+async function getActiveAlertRef(locationRef) {
+    const data = await faunaQuery(
         fq.Filter(
             fq.Paginate(
                 fq.Match(
@@ -77,15 +78,29 @@ async function getInactiveAlert(locationRef) {
                     fq.Ref(fq.Collection("locations"), locationRef)
                 )
             ),
-            fq.Lambda((x) => fq.IsNull(fq.Select("lastScraperRunRef", x, null)))
+            fq.Lambda((x) =>
+                fq.IsNull(
+                    fq.Select(["data", "lastScraperRunRef"], fq.Get(x), null)
+                )
+            )
         )
-    );
+    ).then((res) => {
+        console.log(res);
+        return res.map((alert) => alert.data);
+    });
+    if (data.length > 1) {
+        throw `Multiple inactive alerts found for location ${locationRef}.`;
+    } else {
+        return data[0];
+    }
 }
 
-function setInactiveAlert(locationRef, scraperRunRef) {
+async function setInactiveAlert(locationRef, scraperRunRef) {
     /* find the entry in appointmentAlerts for this location with a null
      * lastScraperRunRef, and set lastScraperRunRef to scraperRunRef
      */
+    const id = await getActiveAlertRef(locationRef);
+
     return;
 }
 
@@ -104,9 +119,10 @@ function getLastAlertStartTime(locationRef) {
 }
 
 async function setUpNewAlert(locationRef, scraperRunRef) {
+    const id = await generateId();
     // create a new entry in appointmentAlerts with locationRef and firstScraperRunRef set to scraperRunRef.
     await faunaQuery(
-        fq.Create(fq.Ref(fq.Collection("appointmentAlerts")), {
+        fq.Create(fq.Ref(fq.Collection("appointmentAlerts"), id), {
             data: {
                 locationRef,
                 firstScraperRunRef: scraperRunRef,
@@ -120,7 +136,7 @@ async function setUpNewAlert(locationRef, scraperRunRef) {
      * Start the first round of text alerts (don't know throughput really)
      */
 
-    return;
+    return id;
 }
 
 function handler(data) {
