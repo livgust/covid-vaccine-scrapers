@@ -19,8 +19,8 @@ async function ScrapeWebsiteData(browser) {
 
     if ((await page.title()) === "Application Error") {
         console.log("Got the Mass. Heroku error page, giving up.");
-    }
-    if (pages.length < 1) {
+        return {};
+    } else if (pages.length < 1) {
         console.log(
             "No content matching our CSS selector (looking for nav.pagination)!"
         );
@@ -31,6 +31,8 @@ async function ScrapeWebsiteData(browser) {
         );
 
         const results = {};
+
+        const clinicPage = await browser.newPage();
 
         //for each page, scrape locations and available appointments.
         for (let pageNumber = 1; pageNumber <= maxPage; pageNumber++) {
@@ -105,7 +107,29 @@ async function ScrapeWebsiteData(browser) {
                       )
                     : null;
                 if (signUpLink) {
+                    // See if the link has any real availability
+                    // The page without availability contains:
+                    //      <div class="danger-alert">
+                    //          Clinic does not have any appointment slots available.
+                    //      </div>
+                    const testSignUpLink =
+                        site.testSignUpLinkWebsite + signUpLink;
                     signUpLink = site.baseWebsite + signUpLink;
+
+                    try {
+                        const response = await clinicPage.goto(testSignUpLink, {
+                            timeout: 3000, // don't wait long though
+                            waitUntil: "load",
+                        });
+
+                        // If this redirected to an error page, then assume no signUpLink
+                        // https://clinics.maimmunizations.org/errors?message=Clinic+does+not+have+any+appointment+slots+available.
+                        if (response?.url().match(/errors\?message/)) {
+                            signUpLink = null; // no availability if there is an alert on the page
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
 
                 results[uniqueID].availability[date] = {
