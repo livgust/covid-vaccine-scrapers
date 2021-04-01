@@ -17,7 +17,7 @@ describe("GetAvailabilities", () => {
         const resultingAvailability = {
             hasAvailability: true,
             availability: {
-                "03/21/2021": {
+                "03/21/2022": {
                     hasAvailability: true,
                     numberAvailableAppointments: 2,
                 },
