@@ -2,14 +2,15 @@ const sinon = require("sinon");
 const alerts = require("../alerts");
 const dbUtils = require("../lib/db-utils");
 const chai = require("chai");
-chai.use(require("deep-equal-in-any-order"));
+chai.use(require("chai-as-promised"));
 const expect = chai.expect;
 const { StepFunctions } = require("aws-sdk");
 const moment = require("moment");
+const { setInactiveAlert, getLastAlertStartTime } = require("../alerts");
 
 async function createTestLocation() {
     const newLocationId = await dbUtils.generateId();
-    await dbUtils.writeLocationByRefId({
+    const location = await dbUtils.writeLocationByRefId({
         refId: newLocationId,
         name: "Test Location",
         address: {},
@@ -112,33 +113,125 @@ describe("alerts behavior", () => {
 
 describe("setUpNewAlert", () => {
     it("creates a new alert", async () => {
-        const locationRef = await createTestLocation();
-        const scraperRunRef = await createTestScraperRun(locationRef, 100);
-        const alertId = await alerts.setUpNewAlert(locationRef, scraperRunRef);
-
-        expect(
-            await dbUtils
+        const locationRefId = await createTestLocation();
+        const scraperRunRefId = await createTestScraperRun(locationRefId, 100);
+        const alertId = await alerts.setUpNewAlert(
+            locationRefId,
+            scraperRunRefId
+        );
+        await expect(
+            dbUtils
                 .retrieveItemByRefId("appointmentAlerts", alertId)
-                .then((res) => res.data)
-        ).to.be.deep.equal({
-            firstScraperRunRef: scraperRunRef,
-            locationRef,
+                .then((res) => ({
+                    locationRefId: res.data.locationRef.id,
+                    firstScraperRunRefId: res.data.firstScraperRunRef.id,
+                }))
+        ).to.eventually.be.deep.equal({
+            firstScraperRunRefId: scraperRunRefId,
+            locationRefId,
         });
-        await dbUtils.deleteItemByRefId("locations", locationRef);
-        await dbUtils.deleteItemByRefId("scraperRuns", scraperRunRef);
-    }).timeout(10000);
+        await dbUtils.deleteItemByRefId("locations", locationRefId);
+        await dbUtils.deleteItemByRefId("scraperRuns", scraperRunRefId);
+        await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
+    });
 });
 
-describe("getActiveAlertRef", () => {
+describe("getActiveAlertRefId", () => {
     it("retrieves the active alert for a given location when it exists", async () => {
-        const locationRef = await createTestLocation();
-        const newAlertId = await dbUtils.generateId();
-        const alertId = await alerts.setUpNewAlert(locationRef, newAlertId);
-        console.log(
-            await dbUtils.retrieveItemByRefId("appointmentAlerts", alertId)
+        const locationRefId = await createTestLocation();
+        const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
+
+        await expect(
+            alerts.getActiveAlertRefId(locationRefId)
+        ).to.eventually.equal(alertId);
+        await dbUtils.deleteItemByRefId("locations", locationRefId);
+        await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
+    });
+});
+
+describe("activeAlertExists", () => {
+    it("returns false if no alert is active", async () => {
+        const nonExistentId = await dbUtils.generateId();
+
+        await expect(alerts.activeAlertExists(nonExistentId)).to.eventually.be
+            .false;
+    });
+    it("returns true if alert is active", async () => {
+        const locationRefId = await createTestLocation();
+        const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
+
+        await expect(alerts.activeAlertExists(locationRefId)).to.eventually.be
+            .true;
+
+        await dbUtils.deleteItemByRefId("locations", locationRefId);
+        await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
+    });
+});
+
+describe("setInactiveAlert", () => {
+    it("throws error if no alert is active", async () => {
+        const nonExistentId = await dbUtils.generateId();
+        let error;
+        try {
+            await alerts.setInactiveAlert(nonExistentId, "123");
+        } catch (e) {
+            error = e;
+        }
+        expect(error).to.be.instanceOf(Error);
+    });
+
+    it("updates the alert with lastScraperRunRefId", async () => {
+        const locationRefId = await createTestLocation();
+        const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
+        const newScraperRunId = await dbUtils.generateId();
+        const alertRefId = await setInactiveAlert(
+            locationRefId,
+            newScraperRunId
         );
 
-        expect(await alerts.getActiveAlertRef(locationRef)).to.equal(alertId);
-        await dbUtils.deleteItemByRefId("locations", locationRef);
-    }).timeout(10000);
+        await expect(
+            dbUtils
+                .retrieveItemByRefId("appointmentAlerts", alertRefId)
+                .then((res) => ({
+                    locationRefId: res.data?.locationRef?.id,
+                    firstScraperRunRefId: res.data?.firstScraperRunRef?.id,
+                    lastScraperRunRefId: res.data?.lastScraperRunRef?.id,
+                }))
+        ).to.eventually.deep.equal({
+            locationRefId,
+            firstScraperRunRefId: "12345",
+            lastScraperRunRefId: newScraperRunId,
+        });
+    });
+});
+
+describe("getLastAlertStartTime", () => {
+    it("throws an error if there are no alerts", async () => {
+        const nonExistentId = await dbUtils.generateId();
+        let error;
+        try {
+            await alerts.getLastAlertStartTime(nonExistentId);
+        } catch (e) {
+            error = e;
+        }
+        expect(error).to.be.instanceOf(Error);
+    });
+
+    it("returns the latest timestamp if it exists", async () => {
+        const locationRefId = await createTestLocation();
+        const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
+
+        const expectedTimestamp = await dbUtils
+            .retrieveItemByRefId("appointmentAlerts", alertId)
+            .then((res) => res.ts);
+
+        await expect(
+            alerts
+                .getLastAlertStartTime(locationRefId)
+                .then((ts) => ts.format())
+        ).to.eventually.equal(moment(expectedTimestamp / 1000).format());
+
+        await dbUtils.deleteItemByRefId("locations", locationRefId);
+        await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
+    });
 });

@@ -1,12 +1,29 @@
 /* we expect "data" to have the form:
     {
-        scraperRunRef: 123,
-        locationRef: 234,
+        scraperRunRefId: 123,
+        locationRefId: 234,
         locationName: "Gillette Stadium",
         bookableAppointmentsFound: 456
     }
+
+DB structure:
+
+(for a location, when we first noticed appointments were there, and then when we noticed they were gone)
+appointmentAlerts: {
+    locationRef,
+    firstScraperRunRef,
+    lastScraperRunRef
+}
+
+(for an alert, what zip codes we have texted and when)
+appointmentAlertBatchZips: {
+    appointmentAlertRef,
+    zipCode,
+    count,
+}
 */
 
+const { Ref, Select } = require("faunadb");
 const moment = require("moment");
 const faunadb = require("faunadb"),
     fq = faunadb.query;
@@ -16,7 +33,7 @@ const alerts = {
     APPOINTMENT_NUMBER_THRESHOLD: () => 10,
     REPEAT_ALERT_TIME: () => 15,
     activeAlertExists,
-    getActiveAlertRef,
+    getActiveAlertRefId,
     getLastAlertStartTime,
     handler,
     maybeContinueAlerting,
@@ -25,57 +42,21 @@ const alerts = {
 };
 
 module.exports = alerts;
-/* DB structure:
 
-(for a location, when we first noticed appointments were there, and then when we noticed they were gone)
-appointmentAlerts: {
-    locationRef,
-    startScraperRunRef,
-    finishScraperRunRef
-}
-
-(for an alert, what zip codes we have texted and when)
-appointmentAlertTextZips: {
-    appointmentAlertRef,
-    zipCode,
-    timestamp
-}
-
-*/
-
-/* open alert for a given location is seen by:
-
-appointmentAlert: {
-    locationRef: 123,
-    firstScraperRunRef: 456,
-    lastScraperRunRef: not set
-}
-
-*/
-
-/* last alert for a given location is seen by:
-
-appointmentAlert: {
-    locationRef: 123,
-    finishScraperRunRef: max()
-}
-
-*/
-
-function activeAlertExists(locationRef) {
+async function activeAlertExists(locationRefId) {
     /* search if there's an entry in appointmentAlerts for this location
      * with a null lastScraperRunRef
      */
-    return false;
+    return !!(await alerts.getActiveAlertRefId(locationRefId));
 }
 
-async function getActiveAlertRef(locationRef) {
+async function getActiveAlertRefId(locationRefId) {
     const data = await faunaQuery(
         fq.Filter(
             fq.Paginate(
                 fq.Match(
                     fq.Index("appointmentAlertsByLocationRef"),
-                    fq.Ref(fq.Collection("locations"), locationRef)
+                    fq.Ref(fq.Collection("locations"), locationRefId)
                 )
             ),
             fq.Lambda((x) =>
@@ -85,47 +66,77 @@ async function getActiveAlertRef(locationRef) {
             )
         )
     ).then((res) => {
-        console.log(res);
-        return res.map((alert) => alert.data);
+        return res.data;
     });
     if (data.length > 1) {
-        throw `Multiple inactive alerts found for location ${locationRef}.`;
+        throw Error(
+            `Multiple inactive alerts found for location ${locationRefId}.`
+        );
+    } else if (data.length === 0) {
+        return null;
     } else {
-        return data[0];
+        return data[0].id;
     }
 }
 
-async function setInactiveAlert(locationRef, scraperRunRef) {
+async function setInactiveAlert(locationRefId, scraperRunRefId) {
     /* find the entry in appointmentAlerts for this location with a null
      * lastScraperRunRef, and set lastScraperRunRef to scraperRunRef
      */
-    const id = await getActiveAlertRef(locationRef);
+    const id = await alerts.getActiveAlertRefId(locationRefId);
+    if (!id) {
+        throw Error(`No active alert found for location ${locationRefId}!`);
+    }
 
-    return;
+    await faunaQuery(
+        fq.Update(fq.Ref(fq.Collection("appointmentAlerts"), id), {
+            data: {
+                lastScraperRunRef: fq.Ref(
+                    fq.Collection("scraperRuns"),
+                    scraperRunRefId
+                ),
+            },
+        })
+    );
+    return id;
 }
 
-function maybeContinueAlerting(locationRef, scraperRunRef) {
+// TODO
+function maybeContinueAlerting() {
     /* if appointments are still available, maybe send out more
      * emails or texts?
      */
     return;
 }
 
-function getLastAlertStartTime(locationRef) {
+async function getLastAlertStartTime(locationRefId) {
     /* find the entry in appointmentAlerts for this location with
      * the lastScraperRunRef with the latest TS
      */
-    return null;
+    const nsTimestamp = await faunaQuery(
+        fq.Select(
+            "ts",
+            fq.Get(
+                fq.Match(
+                    "appointmentAlertsByLocationRefSortByTimestamp",
+                    fq.Ref(fq.Collection("locations"), locationRefId)
+                )
+            )
+        )
+    );
+    return moment(nsTimestamp / 1000);
 }
 
-async function setUpNewAlert(locationRef, scraperRunRef) {
-    const id = await generateId();
+async function setUpNewAlert(locationRefId, scraperRunRefId) {
     // create a new entry in appointmentAlerts with locationRef and firstScraperRunRef set to scraperRunRef.
-    await faunaQuery(
-        fq.Create(fq.Ref(fq.Collection("appointmentAlerts"), id), {
+    const record = await faunaQuery(
+        fq.Create(fq.Collection("appointmentAlerts"), {
             data: {
-                locationRef,
-                firstScraperRunRef: scraperRunRef,
+                locationRef: fq.Ref(fq.Collection("locations"), locationRefId),
+                firstScraperRunRef: fq.Ref(
+                    fq.Collection("scraperRuns"),
+                    scraperRunRefId
+                ),
             },
         })
     );
@@ -136,11 +147,11 @@ async function setUpNewAlert(locationRef, scraperRunRef) {
      * Start the first round of text alerts (don't know throughput really)
      */
 
-    return id;
+    return record.ref.id;
 }
 
 function handler(data) {
-    if (alerts.activeAlertExists(data.locationRef)) {
+    if (alerts.activeAlertExists(data.locationRefId)) {
         if (data?.bookableAppointmentsFound === 0) {
             alerts.setInactiveAlert(data.locationRef, data.scraperRunRef);
         } else {
@@ -150,10 +161,10 @@ function handler(data) {
         data?.bookableAppointmentsFound >=
             alerts.APPOINTMENT_NUMBER_THRESHOLD() &&
         alerts
-            .getLastAlertStartTime(data.locationRef)
+            .getLastAlertStartTime(data.locationRefId)
             .isBefore(moment().subtract(alerts.REPEAT_ALERT_TIME(), "minutes"))
     ) {
-        alerts.setUpNewAlert(data.locationRef, data.scraperRunRef);
+        alerts.setUpNewAlert(data.locationRefId, data.scraperRunRefId);
     }
     return;
 }
