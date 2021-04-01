@@ -3,7 +3,7 @@ const { site } = require("./config");
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const info = await ScrapeWebsiteData(browser);
-    console.log(`${site.name} starting.`);
+    console.log(`${site.name} done.`);
     return {
         ...site,
         signUpLink: site.website,
@@ -22,14 +22,14 @@ async function ScrapeWebsiteData(browser) {
     await page
         .waitForSelector(".loadingSpinner", { hidden: true })
         .catch(() => {});
+    // Wait for the buttons to show up
+    await page.waitForSelector(".slds-button").catch(() => {});
 
     const content = await page.content();
 
     const result = {
         hasAvailability:
-            content.indexOf(
-                "There are currently no time slots available for vaccinations."
-            ) == -1,
+            content.indexOf("there are no time slots available") == -1,
     };
 
     return result;
