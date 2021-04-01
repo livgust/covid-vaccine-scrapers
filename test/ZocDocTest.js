@@ -12,7 +12,7 @@ const { locationData } = require("./ZocDoc/location-data");
  * This test the config generator utility. Not a part of scraping but gathering
  * info from fetching provider data from ZocDoc. Automates site info creation.
  */
-describe.skip("Config generator test", function () {
+describe.skip("ZocDoc Config generator test", function () {
     it("should provide id, name and location for each site", async function () {
         const providerDetailsJson = locationData; // await generator.fetchProviderDetails();
         const providerDetails = generator.parseProviderDetails(
@@ -27,7 +27,7 @@ describe.skip("Config generator test", function () {
     });
 });
 
-describe("Provider availability test using scraper and canned data", function () {
+describe("ZocDoc Provider availability test using scraper and canned data", function () {
     const testFetchService = {
         async fetchAvailability() {
             return someAvailability;
@@ -63,7 +63,7 @@ describe("Provider availability test using scraper and canned data", function ()
     });
 });
 
-describe.skip("Testing zocdocBase with canned data", function () {
+describe.skip("ZocDoc Testing zocdocBase with canned data", function () {
     it("should provide availability for each site", async function () {
         const providerAvailabilityJson = await helper.fetchAvailability();
 

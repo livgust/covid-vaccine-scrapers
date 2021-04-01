@@ -3,7 +3,7 @@ const { formatResponse } = require("./../no-browser-site-scrapers/Color");
 const chai = require("chai");
 const expect = chai.expect;
 
-describe("Transformations", () => {
+describe("Color Transformations", () => {
     it("should return no availabilities when there is -1", () => {
         // mock out the availability request
         const response = `{"results": [{

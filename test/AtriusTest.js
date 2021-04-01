@@ -5,7 +5,7 @@ const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
 
-describe("GetAvailabilities", () => {
+describe("Atrius GetAvailabilities", () => {
     it("should return no availabilities when there is a redirect", () => {
         const atrius = require("./../no-browser-site-scrapers/Atrius");
         // mock out the redirect that occurs when there Atrius doesn't want to show any slots.

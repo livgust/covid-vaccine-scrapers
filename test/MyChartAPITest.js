@@ -365,7 +365,7 @@ const exampleWithError = {
     VisitTypeInfo: null,
 };
 
-describe("AddSiteInfo", () => {
+describe("MyChartAPI AddSiteInfo", () => {
     it("should add site info and default data to results object", () => {
         results = {};
         siteKey = Object.keys(exampleWithAvailability.AllDepartments)[0];
@@ -389,7 +389,7 @@ describe("AddSiteInfo", () => {
     });
 });
 
-describe("CommonPostDataCallback", () => {
+describe("MyChartAPI CommonPostDataCallback", () => {
     it("should return a function", () => {
         const res = mychart.CommonPostDataCallback([], [], "");
         expect(res).to.be.a("function");
@@ -425,7 +425,7 @@ describe("CommonPostDataCallback", () => {
     });
 });
 
-describe("UpdateResults", () => {
+describe("MyChartAPI UpdateResults", () => {
     it("should add site info and default data to results object", () => {
         results = {};
         mychart.UpdateResults(results, exampleWithAvailability);
