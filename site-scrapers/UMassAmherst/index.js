@@ -29,7 +29,9 @@ async function ScrapeWebsiteData(browser) {
 
     const result = {
         hasAvailability:
-            content.indexOf("there are no time slots available") == -1,
+            content.indexOf(
+                "Sorry there are no time slots available at the moment to book first and second dose appointments, please check back later."
+            ) == -1,
     };
 
     return result;
