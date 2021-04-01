@@ -11,8 +11,7 @@ const sites = {
         street: "279 Tremont St",
         city: "Boston",
         zip: "02116",
-        signUpLink:
-            "https://www.zocdoc.com/wl/tuftscovid19vaccination/practice/64825?reason_visit=5243",
+        signUpLink: "https://www.tuftsmcvaccine.org",
     },
     "pr_BDBebslqJU2vrCAvVMhYeh|lo_zDtK7NZWO0S_rgUqjxD1hB": {
         name: "Holtzman Medical Group - Mount Ida Campus",
