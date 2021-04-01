@@ -2,7 +2,6 @@
     {
         scraperRunRefId: 123,
         locationRefId: 234,
-        locationName: "Gillette Stadium",
         bookableAppointmentsFound: 456
     }
 
@@ -22,21 +21,28 @@ appointmentAlertBatchZips: {
     count,
 }
 */
-
-const { Ref, Select } = require("faunadb");
-const moment = require("moment");
+const { faunaQuery, generateId } = require("../lib/db-utils");
+const { sendSlackMsg } = require("../lib/slack");
+const dbUtils = require("../lib/db-utils");
+const dotenv = require("dotenv");
 const faunadb = require("faunadb"),
     fq = faunadb.query;
-const { faunaQuery, generateId } = require("../lib/db-utils");
+const moment = require("moment");
+
+dotenv.config();
 
 const alerts = {
+    // How many appointments we must find to consider alerting
     APPOINTMENT_NUMBER_THRESHOLD: () => 10,
+    // How many minutes must pass between new alerts for the same location
     REPEAT_ALERT_TIME: () => 15,
+    // exported functions:
     activeAlertExists,
     getActiveAlertRefId,
     getLastAlertStartTime,
     handler,
     maybeContinueAlerting,
+    runImmediateAlerts,
     setInactiveAlert,
     setUpNewAlert,
 };
@@ -70,7 +76,7 @@ async function getActiveAlertRefId(locationRefId) {
     });
     if (data.length > 1) {
         throw Error(
-            `Multiple inactive alerts found for location ${locationRefId}.`
+            `Multiple active alerts found for location ${locationRefId}.`
         );
     } else if (data.length === 0) {
         return null;
@@ -118,7 +124,7 @@ async function getLastAlertStartTime(locationRefId) {
             "ts",
             fq.Get(
                 fq.Match(
-                    "appointmentAlertsByLocationRefSortByTimestamp",
+                    "appointmentAlertsByLocationRefSortByStartTime",
                     fq.Ref(fq.Collection("locations"), locationRefId)
                 )
             )
@@ -127,7 +133,11 @@ async function getLastAlertStartTime(locationRefId) {
     return moment(nsTimestamp / 1000);
 }
 
-async function setUpNewAlert(locationRefId, scraperRunRefId) {
+async function setUpNewAlert(
+    locationRefId,
+    scraperRunRefId,
+    bookableAppointmentsFound
+) {
     // create a new entry in appointmentAlerts with locationRef and firstScraperRunRef set to scraperRunRef.
     const record = await faunaQuery(
         fq.Create(fq.Collection("appointmentAlerts"), {
@@ -137,6 +147,7 @@ async function setUpNewAlert(locationRefId, scraperRunRefId) {
                     fq.Collection("scraperRuns"),
                     scraperRunRefId
                 ),
+                startTime: fq.Time("now"),
             },
         })
     );
@@ -146,25 +157,52 @@ async function setUpNewAlert(locationRefId, scraperRunRefId) {
      * Prioritize emails in one go (50,000 daily, 14 per second or 840/min)
      * Start the first round of text alerts (don't know throughput really)
      */
+    await alerts.runImmediateAlerts(locationRefId, bookableAppointmentsFound);
 
     return record.ref.id;
 }
 
-function handler(data) {
-    if (alerts.activeAlertExists(data.locationRefId)) {
+async function runImmediateAlerts(locationRefId, bookableAppointmentsFound) {
+    const location = await dbUtils
+        .retrieveItemByRefId("locations", locationRefId)
+        .then((res) => res.data);
+
+    const message = `${bookableAppointmentsFound} appointments available at ${location.name} in ${location.address.city}. Visit macovidvaccines.com to book.`;
+
+    sendSlackMsg("bot", message);
+
+    return;
+}
+
+async function handler(data) {
+    if (await alerts.activeAlertExists(data.locationRefId)) {
         if (data?.bookableAppointmentsFound === 0) {
-            alerts.setInactiveAlert(data.locationRef, data.scraperRunRef);
+            await alerts.setInactiveAlert(
+                data.locationRefId,
+                data.scraperRunRefId
+            );
         } else {
-            alerts.maybeContinueAlerting();
+            await alerts.maybeContinueAlerting();
         }
     } else if (
-        data?.bookableAppointmentsFound >=
-            alerts.APPOINTMENT_NUMBER_THRESHOLD() &&
-        alerts
-            .getLastAlertStartTime(data.locationRefId)
-            .isBefore(moment().subtract(alerts.REPEAT_ALERT_TIME(), "minutes"))
+        data.bookableAppointmentsFound &&
+        data.bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()
     ) {
-        alerts.setUpNewAlert(data.locationRefId, data.scraperRunRefId);
+        const alertStartTime = await alerts.getLastAlertStartTime(
+            data.locationRefId
+        );
+        if (
+            !alertStartTime ||
+            alertStartTime.isBefore(
+                moment().subtract(alerts.REPEAT_ALERT_TIME(), "minutes")
+            )
+        ) {
+            await alerts.setUpNewAlert(
+                data.locationRefId,
+                data.scraperRunRefId,
+                data.bookableAppointmentsFound
+            );
+        }
     }
     return;
 }
