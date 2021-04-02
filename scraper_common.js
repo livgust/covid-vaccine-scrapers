@@ -20,6 +20,9 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
 const dbUtils = require("./lib/db-utils");
 const moment = require("moment");
+const AWS = require("aws-sdk");
+const { Lambda } = require("faunadb");
+const alertsLambda = new AWS.Lambda();
 
 const WRITE_TO_FAUNA = true;
 
@@ -85,25 +88,41 @@ async function execute(usePuppeteer, scrapers) {
                 try {
                     await Promise.all(
                         returnValueArray.map(async (res) => {
-                            await dbUtils.writeScrapedData({
-                                name: res.name,
-                                street: res.street,
-                                city: res.city,
-                                zip: res.zip,
-                                bookableAppointmentsFound: numberAppointments,
-                                availability: res.availability,
-                                hasAvailability: res.availability,
-                                extraData: res.extraData,
-                                timestamp: moment().utc().format(),
-                                signUpLink: res.signUpLink,
-                                restrictions: res.restrictions,
-                                massVax: res.massVax,
-                                siteTimestamp: res.siteTimestamp
-                                    ? JSON.parse(
-                                          JSON.stringify(res.siteTimestamp)
-                                      )
-                                    : null,
-                            });
+                            await dbUtils
+                                .writeScrapedData({
+                                    name: res.name,
+                                    street: res.street,
+                                    city: res.city,
+                                    zip: res.zip,
+                                    bookableAppointmentsFound: numberAppointments,
+                                    availability: res.availability,
+                                    hasAvailability: res.availability,
+                                    extraData: res.extraData,
+                                    timestamp: moment().utc().format(),
+                                    signUpLink: res.signUpLink,
+                                    restrictions: res.restrictions,
+                                    massVax: res.massVax,
+                                    siteTimestamp: res.siteTimestamp
+                                        ? JSON.parse(
+                                              JSON.stringify(res.siteTimestamp)
+                                          )
+                                        : null,
+                                })
+                                .then(({ scraperRunRefId, locationRefId }) => {
+                                    alertsLambda.invoke(
+                                        {
+                                            FunctionName:
+                                                process.env.ALERTSFUNCTIONNAME,
+                                            InvocationType: "Event",
+                                            Payload: JSON.stringify({
+                                                scraperRunRefId,
+                                                locationRefId,
+                                                bookableAppointmentsFound: numberAppointments,
+                                            }),
+                                        },
+                                        () => {}
+                                    );
+                                });
                         })
                     );
                 } catch (e) {

@@ -74,6 +74,7 @@ Resources:
           AWSS3BUCKETNAME: !Ref BucketName
           RECAPTCHATOKEN: !Ref RecaptchaToken
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+          ALERTSFUNCTIONNAME: !Ref MACovidVaccineAlerts
       Events:
         ScraperSchedule:
           Type: Schedule
@@ -103,6 +104,7 @@ Resources:
           NODE_ENV: !Ref NodeEnv
           AWSS3BUCKETNAME: !Ref BucketName
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+          ALERTSFUNCTIONNAME: !Ref MACovidVaccineAlerts
       Events:
         ScraperSchedule:
           Type: Schedule
