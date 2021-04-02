@@ -122,15 +122,25 @@ async function getLastAlertStartTime(locationRefId) {
     const nsTimestamp = await faunaQuery(
         fq.Select(
             "ts",
-            fq.Get(
-                fq.Match(
-                    "appointmentAlertsByLocationRefSortByStartTime",
-                    fq.Ref(fq.Collection("locations"), locationRefId)
-                )
-            )
+            fq.If(
+                fq.Exists(
+                    fq.Match(
+                        "appointmentAlertsByLocationRefSortByStartTime",
+                        fq.Ref(fq.Collection("locations"), locationRefId)
+                    )
+                ),
+                fq.Get(
+                    fq.Match(
+                        "appointmentAlertsByLocationRefSortByStartTime",
+                        fq.Ref(fq.Collection("locations"), locationRefId)
+                    )
+                ),
+                {}
+            ),
+            ""
         )
     );
-    return moment(nsTimestamp / 1000);
+    return nsTimestamp ? moment(nsTimestamp / 1000) : null;
 }
 
 async function setUpNewAlert(
@@ -175,19 +185,23 @@ async function runImmediateAlerts(locationRefId, bookableAppointmentsFound) {
 }
 
 async function handler(data) {
+    console.log(data);
     if (await alerts.activeAlertExists(data.locationRefId)) {
         if (data?.bookableAppointmentsFound === 0) {
+            console.log("setting alert inactive.");
             await alerts.setInactiveAlert(
                 data.locationRefId,
                 data.scraperRunRefId
             );
         } else {
+            console.log("continuing alert.");
             await alerts.maybeContinueAlerting();
         }
     } else if (
         data.bookableAppointmentsFound &&
         data.bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()
     ) {
+        console.log("appointments pass threshold.");
         const alertStartTime = await alerts.getLastAlertStartTime(
             data.locationRefId
         );
@@ -197,6 +211,7 @@ async function handler(data) {
                 moment().subtract(alerts.REPEAT_ALERT_TIME(), "minutes")
             )
         ) {
+            console.log("starting new alert.");
             await alerts.setUpNewAlert(
                 data.locationRefId,
                 data.scraperRunRefId,

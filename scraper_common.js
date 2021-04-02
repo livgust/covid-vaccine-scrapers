@@ -109,19 +109,31 @@ async function execute(usePuppeteer, scrapers) {
                                         : null,
                                 })
                                 .then(({ scraperRunRefId, locationRefId }) => {
-                                    alertsLambda.invoke(
-                                        {
-                                            FunctionName:
-                                                process.env.ALERTSFUNCTIONNAME,
-                                            InvocationType: "Event",
-                                            Payload: JSON.stringify({
-                                                scraperRunRefId,
-                                                locationRefId,
-                                                bookableAppointmentsFound: numberAppointments,
-                                            }),
-                                        },
-                                        () => {}
-                                    );
+                                    if (process.env.NODE_ENV === "production") {
+                                        alertsLambda.invoke(
+                                            {
+                                                FunctionName:
+                                                    process.env
+                                                        .ALERTSFUNCTIONNAME,
+                                                InvocationType: "Event",
+                                                Payload: JSON.stringify({
+                                                    scraperRunRefId,
+                                                    locationRefId,
+                                                    bookableAppointmentsFound: numberAppointments,
+                                                }),
+                                            },
+                                            () => {}
+                                        );
+                                    } else {
+                                        console.log(
+                                            "would call alerting function with the following args:"
+                                        );
+                                        console.log({
+                                            scraperRunRefId,
+                                            locationRefId,
+                                            bookableAppointmentsFound: numberAppointments,
+                                        });
+                                    }
                                 });
                         })
                     );
