@@ -94,7 +94,9 @@ async function execute(usePuppeteer, scrapers) {
                                     street: res.street,
                                     city: res.city,
                                     zip: res.zip,
-                                    bookableAppointmentsFound: numberAppointments,
+                                    bookableAppointmentsFound: getTotalNumberOfAppointments(
+                                        res
+                                    ),
                                     availability: res.availability,
                                     hasAvailability: res.availability,
                                     extraData: res.extraData,
