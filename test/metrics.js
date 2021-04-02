@@ -2,7 +2,7 @@ const { getTotalNumberOfAppointments } = require("../lib/metrics");
 const chai = require("chai");
 const expect = chai.expect;
 
-describe("getTotalNumberOfAppointments", () => {
+describe("metrics getTotalNumberOfAppointments", () => {
     it("works for null result", () => {
         expect(getTotalNumberOfAppointments(null)).to.be.equal(0);
     });

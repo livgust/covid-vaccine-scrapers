@@ -5,7 +5,7 @@ const chai = require("chai");
 chai.use(require("chai-subset"));
 const expect = chai.expect;
 
-describe("GetAvailabilities", () => {
+describe("PriceChopper GetAvailabilities", () => {
     it("should return availabilities when there are availabilities", async () => {
         const scraper = require("../no-browser-site-scrapers/PriceChopper");
 

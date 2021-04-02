@@ -21,7 +21,7 @@ const s3 = require("./lib/s3");
 const dbUtils = require("./lib/db-utils");
 const moment = require("moment");
 
-const WRITE_TO_FAUNA = false;
+const WRITE_TO_FAUNA = true;
 
 async function execute(usePuppeteer, scrapers) {
     const globalStartTime = new Date();
@@ -42,7 +42,7 @@ async function execute(usePuppeteer, scrapers) {
                   headless: true,
               })
             : await Puppeteer.launch({
-                  args: [...chromium.args, "--single-process"],
+                  args: chromium.args,
                   defaultViewport: chromium.defaultViewport,
                   executablePath: await chromium.executablePath,
                   headless: chromium.headless,
@@ -62,7 +62,6 @@ async function execute(usePuppeteer, scrapers) {
                 isSuccess = false;
                 return null;
             });
-            results.push(returnValue);
             const numberAppointments = getTotalNumberOfAppointments(
                 returnValue
             );
@@ -73,6 +72,7 @@ async function execute(usePuppeteer, scrapers) {
                 startTime,
                 numberAppointments
             );
+            results.push(returnValue);
             // Coerce the results into the format we want.
             let returnValueArray = [];
             if (Array.isArray(returnValue)) {
@@ -81,7 +81,7 @@ async function execute(usePuppeteer, scrapers) {
                 returnValueArray = [returnValue];
             }
             // Write the data to FaunaDB.
-            if (WRITE_TO_FAUNA) {
+            if (WRITE_TO_FAUNA && process.env.FAUNA_DB) {
                 try {
                     await Promise.all(
                         returnValueArray.map(async (res) => {
