@@ -282,11 +282,9 @@ describe("FaunaDB Utils", function () {
             {
                 date: "03/17/2021",
                 numberAvailable: 1,
-                signUpLink: "fake-signup-link",
             },
             {
                 date: "03/18/2021",
-                signUpLink: "fake-signup-link",
             },
         ]);
         const appointmentRefIds = retrieveAppointmentsResult.data.map(
@@ -563,35 +561,118 @@ describe("FaunaDB Utils", function () {
         }
     ).timeout(5000);
 
-    it.only(
-        "can get the availability for all locations' most recent scraper runs",
-        async () => {
-            await dbUtils.getAppointmentsForAllLocations();
-            // Write data from a scraper.
-            const randomName1 = Math.random().toString(36).substring(7);
-            const scrapedData1 = {
-                name: `RandomName-${randomName1}`,
-                street: "1601 Washington St",
-                city: "Boston",
-                zip: "02118",
-                availability: {
-                    "04/10/2021": {
-                        hasAvailability: true,
-                        numberAvailableAppointments: 2,
-                        signUpLink: "fake-signup-link-2",
-                    },
-                    "04/11/2021": {
-                        hasAvailability: true,
-                        numberAvailableAppointments: 1,
-                        signUpLink: null,
-                    },
+    it("can get the availability for all locations' most recent scraper runs", async () => {
+        await dbUtils.getAppointmentsForAllLocations();
+        // Write data from a scraper.
+        const randomName1 = Math.random().toString(36).substring(7);
+        const scrapedData1 = {
+            name: `RandomName-${randomName1}`,
+            street: "1601 Washington St",
+            city: "Boston",
+            zip: "02118",
+            availability: {
+                "04/10/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 2,
+                    signUpLink: "fake-signup-link-2",
                 },
-                hasAvailability: true,
-                timestamp: "2021-04-02T15:15:15.318Z",
-                signUpLink: "fake-signup-link",
-            };
-            await dbUtils.writeScrapedData(scrapedData1);
-            const scrapedData2 = {
+                "04/11/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 1,
+                    signUpLink: null,
+                },
+            },
+            hasAvailability: true,
+            timestamp: "2021-04-02T15:15:15.318Z",
+            signUpLink: "fake-signup-link",
+        };
+        await dbUtils.writeScrapedData(scrapedData1);
+        const scrapedData2 = {
+            name: `RandomName-${randomName1}`,
+            street: "1601 Washington St",
+            city: "Boston",
+            zip: "02118",
+            availability: {
+                "04/12/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 5,
+                    signUpLink: null,
+                },
+                "04/13/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 13,
+                    signUpLink: null,
+                },
+            },
+            hasAvailability: true,
+            timestamp: "2021-04-02T16:16:16.318Z",
+            signUpLink: "fake-signup-link",
+        };
+        await dbUtils.writeScrapedData(scrapedData2);
+
+        // Write data from a second scraper.
+        const randomName2 = Math.random().toString(36).substring(7);
+        const scrapedData3 = {
+            name: `RandomName-${randomName2}`,
+            street: "109 Burnside Ave",
+            city: "Newton",
+            zip: "02459",
+            availability: {
+                "04/15/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 10,
+                    signUpLink: null,
+                },
+            },
+            hasAvailability: true,
+            timestamp: "2021-04-02T15:15:15.318Z",
+            signUpLink: "fake-signup-link",
+            extraData: "there is extraData",
+            restrictions: "there are restrictions",
+            massVax: true,
+        };
+        await dbUtils.writeScrapedData(scrapedData3);
+        const scrapedData4 = {
+            name: `RandomName-${randomName2}`,
+            street: "109 Burnside Ave",
+            city: "Newton",
+            zip: "02459",
+            availability: {},
+            hasAvailability: false,
+            timestamp: "2021-04-02T16:16:16.318Z",
+            signUpLink: "fake-signup-link",
+            extraData: "there is extraData",
+            restrictions: "there are restrictions",
+            massVax: true,
+        };
+        await dbUtils.writeScrapedData(scrapedData4);
+
+        // Figure out the RefIds of the Locations we just wrote.
+        const generatedId1 = dbUtils.generateLocationId({
+            name: scrapedData1.name,
+            street: scrapedData1.street,
+            city: scrapedData1.city,
+            zip: scrapedData1.zip,
+        });
+        const generatedId2 = dbUtils.generateLocationId({
+            name: scrapedData3.name,
+            street: scrapedData3.street,
+            city: scrapedData3.city,
+            zip: scrapedData3.zip,
+        });
+        // Get those locations.
+        const locationsInCollection = await dbUtils.retrieveItemsByRefIds(
+            "locations",
+            [generatedId1, generatedId2]
+        );
+
+        // This is the meat of the test - get the appointments for these given locations.
+        const output = await dbUtils.getAppointmentsForGivenLocations(
+            locationsInCollection
+        );
+
+        const desiredOutput = [
+            {
                 name: `RandomName-${randomName1}`,
                 street: "1601 Washington St",
                 city: "Boston",
@@ -611,32 +692,14 @@ describe("FaunaDB Utils", function () {
                 hasAvailability: true,
                 timestamp: "2021-04-02T16:16:16.318Z",
                 signUpLink: "fake-signup-link",
-            };
-            await dbUtils.writeScrapedData(scrapedData2);
-
-            // Write data from a second scraper.
-            const randomName2 = Math.random().toString(36).substring(7);
-            const scrapedData3 = {
-                name: `RandomName-${randomName2}`,
-                street: "109 Burnside Ave",
-                city: "Newton",
-                zip: "02459",
-                availability: {
-                    "04/15/2021": {
-                        hasAvailability: true,
-                        numberAvailableAppointments: 10,
-                        signUpLink: null,
-                    },
-                },
-                hasAvailability: true,
-                timestamp: "2021-04-02T15:15:15.318Z",
-                signUpLink: "fake-signup-link",
-                extraData: "there is extraData",
-                restrictions: "there are restrictions",
-                massVax: true,
-            };
-            await dbUtils.writeScrapedData(scrapedData3);
-            const scrapedData4 = {
+                extraData: null,
+                restrictions: null,
+                massVax: null,
+                siteTimestamp: null,
+                latitude: 42.3383481,
+                longitude: -71.07489389999999,
+            },
+            {
                 name: `RandomName-${randomName2}`,
                 street: "109 Burnside Ave",
                 city: "Newton",
@@ -648,130 +711,54 @@ describe("FaunaDB Utils", function () {
                 extraData: "there is extraData",
                 restrictions: "there are restrictions",
                 massVax: true,
-            };
-            await dbUtils.writeScrapedData(scrapedData4);
+                siteTimestamp: null,
+                latitude: 42.18391949999999,
+                longitude: -71.31742679999999,
+            },
+        ];
 
-            // Figure out the RefIds of the Locations we just wrote.
-            const generatedId1 = dbUtils.generateLocationId({
-                name: scrapedData1.name,
-                street: scrapedData1.street,
-                city: scrapedData1.city,
-                zip: scrapedData1.zip,
-            });
-            const generatedId2 = dbUtils.generateLocationId({
-                name: scrapedData3.name,
-                street: scrapedData3.street,
-                city: scrapedData3.city,
-                zip: scrapedData3.zip,
-            });
-            // Get those locations.
-            const locationsInCollection = await dbUtils.retrieveItemsByRefIds(
-                "locations",
-                [generatedId1, generatedId2]
-            );
+        // Assert that we got each locations' most recent scraperRun's appointment data.
+        expect(output).to.have.deep.members(desiredOutput);
 
-            // This is the meat of the test - get the appointments for these given locations.
-            const output = await dbUtils.getAppointmentsForGivenLocations(
-                locationsInCollection
-            );
+        // Clean up.
+        const locationRefIdsToDelete = [generatedId1, generatedId2];
+        const scraperRunRefIdsToDelete = (
+            await dbUtils.getScraperRunsByLocations(locationsInCollection)
+        )
+            .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
+            .flat();
+        const appointmentRefIdsToDelete = (
+            await dbUtils.getAppointmentsByScraperRuns(scraperRunRefIdsToDelete)
+        )
+            .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
+            .flat();
 
-            const desiredOutput = [
-                {
-                    name: `RandomName-${randomName1}`,
-                    street: "1601 Washington St",
-                    city: "Boston",
-                    zip: "02118",
-                    availability: {
-                        "04/12/2021": {
-                            hasAvailability: true,
-                            numberAvailableAppointments: 5,
-                            signUpLink: null,
-                        },
-                        "04/13/2021": {
-                            hasAvailability: true,
-                            numberAvailableAppointments: 13,
-                            signUpLink: null,
-                        },
-                    },
-                    hasAvailability: true,
-                    timestamp: "2021-04-02T16:16:16.318Z",
-                    signUpLink: "fake-signup-link",
-                    extraData: null,
-                    restrictions: null,
-                    massVax: null,
-                    siteTimestamp: null,
-                    latitude: 42.3383481,
-                    longitude: -71.07489389999999,
-                },
-                {
-                    name: `RandomName-${randomName2}`,
-                    street: "109 Burnside Ave",
-                    city: "Newton",
-                    zip: "02459",
-                    availability: {},
-                    hasAvailability: false,
-                    timestamp: "2021-04-02T16:16:16.318Z",
-                    signUpLink: "fake-signup-link",
-                    extraData: "there is extraData",
-                    restrictions: "there are restrictions",
-                    massVax: true,
-                    siteTimestamp: null,
-                    latitude: 42.18391949999999,
-                    longitude: -71.31742679999999,
-                },
-            ];
+        // Delete locations, scraperRuns, appointments.
+        await dbUtils.deleteItemsByRefIds("locations", locationRefIdsToDelete);
+        await dbUtils.deleteItemsByRefIds(
+            "scraperRuns",
+            scraperRunRefIdsToDelete
+        );
+        await dbUtils.deleteItemsByRefIds(
+            "appointments",
+            appointmentRefIdsToDelete
+        );
 
-            // Assert that we got each locations' most recent scraperRun's appointment data.
-            expect(output).to.have.deep.members(desiredOutput);
-
-            // Clean up.
-            const locationRefIdsToDelete = [generatedId1, generatedId2];
-            const scraperRunRefIdsToDelete = (
-                await dbUtils.getScraperRunsByLocations(locationsInCollection)
-            )
-                .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
-                .flat();
-            const appointmentRefIdsToDelete = (
-                await dbUtils.getAppointmentsByScraperRuns(
-                    scraperRunRefIdsToDelete
-                )
-            )
-                .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
-                .flat();
-
-            // Delete locations, scraperRuns, appointments.
-            await dbUtils.deleteItemsByRefIds(
-                "locations",
-                locationRefIdsToDelete
-            );
-            await dbUtils.deleteItemsByRefIds(
+        // Make sure it's all gone!
+        await expect(
+            dbUtils.checkItemsExistByRefIds("locations", locationRefIdsToDelete)
+        ).to.eventually.deep.equal([false, false]);
+        await expect(
+            dbUtils.checkItemsExistByRefIds(
                 "scraperRuns",
                 scraperRunRefIdsToDelete
-            );
-            await dbUtils.deleteItemsByRefIds(
+            )
+        ).to.eventually.deep.equal([false, false, false, false]);
+        await expect(
+            dbUtils.checkItemsExistByRefIds(
                 "appointments",
                 appointmentRefIdsToDelete
-            );
-
-            // Make sure it's all gone!
-            await expect(
-                dbUtils.checkItemsExistByRefIds(
-                    "locations",
-                    locationRefIdsToDelete
-                )
-            ).to.eventually.deep.equal([false, false]);
-            await expect(
-                dbUtils.checkItemsExistByRefIds(
-                    "scraperRuns",
-                    scraperRunRefIdsToDelete
-                )
-            ).to.eventually.deep.equal([false, false, false, false]);
-            await expect(
-                dbUtils.checkItemsExistByRefIds(
-                    "appointments",
-                    appointmentRefIdsToDelete
-                )
-            ).to.eventually.deep.equal([false, false, false, false, false]);
-        }
-    ).timeout(9000);
+            )
+        ).to.eventually.deep.equal([false, false, false, false, false]);
+    }).timeout(9000);
 });
