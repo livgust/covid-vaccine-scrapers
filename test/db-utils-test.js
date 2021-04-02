@@ -17,7 +17,7 @@ describe("FaunaDB Utils", function () {
         };
         const generatedId = dbUtils.generateLocationId({
             name: location.name,
-            steet: location.address.street,
+            street: location.address.street,
             city: location.address.city,
             zip: location.address.zip,
         });
