@@ -119,7 +119,9 @@ async function execute(usePuppeteer, scrapers) {
                                                 Payload: JSON.stringify({
                                                     scraperRunRefId,
                                                     locationRefId,
-                                                    bookableAppointmentsFound: numberAppointments,
+                                                    bookableAppointmentsFound: getTotalNumberOfAppointments(
+                                                        res
+                                                    ),
                                                 }),
                                             },
                                             () => {}
