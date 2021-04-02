@@ -103,7 +103,7 @@ async function ScrapeWebsiteData(browser, pageService, site) {
 
     // Initialize results to no availability
     const results = {
-        availability: [],
+        availability: {},
         hasAvailability: false,
     };
 
