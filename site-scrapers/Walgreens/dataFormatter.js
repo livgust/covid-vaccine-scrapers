@@ -90,7 +90,7 @@ function formatData(data, website) {
         // See Issue #200 (https://github.com/livgust/covid-vaccine-scrapers/issues/200)
 
         // QUICK FIX: Don't report any availability until the following date.
-        const stopUntilDate = new Date("2021-04-02T12:00:00-04:00");
+        const stopUntilDate = new Date("2021-04-02T00:59:33-04:00");
         if (new Date() >= stopUntilDate) {
             entry.appointmentAvailability.forEach((daySlot) => {
                 const date = moment(daySlot.date).local().startOf("day");
