@@ -301,253 +301,477 @@ describe("FaunaDB Utils", function () {
         });
     }).timeout(5000);
 
-    it("given a batch of scrapers outputs, can create, retrieve, and delete docs from Locations, ScraperRuns, and Appointments collections", async () => {
-        const timestamp = "2021-04-07T00:00:00.00Z";
-        const locations = [
-            {
-                name: `RandomName-${Math.random().toString(36).substring(7)}`,
-                street: "2240 Iyannough Road",
-                city: "West Barnstable",
-                zip: "02668",
+    it.skip(
+        "given a batch of scrapers outputs, can create, retrieve, and delete docs from Locations, ScraperRuns, and Appointments collections",
+        async () => {
+            const timestamp = "2021-04-07T00:00:00.00Z";
+            const locations = [
+                {
+                    name: `RandomName-${Math.random()
+                        .toString(36)
+                        .substring(7)}`,
+                    street: "2240 Iyannough Road",
+                    city: "West Barnstable",
+                    zip: "02668",
+                    availability: {
+                        "03/16/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 2,
+                            signUpLink: "fake-signup-link-2",
+                        },
+                        "03/17/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 1,
+                            signUpLink: null,
+                        },
+                    },
+                    hasAvailability: true,
+                    extraData: {
+                        "Vaccinations offered":
+                            "Pfizer-BioNTech COVID-19 Vaccine",
+                        "Age groups served": "Adults",
+                        "Services offered": "Vaccination",
+                        "Additional Information": "Pfizer vaccine",
+                        "Clinic Hours": "10:00 am - 03:00 pm",
+                    },
+                    timestamp: "2021-03-16T13:15:27.318Z",
+                    latitude: 41.6909399,
+                    longitude: -70.3373802,
+                    signUpLink: "fake-signup-link",
+                },
+                {
+                    name: `RandomName-${Math.random()
+                        .toString(36)
+                        .substring(7)}`,
+                    street: "409 W Broadway",
+                    city: "South Boston",
+                    zip: "02127",
+                    availability: {
+                        "03/30/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 30,
+                            signUpLink: "fake-signup-link-3",
+                        },
+                    },
+                    hasAvailability: true,
+                    timestamp: "2021-03-16T16:16:16.318Z",
+                    latitude: 100,
+                    longitude: -100,
+                    signUpLink: "fake-signup-link-3",
+                },
+                {
+                    name: `RandomName-${Math.random()
+                        .toString(36)
+                        .substring(7)}`,
+                    street: "280 Main Street",
+                    city: "Rutland",
+                    zip: "01543",
+                    availability: {},
+                    hasAvailability: false,
+                    timestamp: "2021-03-16T21:21:21.318Z",
+                    latitude: 50,
+                    longitude: -50,
+                    signUpLink: "fake-signup-link-4",
+                },
+            ];
+            // Write the appopriate location (if it's not already there), scaperRun, and appointment(s)
+            await dbUtils.writeScrapedDataBatch(locations, timestamp);
+
+            // sleep while the DB writing happens...
+            await new Promise((r) => setTimeout(r, 1000));
+
+            const locationsWithRefIds = dbUtils.addGeneratedIdsToLocations(
+                locations
+            );
+            const locationRefIds = locationsWithRefIds.map((loc) => loc.refId);
+            const retrieveLocationsResult = await dbUtils.retrieveItemsByRefIds(
+                "locations",
+                locationRefIds
+            );
+            const filteredResults = retrieveLocationsResult.map(
+                (entry) => lodash.omit(entry, ["ts", "ref"]) // remove the timestamp and reference, too complicated to check against
+            );
+            expect(filteredResults).to.deep.equalInAnyOrder([
+                {
+                    data: {
+                        name: locations[0].name,
+                        address: {
+                            street: locations[0].street,
+                            city: locations[0].city,
+                            zip: locations[0].zip,
+                        },
+                        signUpLink: locations[0].signUpLink,
+                        latitude: locations[0].latitude,
+                        longitude: locations[0].longitude,
+                    },
+                },
+                {
+                    data: {
+                        name: locations[1].name,
+                        address: {
+                            street: locations[1].street,
+                            city: locations[1].city,
+                            zip: locations[1].zip,
+                        },
+                        signUpLink: locations[1].signUpLink,
+                        latitude: locations[1].latitude,
+                        longitude: locations[1].longitude,
+                    },
+                },
+                {
+                    data: {
+                        name: locations[2].name,
+                        address: {
+                            street: locations[2].street,
+                            city: locations[2].city,
+                            zip: locations[2].zip,
+                        },
+                        signUpLink: locations[2].signUpLink,
+                        latitude: locations[2].latitude,
+                        longitude: locations[2].longitude,
+                    },
+                },
+            ]);
+            // assert that the scraper run is there (check index)
+            const retrieveScraperRunsResult = await dbUtils.getScraperRunsByLocations(
+                locationsWithRefIds
+            );
+
+            const scraperRunRefs = retrieveScraperRunsResult.map(
+                (res) => res.data[0].ref.id
+            );
+            const filteredResults2 = retrieveScraperRunsResult.map((entry) => {
+                return lodash.set(
+                    entry,
+                    "data",
+                    entry.data.map((subEntry) =>
+                        lodash.omit(subEntry, ["data.locationRef", "ref", "ts"])
+                    )
+                );
+            });
+
+            expect(filteredResults2).to.deep.equalInAnyOrder([
+                {
+                    data: [
+                        {
+                            data: {
+                                timestamp,
+                            },
+                        },
+                    ],
+                },
+                {
+                    data: [
+                        {
+                            data: {
+                                timestamp,
+                            },
+                        },
+                    ],
+                },
+                {
+                    data: [
+                        {
+                            data: {
+                                timestamp,
+                            },
+                        },
+                    ],
+                },
+            ]);
+
+            const retrieveAppointmentsResult = await dbUtils.getAppointmentsByScraperRuns(
+                scraperRunRefs
+            );
+
+            const appointmentRefIds = retrieveAppointmentsResult
+                .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
+                .flat();
+
+            const filteredResults3 = retrieveAppointmentsResult.map((entry) => {
+                return lodash.set(
+                    entry,
+                    "data",
+                    entry.data.map((subEntry) =>
+                        lodash.omit(subEntry, [
+                            "data.scraperRunRef",
+                            "ref",
+                            "ts",
+                        ])
+                    )
+                );
+            });
+
+            expect(filteredResults3).to.deep.equalInAnyOrder([
+                {
+                    data: [
+                        {
+                            data: {
+                                date: "03/30/2021",
+                                numberAvailable: 30,
+                                signUpLink: "fake-signup-link-3",
+                            },
+                        },
+                    ],
+                },
+                {
+                    data: [
+                        {
+                            data: {
+                                date: "03/16/2021",
+                                numberAvailable: 2,
+                                signUpLink: "fake-signup-link-2",
+                                extraData: {
+                                    "Vaccinations offered":
+                                        "Pfizer-BioNTech COVID-19 Vaccine",
+                                    "Age groups served": "Adults",
+                                    "Services offered": "Vaccination",
+                                    "Additional Information": "Pfizer vaccine",
+                                    "Clinic Hours": "10:00 am - 03:00 pm",
+                                },
+                            },
+                        },
+                        {
+                            data: {
+                                date: "03/17/2021",
+                                numberAvailable: 1,
+                                signUpLink: "fake-signup-link",
+                                extraData: {
+                                    "Vaccinations offered":
+                                        "Pfizer-BioNTech COVID-19 Vaccine",
+                                    "Age groups served": "Adults",
+                                    "Services offered": "Vaccination",
+                                    "Additional Information": "Pfizer vaccine",
+                                    "Clinic Hours": "10:00 am - 03:00 pm",
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    data: [],
+                },
+            ]);
+
+            // clean up - delete it all
+            await dbUtils.deleteItemsByRefIds("locations", locationRefIds);
+            await dbUtils.deleteItemsByRefIds("scraperRuns", scraperRunRefs);
+            await dbUtils.deleteItemsByRefIds(
+                "appointments",
+                appointmentRefIds
+            );
+        }
+    ).timeout(5000);
+
+    it.only(
+        "can get the availability for all locations' most recent scraper runs",
+        async () => {
+            await dbUtils.getAppointmentsForAllLocations();
+            // Write data from a scraper.
+            const randomName1 = Math.random().toString(36).substring(7);
+            const scrapedData1 = {
+                name: `RandomName-${randomName1}`,
+                street: "1601 Washington St",
+                city: "Boston",
+                zip: "02118",
                 availability: {
-                    "03/16/2021": {
+                    "04/10/2021": {
                         hasAvailability: true,
                         numberAvailableAppointments: 2,
                         signUpLink: "fake-signup-link-2",
                     },
-                    "03/17/2021": {
+                    "04/11/2021": {
                         hasAvailability: true,
                         numberAvailableAppointments: 1,
                         signUpLink: null,
                     },
                 },
                 hasAvailability: true,
-                extraData: {
-                    "Vaccinations offered": "Pfizer-BioNTech COVID-19 Vaccine",
-                    "Age groups served": "Adults",
-                    "Services offered": "Vaccination",
-                    "Additional Information": "Pfizer vaccine",
-                    "Clinic Hours": "10:00 am - 03:00 pm",
-                },
-                timestamp: "2021-03-16T13:15:27.318Z",
-                latitude: 41.6909399,
-                longitude: -70.3373802,
+                timestamp: "2021-04-02T15:15:15.318Z",
                 signUpLink: "fake-signup-link",
-            },
-            {
-                name: `RandomName-${Math.random().toString(36).substring(7)}`,
-                street: "409 W Broadway",
-                city: "South Boston",
-                zip: "02127",
+            };
+            await dbUtils.writeScrapedData(scrapedData1);
+            const scrapedData2 = {
+                name: `RandomName-${randomName1}`,
+                street: "1601 Washington St",
+                city: "Boston",
+                zip: "02118",
                 availability: {
-                    "03/30/2021": {
+                    "04/12/2021": {
                         hasAvailability: true,
-                        numberAvailableAppointments: 30,
-                        signUpLink: "fake-signup-link-3",
+                        numberAvailableAppointments: 5,
+                        signUpLink: null,
+                    },
+                    "04/13/2021": {
+                        hasAvailability: true,
+                        numberAvailableAppointments: 13,
+                        signUpLink: null,
                     },
                 },
                 hasAvailability: true,
-                timestamp: "2021-03-16T16:16:16.318Z",
-                latitude: 100,
-                longitude: -100,
-                signUpLink: "fake-signup-link-3",
-            },
-            {
-                name: `RandomName-${Math.random().toString(36).substring(7)}`,
-                street: "280 Main Street",
-                city: "Rutland",
-                zip: "01543",
+                timestamp: "2021-04-02T16:16:16.318Z",
+                signUpLink: "fake-signup-link",
+            };
+            await dbUtils.writeScrapedData(scrapedData2);
+
+            // Write data from a second scraper.
+            const randomName2 = Math.random().toString(36).substring(7);
+            const scrapedData3 = {
+                name: `RandomName-${randomName2}`,
+                street: "109 Burnside Ave",
+                city: "Newton",
+                zip: "02459",
+                availability: {
+                    "04/15/2021": {
+                        hasAvailability: true,
+                        numberAvailableAppointments: 10,
+                        signUpLink: null,
+                    },
+                },
+                hasAvailability: true,
+                timestamp: "2021-04-02T15:15:15.318Z",
+                signUpLink: "fake-signup-link",
+                extraData: "there is extraData",
+                restrictions: "there are restrictions",
+                massVax: true,
+            };
+            await dbUtils.writeScrapedData(scrapedData3);
+            const scrapedData4 = {
+                name: `RandomName-${randomName2}`,
+                street: "109 Burnside Ave",
+                city: "Newton",
+                zip: "02459",
                 availability: {},
                 hasAvailability: false,
-                timestamp: "2021-03-16T21:21:21.318Z",
-                latitude: 50,
-                longitude: -50,
-                signUpLink: "fake-signup-link-4",
-            },
-        ];
-        // Write the appopriate location (if it's not already there), scaperRun, and appointment(s)
-        await dbUtils.writeScrapedDataBatch(locations, timestamp);
+                timestamp: "2021-04-02T16:16:16.318Z",
+                signUpLink: "fake-signup-link",
+                extraData: "there is extraData",
+                restrictions: "there are restrictions",
+                massVax: true,
+            };
+            await dbUtils.writeScrapedData(scrapedData4);
 
-        // sleep while the DB writing happens...
-        await new Promise((r) => setTimeout(r, 1000));
-
-        const locationsWithRefIds = dbUtils.addGeneratedIdsToLocations(
-            locations
-        );
-        const locationRefIds = locationsWithRefIds.map((loc) => loc.refId);
-        const retrieveLocationsResult = await dbUtils.retrieveItemsByRefIds(
-            "locations",
-            locationRefIds
-        );
-        const filteredResults = retrieveLocationsResult.map(
-            (entry) => lodash.omit(entry, ["ts", "ref"]) // remove the timestamp and reference, too complicated to check against
-        );
-        expect(filteredResults).to.deep.equalInAnyOrder([
-            {
-                data: {
-                    name: locations[0].name,
-                    address: {
-                        street: locations[0].street,
-                        city: locations[0].city,
-                        zip: locations[0].zip,
-                    },
-                    signUpLink: locations[0].signUpLink,
-                    latitude: locations[0].latitude,
-                    longitude: locations[0].longitude,
-                },
-            },
-            {
-                data: {
-                    name: locations[1].name,
-                    address: {
-                        street: locations[1].street,
-                        city: locations[1].city,
-                        zip: locations[1].zip,
-                    },
-                    signUpLink: locations[1].signUpLink,
-                    latitude: locations[1].latitude,
-                    longitude: locations[1].longitude,
-                },
-            },
-            {
-                data: {
-                    name: locations[2].name,
-                    address: {
-                        street: locations[2].street,
-                        city: locations[2].city,
-                        zip: locations[2].zip,
-                    },
-                    signUpLink: locations[2].signUpLink,
-                    latitude: locations[2].latitude,
-                    longitude: locations[2].longitude,
-                },
-            },
-        ]);
-        // assert that the scraper run is there (check index)
-        const retrieveScraperRunsResult = await dbUtils.getScraperRunsByLocations(
-            locationsWithRefIds
-        );
-
-        const scraperRunRefs = retrieveScraperRunsResult.map(
-            (res) => res.data[0].ref.id
-        );
-        const filteredResults2 = retrieveScraperRunsResult.map((entry) => {
-            return lodash.set(
-                entry,
-                "data",
-                entry.data.map((subEntry) =>
-                    lodash.omit(subEntry, ["data.locationRef", "ref", "ts"])
-                )
+            // Figure out the RefIds of the Locations we just wrote.
+            const generatedId1 = dbUtils.generateLocationId({
+                name: scrapedData1.name,
+                street: scrapedData1.street,
+                city: scrapedData1.city,
+                zip: scrapedData1.zip,
+            });
+            const generatedId2 = dbUtils.generateLocationId({
+                name: scrapedData3.name,
+                street: scrapedData3.street,
+                city: scrapedData3.city,
+                zip: scrapedData3.zip,
+            });
+            // Get those locations.
+            const locationsInCollection = await dbUtils.retrieveItemsByRefIds(
+                "locations",
+                [generatedId1, generatedId2]
             );
-        });
 
-        expect(filteredResults2).to.deep.equalInAnyOrder([
-            {
-                data: [
-                    {
-                        data: {
-                            timestamp,
-                        },
-                    },
-                ],
-            },
-            {
-                data: [
-                    {
-                        data: {
-                            timestamp,
-                        },
-                    },
-                ],
-            },
-            {
-                data: [
-                    {
-                        data: {
-                            timestamp,
-                        },
-                    },
-                ],
-            },
-        ]);
-
-        const retrieveAppointmentsResult = await dbUtils.getAppointmentsByScraperRuns(
-            scraperRunRefs
-        );
-
-        const appointmentRefIds = retrieveAppointmentsResult
-            .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
-            .flat();
-
-        const filteredResults3 = retrieveAppointmentsResult.map((entry) => {
-            return lodash.set(
-                entry,
-                "data",
-                entry.data.map((subEntry) =>
-                    lodash.omit(subEntry, ["data.scraperRunRef", "ref", "ts"])
-                )
+            // This is the meat of the test - get the appointments for these given locations.
+            const output = await dbUtils.getAppointmentsForGivenLocations(
+                locationsInCollection
             );
-        });
 
-        expect(filteredResults3).to.deep.equalInAnyOrder([
-            {
-                data: [
-                    {
-                        data: {
-                            date: "03/30/2021",
-                            numberAvailable: 30,
-                            signUpLink: "fake-signup-link-3",
+            const desiredOutput = [
+                {
+                    name: `RandomName-${randomName1}`,
+                    street: "1601 Washington St",
+                    city: "Boston",
+                    zip: "02118",
+                    availability: {
+                        "04/12/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 5,
+                            signUpLink: null,
+                        },
+                        "04/13/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 13,
+                            signUpLink: null,
                         },
                     },
-                ],
-            },
-            {
-                data: [
-                    {
-                        data: {
-                            date: "03/16/2021",
-                            numberAvailable: 2,
-                            signUpLink: "fake-signup-link-2",
-                            extraData: {
-                                "Vaccinations offered":
-                                    "Pfizer-BioNTech COVID-19 Vaccine",
-                                "Age groups served": "Adults",
-                                "Services offered": "Vaccination",
-                                "Additional Information": "Pfizer vaccine",
-                                "Clinic Hours": "10:00 am - 03:00 pm",
-                            },
-                        },
-                    },
-                    {
-                        data: {
-                            date: "03/17/2021",
-                            numberAvailable: 1,
-                            signUpLink: "fake-signup-link",
-                            extraData: {
-                                "Vaccinations offered":
-                                    "Pfizer-BioNTech COVID-19 Vaccine",
-                                "Age groups served": "Adults",
-                                "Services offered": "Vaccination",
-                                "Additional Information": "Pfizer vaccine",
-                                "Clinic Hours": "10:00 am - 03:00 pm",
-                            },
-                        },
-                    },
-                ],
-            },
-            {
-                data: [],
-            },
-        ]);
+                    hasAvailability: true,
+                    timestamp: "2021-04-02T16:16:16.318Z",
+                    signUpLink: "fake-signup-link",
+                    extraData: null,
+                    restrictions: null,
+                    massVax: null,
+                    siteTimestamp: null,
+                    latitude: 42.3383481,
+                    longitude: -71.07489389999999,
+                },
+                {
+                    name: `RandomName-${randomName2}`,
+                    street: "109 Burnside Ave",
+                    city: "Newton",
+                    zip: "02459",
+                    availability: {},
+                    hasAvailability: false,
+                    timestamp: "2021-04-02T16:16:16.318Z",
+                    signUpLink: "fake-signup-link",
+                    extraData: "there is extraData",
+                    restrictions: "there are restrictions",
+                    massVax: true,
+                    siteTimestamp: null,
+                    latitude: 42.18391949999999,
+                    longitude: -71.31742679999999,
+                },
+            ];
 
-        // clean up - delete it all
-        await dbUtils.deleteItemsByRefIds("locations", locationRefIds);
-        await dbUtils.deleteItemsByRefIds("scraperRuns", scraperRunRefs);
-        await dbUtils.deleteItemsByRefIds("appointments", appointmentRefIds);
-    }).timeout(5000);
+            // Assert that we got each locations' most recent scraperRun's appointment data.
+            expect(output).to.have.deep.members(desiredOutput);
 
-    it("can get the availability for all locations' most recent scraper runs", async () => {
-        await dbUtils.getAppointmentsForAllLocations();
-        // the logic isn't here yet.
-    });
+            // Clean up.
+            const locationRefIdsToDelete = [generatedId1, generatedId2];
+            const scraperRunRefIdsToDelete = (
+                await dbUtils.getScraperRunsByLocations(locationsInCollection)
+            )
+                .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
+                .flat();
+            const appointmentRefIdsToDelete = (
+                await dbUtils.getAppointmentsByScraperRuns(
+                    scraperRunRefIdsToDelete
+                )
+            )
+                .map((entry) => entry.data.map((subEntry) => subEntry.ref.id))
+                .flat();
+
+            // Delete locations, scraperRuns, appointments.
+            await dbUtils.deleteItemsByRefIds(
+                "locations",
+                locationRefIdsToDelete
+            );
+            await dbUtils.deleteItemsByRefIds(
+                "scraperRuns",
+                scraperRunRefIdsToDelete
+            );
+            await dbUtils.deleteItemsByRefIds(
+                "appointments",
+                appointmentRefIdsToDelete
+            );
+
+            // Make sure it's all gone!
+            await expect(
+                dbUtils.checkItemsExistByRefIds(
+                    "locations",
+                    locationRefIdsToDelete
+                )
+            ).to.eventually.deep.equal([false, false]);
+            await expect(
+                dbUtils.checkItemsExistByRefIds(
+                    "scraperRuns",
+                    scraperRunRefIdsToDelete
+                )
+            ).to.eventually.deep.equal([false, false, false, false]);
+            await expect(
+                dbUtils.checkItemsExistByRefIds(
+                    "appointments",
+                    appointmentRefIdsToDelete
+                )
+            ).to.eventually.deep.equal([false, false, false, false, false]);
+        }
+    ).timeout(9000);
 });
