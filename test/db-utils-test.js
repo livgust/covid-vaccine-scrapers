@@ -561,7 +561,7 @@ describe("FaunaDB Utils", function () {
         }
     ).timeout(5000);
 
-    it("can get the availability for all locations' most recent scraper runs", async () => {
+    it("can get the full results objects for the given locations' most recent scraper runs", async () => {
         // Write data from a scraper.
         const randomName1 = Math.random().toString(36).substring(7);
         const scrapedData1 = {
