@@ -562,7 +562,6 @@ describe("FaunaDB Utils", function () {
     ).timeout(5000);
 
     it("can get the availability for all locations' most recent scraper runs", async () => {
-        await dbUtils.getAppointmentsForAllLocations();
         // Write data from a scraper.
         const randomName1 = Math.random().toString(36).substring(7);
         const scrapedData1 = {
@@ -666,8 +665,8 @@ describe("FaunaDB Utils", function () {
             [generatedId1, generatedId2]
         );
 
-        // This is the meat of the test - get the appointments for these given locations.
-        const output = await dbUtils.getAppointmentsForGivenLocations(
+        // This is the meat of the test - get the results (all scraper data, combined) for these given locations.
+        const output = await dbUtils.getResultsForGivenLocations(
             locationsInCollection
         );
 
