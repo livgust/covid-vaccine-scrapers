@@ -16,7 +16,7 @@ function Debug(...args) {
 module.exports = async function GetAvailableAppointments() {
     console.log("SouthLawrence starting.");
 
-    const { name, website, ...restLawrence } = site;
+    const { website, ...restLawrence } = site;
 
     const websiteData = await ScrapeWebsiteData(website);
     Debug("websiteData", websiteData);
