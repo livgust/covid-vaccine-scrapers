@@ -426,7 +426,7 @@ describe("MyChartAPI CommonPostDataCallback", () => {
 });
 
 describe("MyChartAPI UpdateResults", () => {
-    it("should add site info and default data to results object", () => {
+    it.skip("should add site info and default data to results object", () => {
         results = {};
         mychart.UpdateResults(results, exampleWithAvailability);
         for (const [key, info] of Object.entries(results)) {
