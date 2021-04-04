@@ -2,7 +2,9 @@ const scraper = require("../no-browser-site-scrapers/ZocDoc/index");
 const helper = require("../no-browser-site-scrapers/ZocDoc/zocdocBase");
 const generator = require("../no-browser-site-scrapers/ZocDoc/zocdoc-config-generator");
 const { expect } = require("chai");
+const moment = require("moment");
 const file = require("../lib/file");
+const config = require("../no-browser-site-scrapers/ZocDoc/config");
 
 const { someAvailability } = require("./ZocDoc/sample-availability");
 
@@ -12,7 +14,7 @@ const { locationData } = require("./ZocDoc/location-data");
  * This test the config generator utility. Not a part of scraping but gathering
  * info from fetching provider data from ZocDoc. Automates site info creation.
  */
-describe.skip("ZocDoc Config generator test", function () {
+describe("ZocDoc Config generator test", function () {
     it("should provide id, name and location for each site", async function () {
         const providerDetailsJson = locationData; // await generator.fetchProviderDetails();
         const providerDetails = generator.parseProviderDetails(
@@ -33,7 +35,9 @@ describe("ZocDoc Provider availability test using scraper and canned data", func
             return someAvailability;
         },
     };
-    it("should provide availability for each site", async function () {
+    const beforeTime = moment();
+
+    it("should provide availability for each site, and the results objects structure should conform", async function () {
         const results = await scraper(false, testFetchService);
 
         const expected = [
@@ -49,8 +53,21 @@ describe("ZocDoc Provider availability test using scraper and canned data", func
         const hasAvailability = Object.values(results).map(
             (result) => result.hasAvailability
         );
+        const afterTime = moment();
 
         expect(hasAvailability).is.deep.equal(expected);
+
+        /*
+        Structure conformance expectations:
+
+        - All the timestamps are expected to be between before
+            and after when the scraper was executed
+        - Each site's results object must have a property named "hasAvailability"
+         */
+        results.forEach((result) => {
+            expect(moment(result.timestamp).isBetween(beforeTime, afterTime));
+            expect(result.hasAvailability).is.not.undefined;
+        });
 
         // console.log(`${JSON.stringify(results)}`);
 
@@ -63,8 +80,8 @@ describe("ZocDoc Provider availability test using scraper and canned data", func
     });
 });
 
-describe.skip("ZocDoc Testing zocdocBase with canned data", function () {
-    it("should provide availability for each site", async function () {
+describe("ZocDoc Testing zocdocBase with live data", function () {
+    it("should provide availability for each site listed in config.js", async function () {
         const providerAvailabilityJson = await helper.fetchAvailability();
 
         const providerAvailability = helper.parseAvailability(
@@ -75,6 +92,8 @@ describe.skip("ZocDoc Testing zocdocBase with canned data", function () {
         //     console.log(`${JSON.stringify(provider)}`)
         // );
 
-        expect(Object.keys(providerAvailability).length).equals(8);
+        expect(Object.keys(providerAvailability).length).equals(
+            Object.keys(config.sites).length
+        );
     });
 });

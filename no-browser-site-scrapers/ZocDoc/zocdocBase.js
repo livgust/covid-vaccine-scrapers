@@ -55,19 +55,11 @@ function parseAvailability(availabilityResponses) {
     }
 
     const data = availabilityResponses.data;
-    const pLocations = availabilityResponses.data.providerLocations;
+    const pLocations = data.providerLocations;
 
     const results = {};
 
     Object.values(pLocations).map((pLoc) => {
-        /*
-            {
-                providerId : {
-                    availability: { date: {numberAvailableAppointments, hasAvailability} }
-                }
-            }
-        */
-
         if (data.providerLocations.length > 0) {
             const times = pLoc.availability.times;
 

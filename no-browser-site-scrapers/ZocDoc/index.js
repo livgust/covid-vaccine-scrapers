@@ -1,5 +1,6 @@
 const { scraperName, sites } = require("./config");
 const helper = require("./zocdocBase");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(
     _ignored,
@@ -31,6 +32,7 @@ async function ScrapeWebsiteData(fetchService) {
             ...sites[value[0]],
             ...value[1],
             hasAvailability: Object.keys(value[1].availability).length > 0,
+            timestamp: moment().format(),
         });
     });
 
