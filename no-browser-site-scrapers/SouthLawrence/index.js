@@ -1,6 +1,8 @@
 const { site } = require("./config");
 const moment = require("moment");
 const fetch = require("node-fetch");
+const { sendSlackMsg } = require("../../lib/slack");
+const s3 = require("../../lib/s3");
 
 // Set to true for verbose debug messages.
 const DEBUG = false;
@@ -47,6 +49,14 @@ async function ScrapeWebsiteData(website) {
     let hasAvailability = null;
     if (calendarHtml.includes("no-times-available-message")) {
         hasAvailability = false;
+    } else {
+        if (process.env.NODE_ENV === "production") {
+            await s3.saveHTMLContent(site.name, calendarHtml);
+            await sendSlackMsg(
+                "bot",
+                "Appointments maybe found at South Lawrence"
+            );
+        }
     }
     // TODO: there are no examples of available slots at this time, so
     // we can only confirm there is no availability
