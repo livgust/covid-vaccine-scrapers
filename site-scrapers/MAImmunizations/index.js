@@ -84,7 +84,12 @@ async function ScrapeWebsiteData(browser) {
                     }
                 });
 
-                const uniqueID = locationName + street + city + zip;
+                const uniqueID =
+                    locationName +
+                    street +
+                    city +
+                    zip +
+                    extraData["Vaccinations offered"];
 
                 if (!results[uniqueID]) {
                     results[uniqueID] = {
