@@ -1,0 +1,11 @@
+# .prettierrc or .prettierrc.yaml
+trailingComma: "es5"
+tabWidth: 4
+semi: true
+singleQuote: false
+arrowParens: "always"
+endOfLine: "auto"
+overrides:
+  - files: "*.yaml"
+    options:
+      tabWidth: 2

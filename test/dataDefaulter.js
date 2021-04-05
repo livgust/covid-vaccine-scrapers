@@ -1,5 +1,8 @@
 const assert = require("assert");
 const dataDefaulter = require("./../data/dataDefaulter");
+const moment = require("moment");
+
+// NOTE: Timestamps don't really matter in these tests, as long as they exist.
 
 const realisticTestData = [
     {
@@ -12,6 +15,7 @@ const realisticTestData = [
         signUpLink: "https://myhealth.atriushealth.org/fr/",
         availability: {},
         hasAvailability: false,
+        timestamp: moment().local(),
     },
     {
         id: 24181,
@@ -31,6 +35,7 @@ const realisticTestData = [
                 hasAvailability: false,
             },
         },
+        timestamp: moment().local(),
     },
 ];
 
@@ -53,6 +58,7 @@ const realisticDefaultData = [
                 hasAvailability: false,
             },
         },
+        timestamp: moment().local(),
     },
     {
         name: "Family Practice Group",
@@ -62,10 +68,11 @@ const realisticDefaultData = [
         website: "https://bookfpg.timetap.com/#/",
         signUpLink: "https://bookfpg.timetap.com/#/",
         hasAvailability: false,
+        timestamp: moment().local(),
     },
 ];
 
-describe("Simple behavior", () => {
+describe("dataDefaulter Simple behavior", () => {
     it("should return scraped results when no cache values are present", () => {
         assert.deepStrictEqual(
             dataDefaulter.mergeResults(realisticTestData, []),
@@ -80,7 +87,7 @@ describe("Simple behavior", () => {
     });
 });
 
-describe("Conditionally inserting defaults", () => {
+describe("dataDefaulter Conditionally inserting defaults", () => {
     const finalResults = dataDefaulter.mergeResults(
         realisticTestData,
         realisticDefaultData
@@ -100,7 +107,7 @@ describe("Conditionally inserting defaults", () => {
     });
 });
 
-describe("Tolerance for stale data", () => {
+describe("dataDefaulter Tolerance for stale data", () => {
     const secondsOfTolerance = 60;
     it("does not include stale data if specified", () => {
         const timestampedDefault = {
@@ -133,7 +140,7 @@ describe("Tolerance for stale data", () => {
     });
 });
 
-describe("Key generator", () => {
+describe("dataDefaulter Key generator", () => {
     it("generates the expected key", () => {
         assert.strictEqual(
             dataDefaulter.generateKey(realisticTestData[1]),

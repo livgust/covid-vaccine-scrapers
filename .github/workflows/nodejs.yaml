@@ -1,0 +1,44 @@
+name: Workflow 1 - Run Test Suite
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - name: Install chromium browser
+        run: |
+          sudo apt-get -q -y update
+          sudo apt-get -q -y install chromium-browser
+      - name: Set timezone to America/New_York
+        run: sudo timedatectl set-timezone America/New_York
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - name: Run test suite
+        env:
+          DEVELOPMENT: true
+          CHROMEPATH: /usr/bin/chromium-browser
+          FAUNA_DB: ${{ secrets.FAUNA_DB_DEV }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          if [ -z "${{ secrets.FAUNA_DB_DEV }}" ] || [ -z "${{ secrets.GOOGLE_API_KEY }}" ]
+          then
+            echo "\$FAUNA_DB_DEV or \$GOOGLE_API_KEY secret does not exist, skipping Fauna tests"
+            npm test --  --exclude **/db-utils-test.js
+          else
+            echo "Necessary secrets exist, running all tests"
+            npm test
+          fi
+      - run: npx prettier --check ./
+      - run: npm run verifyLockfile
