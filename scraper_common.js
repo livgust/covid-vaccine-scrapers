@@ -161,8 +161,7 @@ async function execute(usePuppeteer, scrapers) {
         };
 
         const webData = JSON.stringify(responseJson);
-
-        if (process.env.DEVELOPMENT) {
+        if (process.env.NODE_ENV !== "production") {
             const outFile = usePuppeteer ? "out.json" : "out_no_browser.json";
             console.log(
                 "The data that would be published is in '" + outFile + "'"
@@ -202,7 +201,7 @@ async function execute(usePuppeteer, scrapers) {
             return uploadResponse;
         }
     };
-    await gatherData();
+    return await gatherData();
 }
 
 module.exports = { execute };

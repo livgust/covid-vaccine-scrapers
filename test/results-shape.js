@@ -106,15 +106,19 @@ describe("shape of return object", async function () {
         console.log = () => {};
         sinon
             .stub(getGeocode, "getAllCoordinates")
-            .callsFake((locations, ...rest) =>
-                locations.map((location) => ({
+            .callsFake((locations, ...rest) => {
+                return locations.map((location) => ({
                     ...location,
                     latitude: 100,
                     longitude: -100,
-                }))
-            );
-        results = await require("../scraper").handler();
-        const results_no_browser = await require("../scrapers_no_browser").handler();
+                }));
+            });
+        results = await require("../scraper")
+            .handler()
+            .then((res) => res.results);
+        const results_no_browser = await require("../scrapers_no_browser")
+            .handler()
+            .then((res) => res.results);
         results = [...results, ...results_no_browser];
         finalNumberTests = results.length;
         console.log = originalConsole;
