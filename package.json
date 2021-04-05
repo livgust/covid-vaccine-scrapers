@@ -39,7 +39,7 @@
     },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",
-        "test": "mocha --exit",
+        "test": "mocha --recursive --exit",
         "verifyLockfile": "node -e \"if(require('./package-lock.json').lockfileVersion !== 2) {process.exit(1);};\""
     }
 }

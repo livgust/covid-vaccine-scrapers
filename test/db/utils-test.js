@@ -6,7 +6,8 @@ const expect = chai.expect;
 const lodash = require("lodash");
 
 describe("FaunaDB Utils", function () {
-    const dbUtils = require("../lib/db-utils");
+    const dbUtils = require("../../lib/db/utils");
+    const scraperTransactions = require("../../lib/db/scraper_data");
     it("can create, retrieve, and delete docs from Locations collection (once doc at a time)", async () => {
         const randomName = Math.random().toString(36).substring(7);
         const collectionName = "locations";
@@ -15,7 +16,7 @@ describe("FaunaDB Utils", function () {
             address: { street: "1 Main St", city: "Newton", zip: "02458" },
             signUpLink: "www.google.com",
         };
-        const generatedId = dbUtils.generateLocationId({
+        const generatedId = scraperTransactions.generateLocationId({
             name: location.name,
             steet: location.address.street,
             city: location.address.city,
@@ -30,7 +31,7 @@ describe("FaunaDB Utils", function () {
             dbUtils.checkItemExistsByRefId(collectionName, generatedId)
         ).to.eventually.be.false;
 
-        await dbUtils.writeLocationByRefId({
+        await scraperTransactions.writeLocationByRefId({
             refId: generatedId,
             ...location,
         });
@@ -86,7 +87,7 @@ describe("FaunaDB Utils", function () {
                 signUpLink: "www.google.com",
             },
         ];
-        const locationsWithRefIds = dbUtils.addGeneratedIdsToLocations(
+        const locationsWithRefIds = scraperTransactions.addGeneratedIdsToLocations(
             locations
         );
         const locationRefIds = locationsWithRefIds.map((loc) => loc.refId);
@@ -99,7 +100,7 @@ describe("FaunaDB Utils", function () {
             dbUtils.checkItemsExistByRefIds(collectionName, locationRefIds)
         ).to.eventually.deep.equal([false, false]);
 
-        await dbUtils.writeLocationsByRefIds(locationsWithRefIds);
+        await scraperTransactions.writeLocationsByRefIds(locationsWithRefIds);
 
         await expect(
             dbUtils.checkItemsExistByRefIds(collectionName, locationRefIds)
@@ -181,12 +182,12 @@ describe("FaunaDB Utils", function () {
         };
 
         // Write the appopriate location (if it's not already there), scaperRun, and appointment(s)
-        await dbUtils.writeScrapedData(scraperOutput);
+        await scraperTransactions.writeScrapedData(scraperOutput);
 
         // sleep while the DB writing happens...
         await new Promise((r) => setTimeout(r, 1000));
 
-        const locationId = dbUtils.generateLocationId({
+        const locationId = scraperTransactions.generateLocationId({
             name: scraperOutput.name,
             street: scraperOutput.street,
             city: scraperOutput.city,
@@ -224,7 +225,7 @@ describe("FaunaDB Utils", function () {
             },
         });
         // assert that the scraper run is there (check index)
-        const retrieveScraperRunResult = await dbUtils.getScraperRunsByLocation(
+        const retrieveScraperRunResult = await scraperTransactions.getScraperRunsByLocation(
             locationId
         );
         expect(retrieveScraperRunResult).to.be.shallowDeepEqual({
@@ -265,7 +266,7 @@ describe("FaunaDB Utils", function () {
         const scraperRunRef = retrieveScraperRunResult.data[0].ref.value.id;
 
         // assert that the appointmentAvailability is there
-        const retrieveAppointmentsResult = await dbUtils.getAppointmentsByScraperRun(
+        const retrieveAppointmentsResult = await scraperTransactions.getAppointmentsByScraperRun(
             scraperRunRef
         );
 
@@ -366,12 +367,12 @@ describe("FaunaDB Utils", function () {
             },
         ];
         // Write the appopriate location (if it's not already there), scaperRun, and appointment(s)
-        await dbUtils.writeScrapedDataBatch(locations, timestamp);
+        await scraperTransactions.writeScrapedDataBatch(locations, timestamp);
 
         // sleep while the DB writing happens...
         await new Promise((r) => setTimeout(r, 1000));
 
-        const locationsWithRefIds = dbUtils.addGeneratedIdsToLocations(
+        const locationsWithRefIds = scraperTransactions.addGeneratedIdsToLocations(
             locations
         );
         const locationRefIds = locationsWithRefIds.map((loc) => loc.refId);
@@ -424,7 +425,7 @@ describe("FaunaDB Utils", function () {
             },
         ]);
         // assert that the scraper run is there (check index)
-        const retrieveScraperRunsResult = await dbUtils.getScraperRunsByLocations(
+        const retrieveScraperRunsResult = await scraperTransactions.getScraperRunsByLocations(
             locationsWithRefIds
         );
 
@@ -471,7 +472,7 @@ describe("FaunaDB Utils", function () {
             },
         ]);
 
-        const retrieveAppointmentsResult = await dbUtils.getAppointmentsByScraperRuns(
+        const retrieveAppointmentsResult = await scraperTransactions.getAppointmentsByScraperRuns(
             scraperRunRefs
         );
 
@@ -546,8 +547,8 @@ describe("FaunaDB Utils", function () {
         await dbUtils.deleteItemsByRefIds("appointments", appointmentRefIds);
     }).timeout(5000);
 
-    it("can get the availability for all locations' most recent scraper runs", async () => {
-        await dbUtils.getAppointmentsForAllLocations();
+    it.skip("can get the availability for all locations' most recent scraper runs", async () => {
+        await scraperTransactions.getAppointmentsForAllLocations();
         // the logic isn't here yet.
     });
 });
