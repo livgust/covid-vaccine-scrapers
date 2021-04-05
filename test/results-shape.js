@@ -1,5 +1,6 @@
 const assert = require("assert");
-const runner = require("./../main").handler;
+const chai = require("chai");
+const expect = chai.expect;
 
 function signUpLinkValidity(entry) {
     if (entry.signUpLink) {
@@ -27,11 +28,16 @@ const keys = {
         },
     },
     city: { required: true, type: "string" },
+    debug: { optional: true, type: ["string", "object"] },
     extraData: { optional: true, type: ["string", "object"] },
     hasAvailability: { required: true, type: "boolean" },
+    latitude: { required: true, type: "number" },
+    longitude: { required: true, type: "number" },
+    massVax: { optional: true, type: "boolean" },
     name: { required: true, type: "string" },
     restrictions: { optional: true, type: "string" },
     signUpLink: { conditional: signUpLinkValidity, type: "string" },
+    siteTimestamp: { conditional: true, type: ["string", "object"] },
     state: { optional: true, type: "string" },
     street: { optional: true, type: "string" },
     timestamp: { required: true, type: "object" }, // Date() is object type
@@ -69,7 +75,9 @@ describe("shape of return object", async function () {
     before(async () => {
         const originalConsole = console.log;
         console.log = () => {};
-        results = await runner();
+        results = await require("../scraper").handler();
+        const results_no_browser = await require("../scrapers_no_browser").handler();
+        results = [...results, ...results_no_browser];
         console.log = originalConsole;
     });
 

@@ -21,7 +21,7 @@ const s3 = require("./lib/s3");
 const dbUtils = require("./lib/db-utils");
 const moment = require("moment");
 
-WRITE_TO_FAUNA = true;
+const WRITE_TO_FAUNA = true;
 
 async function execute(usePuppeteer, scrapers) {
     const globalStartTime = new Date();

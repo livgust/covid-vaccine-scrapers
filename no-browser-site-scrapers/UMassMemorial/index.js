@@ -11,9 +11,10 @@ module.exports = async function GetAvailableAppointments() {
     const timestamp = new Date();
 
     for (const site of sites) {
+        const { departmentId, ...restSite } = site;
         results.push({
             ...webData[site.departmentID],
-            ...site,
+            ...restSite,
             timestamp,
         });
     }

@@ -3,7 +3,7 @@ const fs = require("fs");
 let scrapers = [];
 
 // args override directory list allowing single site runs, e.g. `node scraper.js MAImmunizations`
-if (process.argv.length > 2) {
+if (process.argv.length > 2 && process.env.NODE_ENV !== "test") {
     for (let i = 2; i < process.argv.length; i++) {
         const scraper = require(`./${process.argv[i]}`);
         scrapers.push({
