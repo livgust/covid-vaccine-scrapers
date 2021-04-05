@@ -157,7 +157,16 @@ async function execute(usePuppeteer, scrapers) {
             // Add geocoding for all locations
             results: await getAllCoordinates(finalResultsArray, cachedResults),
         };
-
+        logGlobalMetric(
+            usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
+            1,
+            new Date()
+        );
+        logGlobalMetric(
+            usePuppeteer ? "Duration" : "NoBrowserDuration",
+            new Date() - globalStartTime,
+            new Date()
+        );
         const webData = JSON.stringify(responseJson);
 
         if (process.env.DEVELOPMENT) {
@@ -165,37 +174,12 @@ async function execute(usePuppeteer, scrapers) {
             console.log(
                 "The data that would be published is in '" + outFile + "'"
             );
-            //console.log("The following data would be published:");
-            //console.dir(responseJson, { depth: null });
             file.write(outFile, webData);
-
-            /* -- Don't record metrics in development --
-            logGlobalMetric(
-                usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
-                1,
-                new Date()
-            );
-            logGlobalMetric(
-                usePuppeteer ? "Duration" : "NoBrowserDuration",
-                new Date() - globalStartTime,
-                new Date()
-            );
-            */
             return responseJson;
         } else {
             const uploadResponse = await s3.saveWebData(
                 webData,
                 responseJson.timestamp
-            );
-            logGlobalMetric(
-                usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
-                1,
-                new Date()
-            );
-            logGlobalMetric(
-                usePuppeteer ? "Duration" : "NoBrowserDuration",
-                new Date() - globalStartTime,
-                new Date()
             );
             return uploadResponse;
         }
