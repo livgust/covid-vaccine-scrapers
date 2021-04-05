@@ -66,10 +66,10 @@ async function execute(usePuppeteer, scrapers) {
                 })
                 .then(async (result) => {
                     const numberAppointments = getTotalNumberOfAppointments(
-                        result.individualLocationData
+                        result?.individualLocationData
                     );
                     await logScraperRun(
-                        result.parentLocationName,
+                        scraper.name,
                         isSuccess,
                         new Date() - startTime,
                         startTime,
