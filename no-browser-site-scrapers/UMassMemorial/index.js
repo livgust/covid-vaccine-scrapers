@@ -6,7 +6,6 @@ const departmentIDs = sites.map((site) => site.departmentID);
 module.exports = async function GetAvailableAppointments() {
     console.log("UMassMemorial starting.");
     const webData = await ScrapeWebsiteData();
-    console.log("UMassMemorial done.");
     const results = [];
     const timestamp = new Date();
 
@@ -14,10 +13,15 @@ module.exports = async function GetAvailableAppointments() {
         results.push({
             ...webData[site.departmentID],
             ...site,
-            timestamp,
         });
     }
-    return results;
+    console.log("UMassMemorial done.");
+    return {
+        parentLocationName: "UMass Memorial",
+        isChain: true,
+        timestamp,
+        individualLocationData: results,
+    };
 };
 
 async function ScrapeWebsiteData() {

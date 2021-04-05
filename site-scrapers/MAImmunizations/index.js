@@ -5,7 +5,11 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
-    return Object.values(webData);
+    return {
+        parentLocationName: "MA Immunizations",
+        timestamp: new Date(),
+        individualLocationData: Object.values(webData),
+    };
 };
 
 async function ScrapeWebsiteData(browser) {
@@ -96,7 +100,6 @@ async function ScrapeWebsiteData(browser) {
                         availability: {}, // added below
                         hasAvailability: false, //possibly updated below - represents global availability
                         extraData: extraData,
-                        timestamp: new Date(),
                     };
                 }
 
