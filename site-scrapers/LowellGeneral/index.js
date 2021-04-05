@@ -11,7 +11,11 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
-    return webData;
+    return {
+        parentLocationName: "Lowell General",
+        timestamp: new Date(),
+        individualLocationData: [webData],
+    };
 };
 
 async function ScrapeWebsiteData(browser) {
@@ -26,7 +30,6 @@ async function ScrapeWebsiteData(browser) {
             hasAvailability,
             availability,
             ...site,
-            timestamp: new Date(),
         };
     }
     const stationSelector = "[id*='time_slots_for_doctor_']";

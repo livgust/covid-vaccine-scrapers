@@ -15,10 +15,14 @@ module.exports = async function GetAvailableAppointments() {
         results.push({
             ...webData[site.departmentID],
             ...site,
-            timestamp,
         });
     }
-    return results;
+    return {
+        parentLocationName: "Boston Medical Center",
+        isChain: true,
+        timestamp,
+        individualLocationData: [results],
+    };
 };
 
 async function ScrapeWebsiteData() {
