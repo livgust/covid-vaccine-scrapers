@@ -5,7 +5,7 @@ const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
 
-describe("Atrius GetAvailabilities", () => {
+describe("Atrius GetAvailabilities", async () => {
     it("should return no availabilities when there is a redirect", async () => {
         const atrius = require("./../no-browser-site-scrapers/Atrius");
         // mock out the redirect that occurs when there Atrius doesn't want to show any slots.
@@ -25,6 +25,7 @@ describe("Atrius GetAvailabilities", () => {
             })
             .and.nested.property("availability")
             .deep.equal({});
+        nock.cleanAll();
     });
 
     it("should return availabilities when there are some.", async () => {
@@ -67,5 +68,6 @@ describe("Atrius GetAvailabilities", () => {
         */
         const result = atrius();
         await expect(result).to.eventually.include(resultingAvailability);
+        nock.cleanAll();
     });
 });
