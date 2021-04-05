@@ -9,7 +9,8 @@ module.exports = async function GetAvailableAppointments(
 ) {
     console.log(`${site.name} starting.`);
     const webData = await GetAllAvailability(availabilityService);
-    const individualLocationData = site.locations.map((loc) => {
+    console.log(`${site.name} done.`);
+    return site.locations.map((loc) => {
         const response = webData[loc.zip] || null;
         return {
             name: `${site.name} (${loc.city} - ${loc.zip})`,
@@ -18,14 +19,9 @@ module.exports = async function GetAvailableAppointments(
             signUpLink: site.website,
             restrictions: `Open to eligible residents of the following neighborhoods: Chelsea (02150), East Boston (02128), Everett (02149), Revere (02151), South End (02118), Winthrop (02152)`,
             ...loc,
+            timestamp: moment().format(),
         };
     });
-    console.log(`${site.name} done.`);
-    return {
-        parentLocationName: "East Boston Neighborhood Health Center",
-        timestamp: moment().format(),
-        individualLocationData,
-    };
 };
 
 async function GetAllAvailability(availabilityService) {

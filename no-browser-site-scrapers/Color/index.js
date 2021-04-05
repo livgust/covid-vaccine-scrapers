@@ -16,14 +16,11 @@ async function GetAvailableAppointments() {
         finalSites.push({
             ...rest,
             ...webData,
+            timestamp: new Date(),
         });
     }
     console.log("Color locations complete");
-    return {
-        parentLocationName: "Color",
-        timestamp: new Date(),
-        individualLocationData: finalSites,
-    };
+    return finalSites;
 }
 
 async function ScrapeWebsiteData(siteName, siteUrl, massVax) {

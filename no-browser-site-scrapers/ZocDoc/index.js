@@ -9,11 +9,7 @@ module.exports = async function GetAvailableAppointments(
     console.log(`${scraperName} starting.`);
     const webData = await ScrapeWebsiteData(fetchService);
     console.log(`${scraperName} done.`);
-    return {
-        parentLocationName: "ZocDoc",
-        timestamp: moment().format(),
-        individualLocationData: webData,
-    };
+    return webData;
 };
 
 function liveFetchService() {
@@ -36,6 +32,7 @@ async function ScrapeWebsiteData(fetchService) {
             ...sites[value[0]],
             ...value[1],
             hasAvailability: Object.keys(value[1].availability).length > 0,
+            timestamp: moment().format(),
         });
     });
 

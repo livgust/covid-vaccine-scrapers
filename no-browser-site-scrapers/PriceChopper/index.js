@@ -5,7 +5,8 @@ const crypto = require("crypto");
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData();
-    const individualLocationData = site.locations.map((loc) => {
+    console.log(`${site.name} done.`);
+    return site.locations.map((loc) => {
         const locHash = md5HashString(loc.street + loc.city);
         const responseLocation = webData[locHash];
         let hasAvailability = false;
@@ -36,15 +37,9 @@ module.exports = async function GetAvailableAppointments() {
             availability,
             signUpLink: site.signUpLink,
             ...loc,
+            timestamp: new Date(),
         };
     });
-    console.log(`${site.name} done.`);
-    return {
-        parentLocationName: "Price Chopper",
-        isChain: true,
-        individualLocationData,
-        timestamp: new Date(),
-    };
 };
 
 function md5HashString(string) {

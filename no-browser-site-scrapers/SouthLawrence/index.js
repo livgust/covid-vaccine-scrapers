@@ -23,14 +23,9 @@ module.exports = async function GetAvailableAppointments() {
 
     console.log("SouthLawrence done.");
     return {
-        parentLocationName: "South Lawrence",
+        ...restLawrence,
+        ...websiteData,
         timestamp: moment().format(),
-        individualLocationData: [
-            {
-                ...restLawrence,
-                ...websiteData,
-            },
-        ],
     };
 };
 

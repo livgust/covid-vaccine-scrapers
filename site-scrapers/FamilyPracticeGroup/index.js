@@ -10,15 +10,10 @@ module.exports = async function GetAvailableAppointments(browser) {
     const data = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
     return {
-        parentLocationName: "Arlington Family Practice Group",
+        ...site,
+        signUpLink: site.website,
+        ...data,
         timestamp: new Date(),
-        individualLocationData: [
-            {
-                ...site,
-                signUpLink: site.website,
-                ...data,
-            },
-        ],
     };
 };
 

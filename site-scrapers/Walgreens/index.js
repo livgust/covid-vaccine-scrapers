@@ -12,12 +12,7 @@ module.exports = async function GetAvailableAppointments(browser) {
         site.locations,
         site.website
     );
-    return {
-        parentLocationName: "Walgreens",
-        isChain: true,
-        timestamp: new Date(),
-        individualLocationData: results,
-    };
+    return results;
 };
 
 async function waitAndClick(page, selector) {

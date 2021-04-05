@@ -10,14 +10,9 @@ module.exports = async function GetAvailableAppointments() {
     const webData = await ScrapeWebsiteData();
     console.log(`${site.name} done.`);
     return {
-        parentLocationName: "South Boston Community Health Center",
+        ...site,
+        ...webData[dept],
         timestamp: new Date(),
-        individualLocationData: [
-            {
-                ...site,
-                ...webData[dept],
-            },
-        ],
     };
 };
 

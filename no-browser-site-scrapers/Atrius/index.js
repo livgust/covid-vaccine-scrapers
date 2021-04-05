@@ -9,14 +9,9 @@ module.exports = async function GetAvailableAppointments() {
     const webData = await ScrapeWebsiteData();
     console.log("Atrius done.");
     return {
-        parentLocationName: "Atrius",
+        ...site,
+        ...webData,
         timestamp: new Date(),
-        individualLocationData: [
-            {
-                ...site,
-                ...webData,
-            },
-        ],
     };
 };
 

@@ -5,15 +5,10 @@ module.exports = async function GetAvailableAppointments(browser) {
     const info = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
     return {
-        parentLocationName: "UMass Amherst",
+        ...site,
+        signUpLink: site.website,
+        ...info,
         timestamp: new Date(),
-        individualLocationData: [
-            {
-                ...site,
-                signUpLink: site.website,
-                ...info,
-            },
-        ],
     };
 };
 

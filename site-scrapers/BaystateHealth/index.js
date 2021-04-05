@@ -14,14 +14,9 @@ module.exports = async function GetAvailableAppointments(browser) {
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
     return {
-        parentLocationName: "Baystate Health",
+        ...site,
+        ...webData,
         timestamp: new Date(),
-        individualLocationData: [
-            {
-                ...site,
-                ...webData,
-            },
-        ],
     };
 };
 

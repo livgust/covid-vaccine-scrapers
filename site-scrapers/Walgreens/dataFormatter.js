@@ -61,6 +61,7 @@ function extendData(availableStores, allStores) {
                 hasAvailability: false,
                 availability: {},
                 ...store,
+                timestamp: new Date(),
             });
         }
     });
