@@ -10,9 +10,10 @@ module.exports = async function GetAvailableAppointments() {
     const timestamp = new Date();
 
     for (const site of sites) {
+        const { departmentID, ...restSite } = site;
         results.push({
             ...webData[site.departmentID],
-            ...site,
+            ...restSite,
         });
     }
     console.log("UMassMemorial done.");

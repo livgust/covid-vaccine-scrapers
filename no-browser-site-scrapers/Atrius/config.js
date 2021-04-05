@@ -1,6 +1,6 @@
 const site = {
     name: "Atrius Health",
-    street: "100 Second Avenue ",
+    street: "100 Second Avenue",
     city: "Needham",
     zip: "02494",
     website: "https://myhealth.atriushealth.org/fr/",

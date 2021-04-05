@@ -14,7 +14,7 @@ describe(`${site.name}`, function () {
             "state",
             "zip",
             "signUpLink",
-            "hasAppointments",
+            "hasAvailability",
             "totalAvailability",
             "timestamp",
         ]);

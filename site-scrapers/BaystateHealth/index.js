@@ -35,7 +35,7 @@ async function ScrapeWebsiteData(browser) {
     const alert = await (alertElement
         ? alertElement.evaluate((node) => node.innerText)
         : false);
-    let hasAppointments = false;
+    let hasAvailability = false;
     let totalAvailability = 0;
     if (!alert) {
         const msg = `${site.name} may have appointments...`;
@@ -45,7 +45,7 @@ async function ScrapeWebsiteData(browser) {
     }
 
     return {
-        hasAppointments: hasAppointments,
-        totalAvailability: totalAvailability,
+        hasAvailability,
+        totalAvailability,
     };
 }

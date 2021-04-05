@@ -26,7 +26,6 @@ module.exports = async function GetAvailableAppointments() {
     const individualLocationData = site.locations.map((loc) => {
         const data = rawData[loc.id];
         const results = {
-            id: loc.id,
             name: data.name,
             street: (
                 data.street_address_1 +

@@ -19,7 +19,7 @@ describe("Atrius GetAvailabilities", () => {
            "availability: {}
           }
         */
-        return expect(atrius())
+        return expect(atrius().then((res) => res.individualLocationData[0]))
             .to.eventually.deep.include({
                 hasAvailability: false,
             })
@@ -74,7 +74,7 @@ describe("Atrius GetAvailabilities", () => {
            }
           }
         */
-        result = atrius();
+        const result = atrius().then((res) => res.individualLocationData[0]);
         expect(result).to.eventually.include(resultingAvailability);
         done();
     });

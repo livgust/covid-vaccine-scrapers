@@ -50,9 +50,9 @@ describe("ZocDoc Provider availability test using scraper and canned data", func
             false,
             false,
         ];
-        const hasAvailability = Object.values(results).map(
-            (result) => result.hasAvailability
-        );
+        const hasAvailability = Object.values(
+            results.individualLocationData
+        ).map((result) => result.hasAvailability);
         const afterTime = moment();
 
         expect(hasAvailability).is.deep.equal(expected);
@@ -64,7 +64,7 @@ describe("ZocDoc Provider availability test using scraper and canned data", func
             and after when the scraper was executed
         - Each site's results object must have a property named "hasAvailability"
          */
-        results.forEach((result) => {
+        results.individualLocationData.forEach((result) => {
             expect(moment(result.timestamp).isBetween(beforeTime, afterTime));
             expect(result.hasAvailability).is.not.undefined;
         });

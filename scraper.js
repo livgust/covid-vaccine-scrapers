@@ -6,12 +6,12 @@ const scrapers = require("./site-scrapers");
 const scraperCommon = require("./scraper_common.js");
 
 async function executeScrapers() {
-    await scraperCommon.execute(true, scrapers);
+    return await scraperCommon.execute(true, scrapers);
 }
 
 exports.handler = executeScrapers;
 
-if (process.env.DEVELOPMENT) {
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test") {
     (async () => {
         console.log("DEV MODE");
         await executeScrapers();
