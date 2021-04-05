@@ -21,7 +21,7 @@ module.exports = async function GetAvailableAppointments() {
         parentLocationName: "Boston Medical Center",
         isChain: true,
         timestamp,
-        individualLocationData: [results],
+        individualLocationData: results,
     };
 };
 
