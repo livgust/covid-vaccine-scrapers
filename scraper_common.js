@@ -128,12 +128,14 @@ async function execute(usePuppeteer, scrapers) {
             }
         }
 
-        const cachedResults = await fetch(
-            "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
-        )
-            .then((res) => res.json())
-            .then((unpack) => JSON.parse(unpack.body).results);
-
+        let cachedResults;
+        if (process.env.NODE_ENV !== "test") {
+            cachedResults = await fetch(
+                "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
+            )
+                .then((res) => res.json())
+                .then((unpack) => JSON.parse(unpack.body).results);
+        }
         let finalResultsArray = [];
         if (process.argv.length <= 2) {
             // Only add default data if we're not testing individual scrapers.
