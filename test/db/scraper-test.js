@@ -5,7 +5,6 @@ const getGeocode = require("../../getGeocode");
 const dbUtils = require("../../lib/db/utils");
 const scraperUtils = require("../../lib/db/scraper_data");
 const moment = require("moment");
-const { writeAppointmentsByRefId } = require("../../lib/db/scraper_data");
 
 describe("writeScrapedData", async () => {
     it("maps data correctly to the write functions", async () => {
@@ -39,18 +38,15 @@ describe("writeScrapedData", async () => {
         const generateIdStub = sinon.stub(dbUtils, "generateId").returns("234");
         sinon.stub(dbUtils, "checkItemExistsByRefId").returns(false);
         sinon.stub(getGeocode, "getGeocode").returns(null);
-        const writeLocationByRefIdStub = sinon.stub(
-            scraperUtils,
-            "writeLocationByRefId"
-        );
-        const writeScraperRunByRefIdStub = sinon.stub(
-            scraperUtils,
-            "writeScraperRunByRefId"
-        );
-        const writeAppointmentsByRefIdStub = sinon.stub(
-            scraperUtils,
-            "writeAppointmentsByRefId"
-        );
+        const writeLocationByRefIdStub = sinon
+            .stub(scraperUtils, "writeLocationByRefId")
+            .returns(Promise.resolve());
+        const writeScraperRunStub = sinon
+            .stub(scraperUtils, "writeScraperRun")
+            .returns(Promise.resolve({ ref: { id: "234" } }));
+        const writeAppointmentsEntryStub = sinon
+            .stub(scraperUtils, "writeAppointmentsEntry")
+            .returns(Promise.resolve());
 
         await scraperUtils.writeScrapedData(exampleData);
 
@@ -79,17 +75,15 @@ describe("writeScrapedData", async () => {
                 massVax: false,
             },
         ]);
-        expect(writeScraperRunByRefIdStub.lastCall.args).to.deep.equal([
+        expect(writeScraperRunStub.lastCall.args).to.deep.equal([
             {
-                refId: "234",
                 locationRefId: "123",
                 timestamp: exampleTimestamp,
                 siteTimestamp: undefined,
             },
         ]);
-        expect(writeAppointmentsByRefIdStub.lastCall.args).to.deep.equal([
+        expect(writeAppointmentsEntryStub.lastCall.args).to.deep.equal([
             {
-                refId: "234",
                 scraperRunRefId: "234",
                 date: "4/5/21",
                 numberAvailable: 42,

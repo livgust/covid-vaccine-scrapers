@@ -147,38 +147,44 @@ describe("FaunaDB Utils", function () {
     it("given one scraper's output, can create, retrieve, and delete docs from Locations, ScraperRuns, and Appointments collections", async () => {
         const randomName = Math.random().toString(36).substring(7);
         const scraperOutput = {
-            name: `RandomName-${randomName}`,
-            street: "2240 Iyannough Road",
-            city: "West Barnstable",
-            zip: "02668",
-            availability: {
-                "03/16/2021": {
-                    hasAvailability: true,
-                    numberAvailableAppointments: 2,
-                    signUpLink: "fake-signup-link-2",
-                },
-                "03/17/2021": {
-                    hasAvailability: true,
-                    numberAvailableAppointments: 1,
-                    signUpLink: null,
-                },
-                "03/18/2021": true,
-                "03/19/2021": false,
-                "03/20/2021": {
-                    hasAvailability: true,
-                    numberAvailableAppointments: 0,
-                },
-            },
-            hasAvailability: true,
-            extraData: {
-                "Vaccinations offered": "Pfizer-BioNTech COVID-19 Vaccine",
-                "Age groups served": "Adults",
-                "Services offered": "Vaccination",
-                "Additional Information": "Pfizer vaccine",
-                "Clinic Hours": "10:00 am - 03:00 pm",
-            },
+            parentLocationName: "Parent Location",
             timestamp: "2021-03-16T13:15:27.318Z",
-            signUpLink: "fake-signup-link",
+            individualLocationData: [
+                {
+                    name: `RandomName-${randomName}`,
+                    street: "2240 Iyannough Road",
+                    city: "West Barnstable",
+                    zip: "02668",
+                    availability: {
+                        "03/16/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 2,
+                            signUpLink: "fake-signup-link-2",
+                        },
+                        "03/17/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 1,
+                            signUpLink: null,
+                        },
+                        "03/18/2021": true,
+                        "03/19/2021": false,
+                        "03/20/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 0,
+                        },
+                    },
+                    hasAvailability: true,
+                    extraData: {
+                        "Vaccinations offered":
+                            "Pfizer-BioNTech COVID-19 Vaccine",
+                        "Age groups served": "Adults",
+                        "Services offered": "Vaccination",
+                        "Additional Information": "Pfizer vaccine",
+                        "Clinic Hours": "10:00 am - 03:00 pm",
+                    },
+                    signUpLink: "fake-signup-link",
+                },
+            ],
         };
 
         // Write the appopriate location (if it's not already there), scaperRun, and appointment(s)
@@ -188,10 +194,10 @@ describe("FaunaDB Utils", function () {
         await new Promise((r) => setTimeout(r, 1000));
 
         const locationId = scraperTransactions.generateLocationId({
-            name: scraperOutput.name,
-            street: scraperOutput.street,
-            city: scraperOutput.city,
-            zip: scraperOutput.zip,
+            name: scraperOutput.individualLocationData[0].name,
+            street: scraperOutput.individualLocationData[0].street,
+            city: scraperOutput.individualLocationData[0].city,
+            zip: scraperOutput.individualLocationData[0].zip,
         });
         const retrieveLocationResult = await dbUtils.retrieveItemByRefId(
             "locations",
@@ -214,14 +220,14 @@ describe("FaunaDB Utils", function () {
                 },
             },
             data: {
-                name: scraperOutput.name,
+                name: scraperOutput.individualLocationData[0].name,
                 address: {
-                    street: scraperOutput.street,
-                    city: scraperOutput.city,
-                    zip: scraperOutput.zip,
+                    street: scraperOutput.individualLocationData[0].street,
+                    city: scraperOutput.individualLocationData[0].city,
+                    zip: scraperOutput.individualLocationData[0].zip,
                 },
-                signUpLink: scraperOutput.signUpLink,
-                extraData: scraperOutput.extraData,
+                signUpLink: scraperOutput.individualLocationData[0].signUpLink,
+                extraData: scraperOutput.individualLocationData[0].extraData,
             },
         });
         // assert that the scraper run is there (check index)
@@ -283,11 +289,9 @@ describe("FaunaDB Utils", function () {
             {
                 date: "03/17/2021",
                 numberAvailable: 1,
-                signUpLink: "fake-signup-link",
             },
             {
                 date: "03/18/2021",
-                signUpLink: "fake-signup-link",
             },
         ]);
         const appointmentRefIds = retrieveAppointmentsResult.data.map(
