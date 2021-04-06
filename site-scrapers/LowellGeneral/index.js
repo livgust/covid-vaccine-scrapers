@@ -11,22 +11,26 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
-    return webData;
+    return {
+        parentLocationName: "Lowell General",
+        timestamp: new Date(),
+        individualLocationData: [webData],
+    };
 };
 
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
     await page.goto(site.startUrl, { waitUntil: "networkidle0" });
-    const noAppointments = (await page.content()).match(site.noAppointments);
+    const { noAppointments, startUrl, ...restSite } = site;
+    const noAppointmentsMatch = (await page.content()).match(noAppointments);
     let hasAvailability = false;
     let availability = {};
-    if (noAppointments) {
+    if (noAppointmentsMatch) {
         // This is so we avoid timing out when there aren't any appointments
         return {
             hasAvailability,
             availability,
-            ...site,
-            timestamp: new Date(),
+            ...restSite,
         };
     }
     const stationSelector = "[id*='time_slots_for_doctor_']";

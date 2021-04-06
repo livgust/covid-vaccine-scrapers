@@ -1,5 +1,6 @@
 const { scraperName, sites } = require("./config");
 const helper = require("./zocdocBase");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(
     _ignored,
@@ -8,7 +9,11 @@ module.exports = async function GetAvailableAppointments(
     console.log(`${scraperName} starting.`);
     const webData = await ScrapeWebsiteData(fetchService);
     console.log(`${scraperName} done.`);
-    return webData;
+    return {
+        parentLocationName: "ZocDoc",
+        timestamp: moment().format(),
+        individualLocationData: webData,
+    };
 };
 
 function liveFetchService() {

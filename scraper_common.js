@@ -18,7 +18,7 @@ const file = require("./lib/file");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
-const dbUtils = require("./lib/db-utils");
+const { writeScrapedData } = require("./lib/db/scraper_data");
 const moment = require("moment");
 const AWS = require("aws-sdk");
 const { Lambda } = require("faunadb");
@@ -66,7 +66,7 @@ async function execute(usePuppeteer, scrapers) {
                 return null;
             });
             const numberAppointments = getTotalNumberOfAppointments(
-                returnValue
+                returnValue?.individualLocationData
             );
             await logScraperRun(
                 scraper.name,
@@ -75,72 +75,48 @@ async function execute(usePuppeteer, scrapers) {
                 startTime,
                 numberAppointments
             );
-            results.push(returnValue);
+            results.push(returnValue?.individualLocationData);
             // Coerce the results into the format we want.
             let returnValueArray = [];
-            if (Array.isArray(returnValue)) {
-                returnValueArray = returnValue;
-            } else if (returnValue) {
-                returnValueArray = [returnValue];
+            if (Array.isArray(returnValue?.individualLocationData)) {
+                returnValueArray = returnValue.individualLocationData;
+            } else if (returnValue?.individualLocationData) {
+                returnValueArray = [returnValue.individualLocationData];
             }
             // Write the data to FaunaDB.
             if (WRITE_TO_FAUNA && process.env.FAUNA_DB) {
                 try {
-                    await Promise.all(
-                        returnValueArray.map(async (res) => {
-                            await dbUtils
-                                .writeScrapedData({
-                                    name: res.name,
-                                    street: res.street,
-                                    city: res.city,
-                                    zip: res.zip,
-                                    bookableAppointmentsFound: getTotalNumberOfAppointments(
-                                        res
-                                    ),
-                                    availability: res.availability,
-                                    hasAvailability: res.availability,
-                                    extraData: res.extraData,
-                                    timestamp: moment().utc().format(),
-                                    signUpLink: res.signUpLink,
-                                    restrictions: res.restrictions,
-                                    massVax: res.massVax,
-                                    siteTimestamp: res.siteTimestamp
-                                        ? JSON.parse(
-                                              JSON.stringify(res.siteTimestamp)
-                                          )
-                                        : null,
-                                })
-                                .then(({ scraperRunRefId, locationRefId }) => {
-                                    if (process.env.NODE_ENV === "production") {
-                                        alertsLambda.invoke(
-                                            {
-                                                FunctionName:
-                                                    process.env
-                                                        .ALERTSFUNCTIONNAME,
-                                                InvocationType: "Event",
-                                                Payload: JSON.stringify({
-                                                    scraperRunRefId,
-                                                    locationRefId,
-                                                    bookableAppointmentsFound: getTotalNumberOfAppointments(
-                                                        res
-                                                    ),
-                                                }),
-                                            },
-                                            () => {}
-                                        );
-                                    } else {
-                                        console.log(
-                                            "would call alerting function with the following args:"
-                                        );
-                                        console.log({
-                                            scraperRunRefId,
-                                            locationRefId,
-                                            bookableAppointmentsFound: numberAppointments,
-                                        });
-                                    }
-                                });
-                        })
-                    );
+                    if (returnValue) {
+                        await writeScrapedData(returnValue) //NEED TO RETHINK BELOW CALL
+                            .then(({ scraperRunRefId, locationRefId }) => {
+                                if (process.env.NODE_ENV === "production") {
+                                    alertsLambda.invoke(
+                                        {
+                                            FunctionName:
+                                                process.env.ALERTSFUNCTIONNAME,
+                                            InvocationType: "Event",
+                                            Payload: JSON.stringify({
+                                                scraperRunRefId,
+                                                locationRefId,
+                                                bookableAppointmentsFound: getTotalNumberOfAppointments(
+                                                    returnValue //TODO this is wrong now
+                                                ),
+                                            }),
+                                        },
+                                        () => {}
+                                    );
+                                } else {
+                                    console.log(
+                                        "would call alerting function with the following args:"
+                                    );
+                                    console.log({
+                                        scraperRunRefId,
+                                        locationRefId,
+                                        bookableAppointmentsFound: numberAppointments,
+                                    });
+                                }
+                            });
+                    }
                 } catch (e) {
                     console.error("Failed to write to Fauna, got error:", e);
                 }
@@ -159,12 +135,14 @@ async function execute(usePuppeteer, scrapers) {
             }
         }
 
-        const cachedResults = await fetch(
-            "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
-        )
-            .then((res) => res.json())
-            .then((unpack) => JSON.parse(unpack.body).results);
-
+        let cachedResults;
+        if (process.env.NODE_ENV !== "test") {
+            cachedResults = await fetch(
+                "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
+            )
+                .then((res) => res.json())
+                .then((unpack) => JSON.parse(unpack.body).results);
+        }
         let finalResultsArray = [];
         if (process.argv.length <= 2) {
             // Only add default data if we're not testing individual scrapers.
@@ -188,50 +166,33 @@ async function execute(usePuppeteer, scrapers) {
             // Add geocoding for all locations
             results: await getAllCoordinates(finalResultsArray, cachedResults),
         };
-
+        logGlobalMetric(
+            usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
+            1,
+            new Date()
+        );
+        logGlobalMetric(
+            usePuppeteer ? "Duration" : "NoBrowserDuration",
+            new Date() - globalStartTime,
+            new Date()
+        );
         const webData = JSON.stringify(responseJson);
-
-        if (process.env.DEVELOPMENT) {
+        if (process.env.NODE_ENV !== "production") {
             const outFile = usePuppeteer ? "out.json" : "out_no_browser.json";
             console.log(
                 "The data that would be published is in '" + outFile + "'"
             );
-            //console.log("The following data would be published:");
-            //console.dir(responseJson, { depth: null });
             file.write(outFile, webData);
-
-            /* -- Don't record metrics in development --
-            logGlobalMetric(
-                usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
-                1,
-                new Date()
-            );
-            logGlobalMetric(
-                usePuppeteer ? "Duration" : "NoBrowserDuration",
-                new Date() - globalStartTime,
-                new Date()
-            );
-            */
             return responseJson;
         } else {
             const uploadResponse = await s3.saveWebData(
                 webData,
                 responseJson.timestamp
             );
-            logGlobalMetric(
-                usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
-                1,
-                new Date()
-            );
-            logGlobalMetric(
-                usePuppeteer ? "Duration" : "NoBrowserDuration",
-                new Date() - globalStartTime,
-                new Date()
-            );
             return uploadResponse;
         }
     };
-    await gatherData();
+    return await gatherData();
 }
 
 module.exports = { execute };

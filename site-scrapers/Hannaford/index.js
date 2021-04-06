@@ -5,8 +5,7 @@ const moment = require("moment");
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await rxTouch.ScrapeRxTouch(browser, site, site.name);
-    console.log(`${site.name} done.`);
-    return site.locations.map((loc) => {
+    const individualLocationData = site.locations.map((loc) => {
         const response = webData[loc.zip];
         return {
             name: `${site.name} (${loc.city})`,
@@ -16,7 +15,13 @@ module.exports = async function GetAvailableAppointments(browser) {
             availability: response.availability,
             signUpLink: site.website,
             ...loc,
-            timestamp: moment().format(),
         };
     });
+    console.log(`${site.name} done.`);
+    return {
+        parentLocationName: "Hannaford",
+        isChain: true,
+        timestamp: moment().format(),
+        individualLocationData,
+    };
 };

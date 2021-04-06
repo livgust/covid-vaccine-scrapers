@@ -36,6 +36,8 @@ describe("PriceChopper GetAvailabilities", () => {
 
         // run the test and assert that the result containss availability:
         const result = await scraper();
-        return expect(result).to.containSubset(resultingAvailability);
+        return expect(result.individualLocationData).to.containSubset(
+            resultingAvailability
+        );
     }).timeout(60000);
 });

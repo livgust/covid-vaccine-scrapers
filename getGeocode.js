@@ -28,7 +28,7 @@ const getGeocode = async (name, street, zip) => {
     }
 };
 
-const getAllCoordinates = async (locations, cachedResults) => {
+const getAllCoordinates = async (locations, cachedResults = {}) => {
     const existingLocations = cachedResults.reduce((acc, location) => {
         const { latitude, longitude } = location;
         if (latitude && longitude) {

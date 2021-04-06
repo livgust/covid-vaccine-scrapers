@@ -8,16 +8,21 @@ const noAppointmentMatchString =
  * site
  *
  * @param browser created when Puppeteer connects to a Chromium instance
- * @return JSON blob with { hasAppointments: Bool, totalAvailability: Int }
+ * @return JSON blob with { hasAvailability: Bool, totalAvailability: Int }
  */
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
     return {
-        ...site,
-        ...webData,
+        parentLocationName: "Heywood Healthcare",
         timestamp: new Date(),
+        individualLocationData: [
+            {
+                ...site,
+                ...webData,
+            },
+        ],
     };
 };
 
@@ -26,7 +31,7 @@ module.exports = async function GetAvailableAppointments(browser) {
  * site
  *
  * @param browser created when Puppeteer connects to a Chromium instance
- * @return JSON blob with { hasAppointments: Bool, totalAvailability: Int }
+ * @return JSON blob with { hasAvailability: Bool, totalAvailability: Int }
  */
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
@@ -37,7 +42,7 @@ async function ScrapeWebsiteData(browser) {
     const alert = await (alertElement
         ? alertElement.evaluate((node) => node.innerText)
         : false);
-    let hasAppointments = false;
+    let hasAvailability = false;
     let totalAvailability = 0;
     let date = false;
     if (!alert) {
@@ -62,12 +67,12 @@ async function ScrapeWebsiteData(browser) {
         });
 
         if (totalAvailability > 0) {
-            hasAppointments = true;
+            hasAvailability = true;
         }
     }
 
     return {
-        hasAppointments: hasAppointments,
-        totalAvailability: totalAvailability,
+        hasAvailability,
+        totalAvailability,
     };
 }

@@ -54,7 +54,7 @@ Resources:
       Runtime: nodejs14.x
       CodeUri: .
       MemorySize: 2048
-      Timeout: 180
+      Timeout: 300
       Policies:
         - AWSLambdaBasicExecutionRole
         - CloudWatchPutMetricPolicy: {}

@@ -8,9 +8,15 @@ module.exports = async function GetAvailableAppointments(browser) {
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
     return {
-        ...site,
-        ...webData,
+        parentLocationName: "Wegmans",
+        isChain: true,
         timestamp: moment().format(),
+        individualLocationData: [
+            {
+                ...site,
+                ...webData,
+            },
+        ],
     };
 };
 
