@@ -31,10 +31,12 @@ describe("FaunaDB Utils", function () {
             dbUtils.checkItemExistsByRefId(collectionName, generatedId)
         ).to.eventually.be.false;
 
-        await scraperTransactions.writeLocationByRefId({
-            refId: generatedId,
-            ...location,
-        });
+        await scraperTransactions.writeLocationsByRefIds([
+            {
+                refId: generatedId,
+                ...location,
+            },
+        ]);
 
         await expect(
             dbUtils.checkItemExistsByRefId(collectionName, generatedId)
@@ -74,16 +76,12 @@ describe("FaunaDB Utils", function () {
         const locations = [
             {
                 name: `RandomName-${Math.random().toString(36).substring(7)}`,
-                street: "1 Main St",
-                city: "Newton",
-                zip: "02458",
+                address: { street: "1 Main St", city: "Newton", zip: "02458" },
                 signUpLink: "www.google.com",
             },
             {
                 name: `RandomName-${Math.random().toString(36).substring(7)}`,
-                street: "2 Main St",
-                city: "Newton",
-                zip: "02458",
+                address: { street: "2 Main St", city: "Newton", zip: "02458" },
                 signUpLink: "www.google.com",
             },
         ];
@@ -118,9 +116,9 @@ describe("FaunaDB Utils", function () {
                 data: {
                     name: locations[0].name,
                     address: {
-                        street: locations[0].street,
-                        city: locations[0].city,
-                        zip: locations[0].zip,
+                        street: locations[0].address.street,
+                        city: locations[0].address.city,
+                        zip: locations[0].address.zip,
                     },
                     signUpLink: locations[0].signUpLink,
                 },
@@ -129,9 +127,9 @@ describe("FaunaDB Utils", function () {
                 data: {
                     name: locations[1].name,
                     address: {
-                        street: locations[1].street,
-                        city: locations[1].city,
-                        zip: locations[1].zip,
+                        street: locations[1].address.street,
+                        city: locations[1].address.city,
+                        zip: locations[1].address.zip,
                     },
                     signUpLink: locations[1].signUpLink,
                 },
