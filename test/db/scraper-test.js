@@ -102,6 +102,7 @@ describe("writeScrapedData", async () => {
             [
                 {
                     refId: "234",
+                    parentScraperRunRefId: "200",
                     locationRefId: "123",
                     timestamp: exampleTimestamp,
                     siteTimestamp: undefined,
