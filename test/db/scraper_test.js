@@ -63,7 +63,7 @@ describe("writeScrapedData", async () => {
         await scraperUtils.writeScrapedData(exampleData);
 
         expect(createOrGetParentLocationStub.lastCall.args).to.deep.equal([
-            "Publix",
+            { name: "Publix", isChain: undefined },
         ]);
 
         expect(writeParentScraperRunStub.lastCall.args).to.deep.equal([
@@ -137,14 +137,20 @@ describe("createOrGetParentLocation", () => {
         );
 
         const parentLocationRefId = await scraperUtils.createOrGetParentLocationRefId(
-            parentLocationName
+            {
+                name: parentLocationName,
+                isChain: true,
+            }
         );
 
         expect(parentLocationRefId, "an entry is created and an ID is returned")
             .to.exist;
 
         await expect(
-            scraperUtils.createOrGetParentLocationRefId(parentLocationName),
+            scraperUtils.createOrGetParentLocationRefId({
+                name: parentLocationName,
+                isChain: true,
+            }),
             "the same entry is returned"
         ).to.eventually.equal(parentLocationRefId);
     });
