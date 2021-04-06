@@ -1,10 +1,13 @@
 const chai = require("chai");
+chai.use(require("chai-as-promised"));
 const expect = chai.expect;
 const sinon = require("sinon");
 const getGeocode = require("../../getGeocode");
 const dbUtils = require("../../lib/db/utils");
 const scraperUtils = require("../../lib/db/scraper_data");
 const moment = require("moment");
+const faunadb = require("faunadb"),
+    fq = faunadb.query;
 
 describe("writeScrapedData", async () => {
     after(() => sinon.restore());
@@ -100,5 +103,50 @@ describe("writeScrapedData", async () => {
                 },
             ],
         ]);
+    });
+});
+
+describe("createOrGetParentLocation", () => {
+    it("creates parent location if it doesn't exist", async () => {
+        const parentLocationName = "Test Location 123";
+
+        //make sure it doesn't exist
+        await dbUtils.faunaQuery(
+            fq.Map(
+                fq.Paginate(
+                    fq.Match("parentLocationsByName", parentLocationName)
+                ),
+                fq.Lambda("x", fq.Delete(fq.Var("x")))
+            )
+        );
+
+        const parentLocationRefId = await scraperUtils.createOrGetParentLocationRefId(
+            parentLocationName
+        );
+
+        expect(parentLocationRefId, "an entry is created and an ID is returned")
+            .to.exist;
+
+        await expect(
+            scraperUtils.createOrGetParentLocationRefId(parentLocationName),
+            "the same entry is returned"
+        ).to.eventually.equal(parentLocationRefId);
+    });
+});
+
+describe("writeParentScraperRun", () => {
+    it("writes successfully", async () => {
+        const timestamp = moment().format();
+        const refId = await scraperUtils.writeParentScraperRun({
+            parentLocationRefId: "123",
+            timestamp,
+        });
+
+        const scraperRun = await dbUtils.retrieveItemByRefId(
+            "parentScraperRuns",
+            refId
+        );
+        expect(scraperRun.data.parentLocationRef.id).to.equal("123");
+        expect(scraperRun.data.timestamp).to.equal(timestamp);
     });
 });
