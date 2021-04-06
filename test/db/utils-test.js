@@ -3,7 +3,6 @@ chai.use(require("chai-as-promised"));
 chai.use(require("chai-shallow-deep-equal"));
 chai.use(require("deep-equal-in-any-order"));
 const expect = chai.expect;
-const lodash = require("lodash");
 
 describe("FaunaDB Utils", function () {
     const dbUtils = require("../../lib/db/utils");
@@ -34,6 +33,7 @@ describe("FaunaDB Utils", function () {
         await scraperTransactions.writeLocationsByRefIds([
             {
                 refId: generatedId,
+                parentLocationRefId: "123",
                 ...location,
             },
         ]);
@@ -75,11 +75,13 @@ describe("FaunaDB Utils", function () {
         const collectionName = "locations";
         const locations = [
             {
+                parentLocationRefId: "100",
                 name: `RandomName-${Math.random().toString(36).substring(7)}`,
                 address: { street: "1 Main St", city: "Newton", zip: "02458" },
                 signUpLink: "www.google.com",
             },
             {
+                parentLocationRefId: "100",
                 name: `RandomName-${Math.random().toString(36).substring(7)}`,
                 address: { street: "2 Main St", city: "Newton", zip: "02458" },
                 signUpLink: "www.google.com",
@@ -108,9 +110,17 @@ describe("FaunaDB Utils", function () {
             collectionName,
             locationRefIds
         );
-        const filteredResults = retrieveResult.map(
-            (entry) => lodash.omit(entry, ["ts", "ref"]) // remove the timestamp and reference, too complicated to check against
-        );
+        const filteredResults = retrieveResult.map((entry) => {
+            const { ts, ref, ...rest } = entry;
+            const { parentLocationRef, ...restData } = rest.data;
+            return {
+                ...rest,
+                data: {
+                    ...restData,
+                    parentLocationRefId: parentLocationRef.id,
+                },
+            };
+        });
         expect(filteredResults).to.have.deep.members([
             {
                 data: {
@@ -121,6 +131,7 @@ describe("FaunaDB Utils", function () {
                         zip: locations[0].address.zip,
                     },
                     signUpLink: locations[0].signUpLink,
+                    parentLocationRefId: "100",
                 },
             },
             {
@@ -132,6 +143,7 @@ describe("FaunaDB Utils", function () {
                         zip: locations[1].address.zip,
                     },
                     signUpLink: locations[1].signUpLink,
+                    parentLocationRefId: "100",
                 },
             },
         ]);
@@ -274,9 +286,10 @@ describe("FaunaDB Utils", function () {
             scraperRunRef
         );
 
-        const filteredResults = retrieveAppointmentsResult.data.map(
-            (entry) => lodash.omit(entry.data, ["scraperRunRef"]) // this was too complicated to check against.
-        );
+        const filteredResults = retrieveAppointmentsResult.data.map((entry) => {
+            const { scraperRunRef, ...rest } = entry;
+            return rest;
+        });
 
         expect(filteredResults).to.have.deep.members([
             {

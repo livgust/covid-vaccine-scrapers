@@ -44,6 +44,12 @@ describe("writeScrapedData", async () => {
         sinon.stub(dbUtils, "checkItemExistsByRefId").returns(false);
         sinon.stub(dbUtils, "generateId").returns("234");
         sinon.stub(getGeocode, "getGeocode").returns(null);
+        const createOrGetParentLocationStub = sinon
+            .stub(scraperUtils, "createOrGetParentLocationRefId")
+            .returns(Promise.resolve("100"));
+        const writeParentScraperRunStub = sinon
+            .stub(scraperUtils, "writeParentScraperRun")
+            .returns(Promise.resolve("200"));
         const writeLocationsByRefIdsStub = sinon
             .stub(scraperUtils, "writeLocationsByRefIds")
             .returns(Promise.resolve());
@@ -56,6 +62,14 @@ describe("writeScrapedData", async () => {
 
         await scraperUtils.writeScrapedData(exampleData);
 
+        expect(createOrGetParentLocationStub.lastCall.args).to.deep.equal([
+            "Publix",
+        ]);
+
+        expect(writeParentScraperRunStub.lastCall.args).to.deep.equal([
+            { parentLocationRefId: "100", timestamp: exampleTimestamp },
+        ]);
+
         expect(generateLocationIdStub.lastCall.args).to.deep.equal([
             {
                 name: "Publix #123",
@@ -67,6 +81,7 @@ describe("writeScrapedData", async () => {
         expect(writeLocationsByRefIdsStub.lastCall.args).to.deep.equal([
             [
                 {
+                    parentLocationRefId: "100",
                     refId: "123",
                     name: "Publix #123",
                     address: {
