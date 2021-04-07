@@ -1,6 +1,7 @@
 const { site } = require("./config");
 const { toTitleCase } = require("../../lib/stringUtil");
 const https = require("https");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
@@ -54,7 +55,7 @@ module.exports = async function GetAvailableAppointments() {
                 name: `${site.name} (${city})`,
                 hasAvailability: responseLocation.status !== "Fully Booked",
                 availability: {},
-                timestamp: new Date(),
+                timestamp: moment().format(),
                 siteTimestamp: timestamp,
                 signUpLink: site.website,
             };

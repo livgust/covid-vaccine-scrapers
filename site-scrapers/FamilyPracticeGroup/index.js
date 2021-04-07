@@ -1,6 +1,7 @@
 const { site } = require("./config");
 const { sendSlackMsg } = require("../../lib/slack");
 const s3 = require("../../lib/s3");
+const moment = require("moment");
 
 const noAppointmentMatchString =
     "No services or classes are available for booking at this time.";
@@ -11,7 +12,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} done.`);
     return {
         parentLocationName: "Arlington Family Practice Group",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: [
             {
                 ...site,

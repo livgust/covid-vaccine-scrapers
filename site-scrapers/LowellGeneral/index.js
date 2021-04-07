@@ -6,6 +6,7 @@ const {
     groupAppointmentsByDate,
     getNodeId,
 } = require("./functions");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
@@ -13,7 +14,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} done.`);
     return {
         parentLocationName: "Lowell General",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: [webData],
     };
 };

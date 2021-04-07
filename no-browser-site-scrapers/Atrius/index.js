@@ -1,6 +1,7 @@
 const https = require("https");
 const { site } = require("./config");
 const mychart = require("../../lib/MyChartAPI.js");
+const moment = require("moment");
 
 const dept = "12701803";
 
@@ -11,7 +12,7 @@ module.exports = async function GetAvailableAppointments() {
     const { dphLink, ...atriusSubObject } = site;
     return {
         parentLocationName: "Atrius",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: [
             {
                 ...atriusSubObject,

@@ -1,6 +1,7 @@
 const { site } = require("./config");
 const { sendSlackMsg } = require("../../lib/slack");
 const s3 = require("../../lib/s3");
+const moment = require("moment");
 
 /*
  * This function calls ScrapeWebsiteData to gather availability data from the
@@ -15,7 +16,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} done.`);
     return {
         parentLocationName: "Baystate Health",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: [
             {
                 ...site,

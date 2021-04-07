@@ -1,5 +1,6 @@
 const https = require("https");
 const sites = require("./config");
+const moment = require("moment");
 
 const token = "bcd282a6fe22e6fc47e14be11a35b33fe1bc";
 async function GetAvailableAppointments() {
@@ -21,7 +22,7 @@ async function GetAvailableAppointments() {
     console.log("Color locations complete");
     return {
         parentLocationName: "Color",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: finalSites,
     };
 }
