@@ -1,45 +1,69 @@
 const sinon = require("sinon");
 const alerts = require("../alerts");
-const dbUtils = require("../lib/db-utils");
+const scraperData = require("../lib/db/scraper_data");
+const dbUtils = require("../lib/db/utils");
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
 const { StepFunctions } = require("aws-sdk");
 const moment = require("moment");
 const { setInactiveAlert, getLastAlertStartTime } = require("../alerts");
+const { writeScraperRunsByRefIds } = require("../lib/db/scraper_data");
+
+let newLocationIds = [];
+let scraperRunIds = [];
 
 async function createTestLocation() {
     const newLocationId = await dbUtils.generateId();
-    const location = await dbUtils.writeLocationByRefId({
-        refId: newLocationId,
-        name: "Test Location",
-        address: {},
-    });
+    const location = await scraperData.writeLocationsByRefIds([
+        {
+            parentLocationRefId: "123",
+            refId: newLocationId,
+            name: "Test Location",
+            address: {},
+        },
+    ]);
+    newLocationIds.push(newLocationId);
     return newLocationId;
 }
 
 async function createTestScraperRun(locationRef, bookableAppointmentsFound) {
-    const newScraperRunId = await dbUtils.generateId();
-    await dbUtils.writeScraperRunByRefId({
-        refId: newScraperRunId,
-        locationRefId: locationRef,
-        bookableAppointmentsFound,
-    });
-    return newScraperRunId;
+    const scraperRunId = await dbUtils.generateId();
+    await scraperData.writeScraperRunsByRefIds([
+        {
+            refId: scraperRunId,
+            locationRefId: locationRef,
+            parentScraperRunRefId: "234",
+            bookableAppointmentsFound,
+        },
+    ]);
+    scraperRunIds.push(scraperRunId);
+    return scraperRunId;
 }
 
-describe("alerts behavior", () => {
-    afterEach(() => {
+async function cleanup() {
+    await Promise.all([
+        dbUtils.deleteItemsByRefIds("locations", newLocationIds),
+        dbUtils.deleteItemsByRefIds("scraperRuns", scraperRunIds),
+    ]);
+    newLocationIds = [];
+    scraperRunIds = [];
+    return;
+}
+
+describe("handleIndividualAlert behavior", () => {
+    afterEach(async () => {
         sinon.restore();
+        await cleanup();
     });
 
-    it("does not make a new alert if an active alert exists", () => {
+    it("does not make a new alert if an active alert exists", async () => {
         sinon.stub(alerts, "activeAlertExists").returns(true);
         sinon.stub(alerts, "maybeContinueAlerting");
         sinon.stub(alerts, "setInactiveAlert");
         const setUpNewAlertStub = sinon.stub(alerts, "setUpNewAlert");
 
-        alerts.handler({
+        await alerts.handleIndividualAlert({
             locationRef: "123",
             scraperRunRef: "456",
             bookableAppointmentsFound: 100,
@@ -47,34 +71,34 @@ describe("alerts behavior", () => {
         expect(setUpNewAlertStub.notCalled).to.be.true;
     });
 
-    it("ends an alert if 0 appointments found and there's an active alert", () => {
+    it("ends an alert if 0 appointments found and there's an active alert", async () => {
         sinon.stub(alerts, "activeAlertExists").returns(true);
         const setInactiveAlertStub = sinon.stub(alerts, "setInactiveAlert");
 
-        alerts.handler({
-            locationRef: "123",
-            scraperRunRef: "456",
+        await alerts.handleIndividualAlert({
+            locationRefId: "123",
+            scraperRunRefId: "456",
             bookableAppointmentsFound: 0,
         });
         expect(setInactiveAlertStub.called).to.be.true;
     });
 
-    it("does continued alerting if an active alert exists", () => {
+    it("does continued alerting if an active alert exists", async () => {
         sinon.stub(alerts, "activeAlertExists").returns(true);
         const maybeContinueAlertingStub = sinon.stub(
             alerts,
             "maybeContinueAlerting"
         );
 
-        alerts.handler({
-            locationRef: "123",
-            scraperRunRef: "456",
+        await alerts.handleIndividualAlert({
+            locationRefId: "123",
+            scraperRunRefId: "456",
             bookableAppointmentsFound: 100,
         });
         expect(maybeContinueAlertingStub.called).to.be.true;
     });
 
-    it("starts a new alert if we see appointments and no alert is active", () => {
+    it("starts a new alert if we see appointments and no alert is active", async () => {
         sinon.stub(alerts, "activeAlertExists").returns(false);
         sinon.stub(alerts, "REPEAT_ALERT_TIME").returns(0);
         sinon.stub(alerts, "APPOINTMENT_NUMBER_THRESHOLD").returns(0);
@@ -83,16 +107,16 @@ describe("alerts behavior", () => {
             .returns(moment().subtract(1, "minute"));
         const setUpNewAlertStub = sinon.stub(alerts, "setUpNewAlert");
 
-        alerts.handler({
-            locationRef: "123",
-            scraperRunRef: "456",
+        await alerts.handleIndividualAlert({
+            locationRefId: "123",
+            scraperRunRefId: "456",
             bookableAppointmentsFound: 100,
         });
 
         expect(setUpNewAlertStub.called).to.be.true;
     });
 
-    it("does nothing if no appts found and no active alert", () => {
+    it("does nothing if no appts found and no active alert", async () => {
         sinon.stub(alerts, "activeAlertExists").returns(false);
         const actionStubs = [
             sinon.stub(alerts, "maybeContinueAlerting"),
@@ -100,9 +124,9 @@ describe("alerts behavior", () => {
             sinon.stub(alerts, "setUpNewAlert"),
         ];
 
-        alerts.handler({
-            locationRef: "123",
-            scraperRunRef: "456",
+        await alerts.handleIndividualAlert({
+            locationRefId: "123",
+            scraperRunRefId: "456",
             bookableAppointmentsFound: 0,
         });
         for (const stub of actionStubs) {
@@ -115,6 +139,7 @@ describe("setUpNewAlert", () => {
     it("creates a new alert", async () => {
         const locationRefId = await createTestLocation();
         const scraperRunRefId = await createTestScraperRun(locationRefId, 100);
+
         const alertId = await alerts.setUpNewAlert(
             locationRefId,
             scraperRunRefId
@@ -130,8 +155,7 @@ describe("setUpNewAlert", () => {
             firstScraperRunRefId: scraperRunRefId,
             locationRefId,
         });
-        await dbUtils.deleteItemByRefId("locations", locationRefId);
-        await dbUtils.deleteItemByRefId("scraperRuns", scraperRunRefId);
+
         await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
     });
 });
@@ -144,7 +168,6 @@ describe("getActiveAlertRefId", () => {
         await expect(
             alerts.getActiveAlertRefId(locationRefId)
         ).to.eventually.equal(alertId);
-        await dbUtils.deleteItemByRefId("locations", locationRefId);
         await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
     });
 });
@@ -163,7 +186,6 @@ describe("activeAlertExists", () => {
         await expect(alerts.activeAlertExists(locationRefId)).to.eventually.be
             .true;
 
-        await dbUtils.deleteItemByRefId("locations", locationRefId);
         await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
     });
 });
@@ -231,7 +253,6 @@ describe("getLastAlertStartTime", () => {
                 .then((ts) => ts.format())
         ).to.eventually.equal(moment(expectedTimestamp / 1000).format());
 
-        await dbUtils.deleteItemByRefId("locations", locationRefId);
         await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
     });
 });

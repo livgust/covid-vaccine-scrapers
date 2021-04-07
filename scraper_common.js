@@ -87,8 +87,11 @@ async function execute(usePuppeteer, scrapers) {
             if (WRITE_TO_FAUNA && process.env.FAUNA_DB) {
                 try {
                     if (returnValue) {
-                        await writeScrapedData(returnValue) //NEED TO RETHINK BELOW CALL
-                            .then(({ scraperRunRefId, locationRefId }) => {
+                        await writeScrapedData(returnValue).then(
+                            ({
+                                parentLocationRefId,
+                                parentScraperRunRefId,
+                            }) => {
                                 if (process.env.NODE_ENV === "production") {
                                     alertsLambda.invoke(
                                         {
@@ -96,11 +99,8 @@ async function execute(usePuppeteer, scrapers) {
                                                 process.env.ALERTSFUNCTIONNAME,
                                             InvocationType: "Event",
                                             Payload: JSON.stringify({
-                                                scraperRunRefId,
-                                                locationRefId,
-                                                bookableAppointmentsFound: getTotalNumberOfAppointments(
-                                                    returnValue //TODO this is wrong now
-                                                ),
+                                                parentLocationRefId,
+                                                parentScraperRunRefId,
                                             }),
                                         },
                                         () => {}
@@ -110,12 +110,12 @@ async function execute(usePuppeteer, scrapers) {
                                         "would call alerting function with the following args:"
                                     );
                                     console.log({
-                                        scraperRunRefId,
-                                        locationRefId,
-                                        bookableAppointmentsFound: numberAppointments,
+                                        parentLocationRefId,
+                                        parentScraperRunRefId,
                                     });
                                 }
-                            });
+                            }
+                        );
                     }
                 } catch (e) {
                     console.error("Failed to write to Fauna, got error:", e);

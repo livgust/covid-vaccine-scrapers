@@ -21,9 +21,8 @@ appointmentAlertBatchZips: {
     count,
 }
 */
-const { faunaQuery, generateId } = require("../lib/db-utils");
 const { sendSlackMsg } = require("../lib/slack");
-const dbUtils = require("../lib/db-utils");
+const dbUtils = require("../lib/db/utils");
 const dotenv = require("dotenv");
 const faunadb = require("faunadb"),
     fq = faunadb.query;
@@ -40,6 +39,7 @@ const alerts = {
     activeAlertExists,
     getActiveAlertRefId,
     getLastAlertStartTime,
+    handleIndividualAlert,
     handler,
     maybeContinueAlerting,
     runImmediateAlerts,
@@ -57,23 +57,29 @@ async function activeAlertExists(locationRefId) {
 }
 
 async function getActiveAlertRefId(locationRefId) {
-    const data = await faunaQuery(
-        fq.Filter(
-            fq.Paginate(
-                fq.Match(
-                    fq.Index("appointmentAlertsByLocationRef"),
-                    fq.Ref(fq.Collection("locations"), locationRefId)
-                )
-            ),
-            fq.Lambda((x) =>
-                fq.IsNull(
-                    fq.Select(["data", "lastScraperRunRef"], fq.Get(x), null)
+    const data = await dbUtils
+        .faunaQuery(
+            fq.Filter(
+                fq.Paginate(
+                    fq.Match(
+                        fq.Index("appointmentAlertsByLocationRef"),
+                        fq.Ref(fq.Collection("locations"), locationRefId)
+                    )
+                ),
+                fq.Lambda((x) =>
+                    fq.IsNull(
+                        fq.Select(
+                            ["data", "lastScraperRunRef"],
+                            fq.Get(x),
+                            null
+                        )
+                    )
                 )
             )
         )
-    ).then((res) => {
-        return res.data;
-    });
+        .then((res) => {
+            return res.data;
+        });
     if (data.length > 1) {
         throw Error(
             `Multiple active alerts found for location ${locationRefId}.`
@@ -94,7 +100,7 @@ async function setInactiveAlert(locationRefId, scraperRunRefId) {
         throw Error(`No active alert found for location ${locationRefId}!`);
     }
 
-    await faunaQuery(
+    await dbUtils.faunaQuery(
         fq.Update(fq.Ref(fq.Collection("appointmentAlerts"), id), {
             data: {
                 lastScraperRunRef: fq.Ref(
@@ -119,7 +125,7 @@ async function getLastAlertStartTime(locationRefId) {
     /* find the entry in appointmentAlerts for this location with
      * the lastScraperRunRef with the latest TS
      */
-    const nsTimestamp = await faunaQuery(
+    const nsTimestamp = await dbUtils.faunaQuery(
         fq.Select(
             "ts",
             fq.If(
@@ -140,7 +146,11 @@ async function getLastAlertStartTime(locationRefId) {
             ""
         )
     );
-    return nsTimestamp ? moment(nsTimestamp / 1000) : null;
+    if (!nsTimestamp) {
+        throw new Error(`No alert found for location ${locationRefId}!`);
+    } else {
+        return moment(nsTimestamp / 1000);
+    }
 }
 
 async function setUpNewAlert(
@@ -149,7 +159,7 @@ async function setUpNewAlert(
     bookableAppointmentsFound
 ) {
     // create a new entry in appointmentAlerts with locationRef and firstScraperRunRef set to scraperRunRef.
-    const record = await faunaQuery(
+    const record = await dbUtils.faunaQuery(
         fq.Create(fq.Collection("appointmentAlerts"), {
             data: {
                 locationRef: fq.Ref(fq.Collection("locations"), locationRefId),
@@ -184,26 +194,28 @@ async function runImmediateAlerts(locationRefId, bookableAppointmentsFound) {
     return;
 }
 
-async function handler(data) {
-    console.log(data);
-    if (await alerts.activeAlertExists(data.locationRefId)) {
-        if (data?.bookableAppointmentsFound === 0) {
+async function handleGroupAlerts({ parentLocationRefId, parentScraperRunId }) {}
+
+async function handleIndividualAlert({
+    locationRefId,
+    scraperRunRefId,
+    bookableAppointmentsFound,
+}) {
+    if (await alerts.activeAlertExists(locationRefId)) {
+        if (bookableAppointmentsFound === 0) {
             console.log("setting alert inactive.");
-            await alerts.setInactiveAlert(
-                data.locationRefId,
-                data.scraperRunRefId
-            );
+            await alerts.setInactiveAlert(locationRefId, scraperRunRefId);
         } else {
             console.log("continuing alert.");
             await alerts.maybeContinueAlerting();
         }
     } else if (
-        data.bookableAppointmentsFound &&
-        data.bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()
+        bookableAppointmentsFound &&
+        bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()
     ) {
         console.log("appointments pass threshold.");
         const alertStartTime = await alerts.getLastAlertStartTime(
-            data.locationRefId
+            locationRefId
         );
         if (
             !alertStartTime ||
@@ -213,11 +225,25 @@ async function handler(data) {
         ) {
             console.log("starting new alert.");
             await alerts.setUpNewAlert(
-                data.locationRefId,
-                data.scraperRunRefId,
-                data.bookableAppointmentsFound
+                locationRefId,
+                scraperRunRefId,
+                bookableAppointmentsFound
             );
         }
     }
+    return;
+}
+
+async function handler({ parentLocationRefId, parentScraperRunId }) {
+    // TODO: now I get parentLocationRefId and parentScraperRunId.
+    // Get all scraperRuns from parentScraperRunId, and all locations from parentLocationRefId.
+    // Merge.
+    // If parentLocation isChain, have global alert as well
+    await alerts.handleGroupAlerts({ parentLocationRefId, parentScraperRunId });
+    const childData = alerts.getChildData({
+        parentLocationRefId,
+        parentScraperRunId,
+    });
+    await alerts.handleIndividualAlerts(childData);
     return;
 }
