@@ -49,13 +49,15 @@ const keys = {
         conditional: (entry) => entry.totalAvailability || entry.availability,
         type: ["number"],
     },
-    website: { optional: true, type: ["string"] },
     zip: { optional: true, type: ["string"] },
 };
 
 function keyAndChildrenAreValid(object, key, shapeObject) {
     //verify the key is legal
-    assert.ok(shapeObject[key], `${key} is not valid!`);
+    assert.ok(
+        shapeObject[key],
+        `${key} is not valid! ${JSON.stringify(object)}`
+    );
 
     //if there is an object within this key, evaluate it
     if (shapeObject[key].subObject) {
@@ -81,7 +83,9 @@ function requiredKeyAndChildrenArePresent(object, shapeObject, key) {
     if (object[key]) {
         expect(
             shapeObject[key].type,
-            `${key} is of unexpected type ${typeof object[key]}!`
+            `${key} is of unexpected type ${typeof object[
+                key
+            ]}! ${JSON.stringify(object)}`
         ).to.include.members([typeof object[key]]);
     }
     if (shapeObject[key].subObject && object[key]) {
@@ -127,7 +131,6 @@ describe("shape of return object", async function () {
     it("has no unauthorized keys", (done) => {
         let testNumber = 0;
         for (const result of results) {
-            console.log(result);
             for (const key of Object.keys(result)) {
                 keyAndChildrenAreValid(result, key, keys);
             }
@@ -146,7 +149,6 @@ describe("shape of return object", async function () {
     it("isn't missing any required keys", (done) => {
         let testNumber = 0;
         for (const result of results) {
-            console.log(result);
             for (const key in keys) {
                 requiredKeyAndChildrenArePresent(result, keys, key);
             }
