@@ -22,7 +22,6 @@ _**NOTE:** If you use a different major version of `node`, you may experience er
         # e.g. /Applications/Chromium.app/Contents/MacOS/Chromium
         PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
 
-1.  Install [node.js](https://nodejs.org/en/) version 14.0 or later
 1.  Install `prettier` and `eslint`; make sure you run them before making any commits.
 
 ## Using this code
