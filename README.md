@@ -20,8 +20,11 @@ This is the open-source portion of the back-end, website scraping software that 
         DEVELOPMENT=true
         CHROMEPATH="path/to/chromium/that/you/downloaded"
         # e.g. /Applications/Chromium.app/Contents/MacOS/Chromium
-        PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
-
+        # PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
+        # SLACKWEBHOOKBOTCHANNEL=https://hooks.slack.com/services/your/token/here
+        # AWSACCESSKEYID=yourAccessKey
+        # AWSSECRETACCESSKEY=yourSecretKey
+        
 1.  Install `prettier` and `eslint`; make sure you run them before making any commits.
 
 ## Using this code
