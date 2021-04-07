@@ -9,8 +9,9 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const data = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
+    const { website, ...restSite } = site;
     return {
-        ...site,
+        ...restSite,
         signUpLink: site.website,
         ...data,
         timestamp: new Date(),

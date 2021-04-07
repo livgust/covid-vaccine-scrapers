@@ -6,13 +6,13 @@ const site = {
     graphQLUrl: "https://framework-backend.scheduling.athena.io/v1/graphql",
     locations: [
         {
-            address: "84 Highland Ave",
+            street: "84 Highland Ave",
             city: "Salem",
             state: "MA",
             zip: "01970",
         },
         {
-            address: "30 Tozer Rd",
+            street: "30 Tozer Rd",
             city: "Beverly",
             state: "MA",
             zip: "01915",

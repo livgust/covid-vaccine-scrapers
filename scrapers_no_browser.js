@@ -6,12 +6,12 @@ const noBrowserScrapers = require("./no-browser-site-scrapers");
 const scraperCommon = require("./scraper_common.js");
 
 async function executeNoBrowserScrapers() {
-    await scraperCommon.execute(false, noBrowserScrapers);
+    return await scraperCommon.execute(false, noBrowserScrapers);
 }
 
 exports.handler = executeNoBrowserScrapers;
 
-if (process.env.DEVELOPMENT) {
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test") {
     (async () => {
         console.log("DEV MODE");
         await executeNoBrowserScrapers();

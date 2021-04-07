@@ -1,12 +1,12 @@
 const assert = require("assert");
 const nock = require("nock");
-const mock = require("mock-require");
+const sinon = require("sinon");
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
 
-describe("Atrius GetAvailabilities", () => {
-    it("should return no availabilities when there is a redirect", () => {
+describe("Atrius GetAvailabilities", async () => {
+    it("should return no availabilities when there is a redirect", async () => {
         const atrius = require("./../no-browser-site-scrapers/Atrius");
         // mock out the redirect that occurs when there Atrius doesn't want to show any slots.
         nock("https://myhealth.atriushealth.org")
@@ -19,15 +19,16 @@ describe("Atrius GetAvailabilities", () => {
            "availability: {}
           }
         */
-        return expect(atrius())
+        await expect(atrius())
             .to.eventually.deep.include({
                 hasAvailability: false,
             })
             .and.nested.property("availability")
             .deep.equal({});
+        nock.cleanAll();
     });
 
-    it("should return availabilities when there are some.", (done) => {
+    it("should return availabilities when there are some.", async () => {
         // mock that there is no redirect
         nock("https://myhealth.atriushealth.org")
             .get("/fr/")
@@ -44,22 +45,13 @@ describe("Atrius GetAvailabilities", () => {
         };
 
         // mock the mychart api
-        mock("../lib/MyChartAPI.js", {
-            GetCookieAndVerificationToken: (verifcationUrl) => {
-                console.log("GetCookieAndVerificationTokenCalled");
-                return ["theCookie", "theVerificationToken"];
-            },
-            AddFutureWeeks: (
-                scheduleHost,
-                schedulePath,
-                cookie,
-                verificationToken,
-                weekCount,
-                postDataCallback
-            ) => {
-                return resultingAvailability;
-            },
-        });
+        const myChartApi = require("../lib/MyChartAPI");
+        sinon
+            .stub(myChartApi, "GetCookieAndVerificationToken")
+            .callsFake(() => ["theCookie", "theVerificationToken"]);
+        sinon
+            .stub(myChartApi, "AddFutureWeeks")
+            .callsFake(() => ({ 12701803: resultingAvailability }));
         // specify the require here after the mock was created.
         const atrius = require("./../no-browser-site-scrapers/Atrius");
         // run the test and assert that the result looks like:
@@ -74,8 +66,8 @@ describe("Atrius GetAvailabilities", () => {
            }
           }
         */
-        result = atrius();
-        expect(result).to.eventually.include(resultingAvailability);
-        done();
+        const result = atrius();
+        await expect(result).to.eventually.include(resultingAvailability);
+        nock.cleanAll();
     });
 });

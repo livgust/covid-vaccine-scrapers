@@ -21,7 +21,7 @@ const s3 = require("./lib/s3");
 const dbUtils = require("./lib/db-utils");
 const moment = require("moment");
 
-WRITE_TO_FAUNA = true;
+const WRITE_TO_FAUNA = true;
 
 async function execute(usePuppeteer, scrapers) {
     const globalStartTime = new Date();
@@ -128,12 +128,14 @@ async function execute(usePuppeteer, scrapers) {
             }
         }
 
-        const cachedResults = await fetch(
-            "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
-        )
-            .then((res) => res.json())
-            .then((unpack) => JSON.parse(unpack.body).results);
-
+        let cachedResults;
+        if (process.env.NODE_ENV !== "test") {
+            cachedResults = await fetch(
+                "https://mzqsa4noec.execute-api.us-east-1.amazonaws.com/prod"
+            )
+                .then((res) => res.json())
+                .then((unpack) => JSON.parse(unpack.body).results);
+        }
         let finalResultsArray = [];
         if (process.argv.length <= 2) {
             // Only add default data if we're not testing individual scrapers.
@@ -159,8 +161,7 @@ async function execute(usePuppeteer, scrapers) {
         };
 
         const webData = JSON.stringify(responseJson);
-
-        if (process.env.DEVELOPMENT) {
+        if (process.env.NODE_ENV !== "production") {
             const outFile = usePuppeteer ? "out.json" : "out_no_browser.json";
             console.log(
                 "The data that would be published is in '" + outFile + "'"
@@ -200,7 +201,7 @@ async function execute(usePuppeteer, scrapers) {
             return uploadResponse;
         }
     };
-    await gatherData();
+    return await gatherData();
 }
 
 module.exports = { execute };

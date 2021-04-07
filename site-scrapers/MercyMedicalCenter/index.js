@@ -9,8 +9,9 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
+    const { noAppointments, timeslotsUrl, ...restSite } = site;
     return {
-        ...site,
+        ...restSite,
         ...webData,
         timestamp: new Date(),
     };
