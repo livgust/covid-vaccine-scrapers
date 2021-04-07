@@ -10,9 +10,9 @@ This is the open-source portion of the back-end, website scraping software that 
 
 1. If you do not have NodeJS installed, please go to the [NodeJS Downloads Page](https://nodejs.org/en/download/) to download and install it. Choose the latest version corresponding to the major version number defined in `.nvmrc`.
 
- If you use [nvm](https://github.com/nvm-sh/nvm) to manage installed versions of `node` and `npm`, switch to the node version defined in `.nvmrc` via `nvm use`. Run `nvm install` if you get a "not yet installed" error.
+      If you use [nvm](https://github.com/nvm-sh/nvm) to manage installed versions of `node` and `npm`, switch to the node version defined in `.nvmrc` via `nvm use`. Run `nvm install` if you get a "not yet installed" error.
 
- _**NOTE:** If you use a different major version of `node`, you may experience errors when running commands from this repo with `node` or `npm`. Additionally, please ensure you're using `npm` version `7.0.0` or greater by running `npm --version`._
+      _**NOTE:** If you use a different major version of `node`, you may experience errors when running commands from this repo with `node` or `npm`. Additionally, please ensure you're using `npm` version `7.0.0` or greater by running `npm --version`._
 
 1.  Download a recent version of Chromium locally: https://download-chromium.appspot.com/
 1.  Create a [`.env`](https://www.npmjs.com/package/dotenv) file in the root directory of the project with the following:
