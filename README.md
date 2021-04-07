@@ -9,13 +9,14 @@ This is the open-source portion of the back-end, website scraping software that 
 ## Setup
 
 1.  Download a recent version of Chromium locally: https://download-chromium.appspot.com/
-1.  Create a `.env` file with the following:
+1.  Create a [`.env`](https://www.npmjs.com/package/dotenv) file in the root directory of the project with the following:
 
         DEVELOPMENT=true
         CHROMEPATH="path/to/chromium/that/you/downloaded"
         # e.g. /Applications/Chromium.app/Contents/MacOS/Chromium
         PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
 
+1.  Install [node.js](https://nodejs.org/en/) version 14.0 or later
 1.  Install `prettier` and `eslint`; make sure you run them before making any commits.
 
 ## Using this code
