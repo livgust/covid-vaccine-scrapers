@@ -12,7 +12,7 @@ module.exports = async function GetAvailableAppointments() {
     return massLocations.map((location) => {
         const retval = {
             name: `${site.name} (${location.address})`,
-            hasAvailability: location.availability,
+            hasAvailability: location.availability == "true",
             signUpLink: location.coach_url,
             latitude: location.lat,
             longitude: location.long,
