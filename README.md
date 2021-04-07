@@ -62,6 +62,22 @@ To scrape data from a site, you either need to:
 - figure out which API calls are made (Chrome devtools > Network tab) and make these calls yourself to fetch availability
 - interact with the site (clicking buttons, inspecting HTML elements, etc) using puppeteer
 
+Implement `GetAvailableAppointments` in your scraper to return a list of locations with pertinent location and availability data. For example, a dictionary specifying a CVS location might look like this:
+
+    {
+      city: 'North Andover',
+      name: 'CVS (North Andover)',
+      hasAvailability: false,
+      availability: {},
+      timestamp: 2021-04-07T18:27:37.498Z,
+      siteTimestamp: 2021-04-07T17:23:33.046Z,
+      signUpLink: 'https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine',
+      latitude: 42.6757741,
+      longitude: -71.12855859999999
+    },
+
+Some values such as timestamp will be supplied by default, so you only need to supply them if overriding a default value.
+
 It's often the case that at the time you're trying to write a scraper, there is no availability to scrape. This makes it hard to know what to do in the case of availability.
 To start, you can just return `hasAvailability = true` or `false` and not report specific available appointments.
 

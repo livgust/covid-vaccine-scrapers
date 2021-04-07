@@ -165,8 +165,8 @@ async function execute(usePuppeteer, scrapers) {
             console.log(
                 "The data that would be published is in '" + outFile + "'"
             );
-            //console.log("The following data would be published:");
-            //console.dir(responseJson, { depth: null });
+            console.log("The following data would be published:");
+            console.dir(responseJson, { depth: null });
             file.write(outFile, webData);
 
             /* -- Don't record metrics in development --

@@ -57,7 +57,7 @@ function formatResponse(availabilityResponse, massVax) {
 
     // If this is a massVax site that is invite-only, then we don't
     // need availability data.
-    if (!massVax) {
+//     if (!massVax) {
         // Collect availability count by date
         availability.reduce((memo, currentValue) => {
             /* The availability returns an array of appointments like this:
@@ -98,7 +98,7 @@ function formatResponse(availabilityResponse, massVax) {
             }
             return memo;
         }, results);
-    }
+//     }
     return results;
 }
 

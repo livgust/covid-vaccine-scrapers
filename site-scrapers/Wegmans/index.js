@@ -53,11 +53,11 @@ async function ScrapeWebsiteData(browser) {
     let availability = {};
 
     const noAppointments = lastMessageText.includes(paths.noAppointments);
-    if (!noAppointments) {
+    if (noAppointments) {
         const msg = `${site.name} - possible appointments`;
         console.log(msg);
         await s3.savePageContent(site.name, page);
-        await sendSlackMsg("bot", msg);
+        await sendSlackMsg("bot", "HI");
     }
 
     return {
