@@ -76,7 +76,7 @@ Implement `GetAvailableAppointments` in your scraper to return a list of locatio
       longitude: -71.12855859999999
     },
 
-Some values such as timestamp will be supplied by default, so you only need to supply them if overriding a default value.
+Some values, such as `latitude` and `longitude`, may be calculated based on the presence of other values such as `street`, `city` and `zip`. Look at existing scrapers for examples of how to populate the most important values.
 
 It's often the case that at the time you're trying to write a scraper, there is no availability to scrape. This makes it hard to know what to do in the case of availability.
 To start, you can just return `hasAvailability = true` or `false` and not report specific available appointments.
