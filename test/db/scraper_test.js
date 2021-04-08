@@ -301,7 +301,7 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
                     })),
                 };
             })
-        ).to.have.deep.members([
+        ).to.deep.include.members([
             {
                 scraperRun: {
                     refId: scraperRunRefIds[0],

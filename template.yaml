@@ -30,6 +30,14 @@ Parameters:
     Type: String
   SlackWebhook:
     Type: String
+  TwitterApiKey:
+    Type: String
+  TwitterApiSecret:
+    Type: String
+  TwitterAccessTokenKey:
+    Type: String
+  TwitterAccessTokenSecret:
+    Type: String
 
 Globals:
   Function:
@@ -149,3 +157,7 @@ Resources:
           GOOGLE_API_KEY: !Ref GoogleApiKey
           FAUNA_DB: !Ref FaunaApiKey
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+          TWITTER_API_KEY: !Ref TwitterApiKey
+          TWITTER_API_SECRET: !Ref TwitterApiSecret
+          TWITTER_ACCESS_TOKEN_KEY: !Ref TwitterAccessTokenKey
+          TWITTER_ACCESS_TOKEN_SECRET: !Ref TwitterAccessTokenSecret

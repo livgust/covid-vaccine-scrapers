@@ -20,6 +20,7 @@
         "puppeteer-extra-plugin-recaptcha": "^3.3.5",
         "puppeteer-extra-plugin-stealth": "^2.7.6",
         "rimraf": "^3.0.2",
+        "twit": "^2.2.11",
         "us-zips": "^4.0.2"
     },
     "devDependencies": {

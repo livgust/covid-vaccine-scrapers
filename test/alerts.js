@@ -5,10 +5,7 @@ const dbUtils = require("../lib/db/utils");
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
-const { StepFunctions } = require("aws-sdk");
 const moment = require("moment");
-const { setInactiveAlert, getLastAlertStartTime } = require("../alerts");
-const { writeScraperRunsByRefIds } = require("../lib/db/scraper_data");
 
 let newLocationIds = [];
 let scraperRunIds = [];
@@ -50,6 +47,11 @@ async function cleanup() {
     scraperRunIds = [];
     return;
 }
+
+afterEach(async () => {
+    sinon.restore();
+    await cleanup();
+});
 
 describe("handleIndividualAlert behavior", () => {
     afterEach(async () => {
@@ -102,6 +104,7 @@ describe("handleIndividualAlert behavior", () => {
         sinon.stub(alerts, "activeAlertExists").returns(false);
         sinon.stub(alerts, "REPEAT_ALERT_TIME").returns(0);
         sinon.stub(alerts, "APPOINTMENT_NUMBER_THRESHOLD").returns(0);
+        sinon.stub(alerts, "runImmediateAlerts").returns(Promise.resolve());
         sinon
             .stub(alerts, "getLastAlertStartTime")
             .returns(moment().subtract(1, "minute"));
@@ -206,7 +209,7 @@ describe("setInactiveAlert", () => {
         const locationRefId = await createTestLocation();
         const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
         const newScraperRunId = await dbUtils.generateId();
-        const alertRefId = await setInactiveAlert(
+        const alertRefId = await alerts.setInactiveAlert(
             locationRefId,
             newScraperRunId
         );
@@ -336,7 +339,7 @@ describe("mergeData", () => {
     });
 });
 
-describe.only("aggregateAvailability", () => {
+describe("aggregateAvailability", () => {
     it("returns generic availability if we have one entry with no listed appts available", () => {
         expect(alerts.aggregateAvailability([{ data: {} }])).to.deep.equal({
             bookableAppointmentsFound: null,
@@ -360,5 +363,166 @@ describe.only("aggregateAvailability", () => {
             bookableAppointmentsFound: 13,
             availabilityWithNoNumbers: false,
         });
+    });
+});
+
+describe("handleGroupAlerts", () => {
+    afterEach(async () => {
+        sinon.restore();
+        await cleanup();
+    });
+
+    it("does nothing if the location is not a chain", async () => {
+        const setUpNewAlertStub = sinon
+            .stub(alerts, "setUpNewAlert")
+            .returns(Promise.resolve());
+        await alerts.handleGroupAlerts({
+            parentLocation: { ref: { id: "123" }, data: { isChain: false } },
+            parentScraperRunRefId: "doesntmatter",
+            locations: [],
+        });
+
+        expect(setUpNewAlertStub.notCalled).to.be.true;
+    });
+
+    it("does nothing if there is no active alert and no availability", async () => {
+        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(false));
+        const setUpNewAlertStub = sinon
+            .stub(alerts, "setUpNewAlert")
+            .returns(Promise.resolve());
+        const setInactiveAlertStub = sinon
+            .stub(alerts, "setInactiveAlert")
+            .returns(Promise.resolve());
+
+        await alerts.handleGroupAlerts({
+            parentLocation: { ref: { id: "123" }, data: { isChain: true } },
+            parentScraperRunRefId: "doesntmatter",
+            locations: [],
+        });
+
+        expect(setUpNewAlertStub.notCalled).to.be.true;
+        expect(setInactiveAlertStub.notCalled).to.be.true;
+    });
+
+    it("starts new alert if no recent or active alert exists and there is availability", async () => {
+        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(false));
+        sinon
+            .stub(alerts, "getLastAlertStartTime")
+            .returns(
+                Promise.resolve(
+                    moment().subtract(2 * alerts.REPEAT_ALERT_TIME(), "minutes")
+                )
+            );
+        const setUpNewAlertStub = sinon
+            .stub(alerts, "setUpNewAlert")
+            .returns(Promise.resolve());
+        const setInactiveAlertStub = sinon
+            .stub(alerts, "setInactiveAlert")
+            .returns(Promise.resolve());
+
+        await alerts.handleGroupAlerts({
+            parentLocation: { ref: { id: "123" }, data: { isChain: true } },
+            parentScraperRunRefId: "doesntmatter",
+            locations: [
+                {
+                    location: { address: { city: "Haverhill" } },
+                    appointments: [
+                        {
+                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                        },
+                    ],
+                },
+                {
+                    location: { address: { city: "Cambridge" } },
+                    appointments: [
+                        {
+                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                        },
+                    ],
+                },
+            ],
+        });
+        expect(setUpNewAlertStub.lastCall?.args).to.deep.equal([
+            "123",
+            "doesntmatter",
+            2 * alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+            false,
+        ]);
+        expect(setInactiveAlertStub.notCalled).to.be.true;
+    });
+
+    it("doesn't start a new alert if it's been a short time since the last", async () => {
+        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(false));
+        sinon
+            .stub(alerts, "getLastAlertStartTime")
+            .returns(
+                Promise.resolve(
+                    moment().subtract(alerts.REPEAT_ALERT_TIME() / 2, "minutes")
+                )
+            );
+        const setUpNewAlertStub = sinon
+            .stub(alerts, "setUpNewAlert")
+            .returns(Promise.resolve());
+        const setInactiveAlertStub = sinon
+            .stub(alerts, "setInactiveAlert")
+            .returns(Promise.resolve());
+
+        await alerts.handleGroupAlerts({
+            parentLocation: { ref: { id: "123" }, data: { isChain: true } },
+            parentScraperRunRefId: "doesntmatter",
+            locations: [
+                {
+                    location: { address: { city: "Haverhill" } },
+                    appointments: [
+                        {
+                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                        },
+                    ],
+                },
+                {
+                    location: { address: { city: "Cambridge" } },
+                    appointments: [
+                        {
+                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                        },
+                    ],
+                },
+            ],
+        });
+        expect(setUpNewAlertStub.notCalled).to.be.true;
+        expect(setInactiveAlertStub.notCalled).to.be.true;
+    });
+
+    it("ends an alert if there is an active alert and no current availability", async () => {
+        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(true));
+        const setUpNewAlertStub = sinon
+            .stub(alerts, "setUpNewAlert")
+            .returns(Promise.resolve());
+        const setInactiveAlertStub = sinon
+            .stub(alerts, "setInactiveAlert")
+            .returns(Promise.resolve());
+
+        await alerts.handleGroupAlerts({
+            parentLocation: {
+                ref: { id: "123" },
+                data: { isChain: true },
+            },
+            parentScraperRunRefId: "doesntmatter",
+            locations: [
+                {
+                    location: { address: { city: "Haverhill" } },
+                    appointments: [],
+                },
+                {
+                    location: { address: { city: "Cambridge" } },
+                    appointments: [],
+                },
+            ],
+        });
+        expect(setUpNewAlertStub.notCalled).to.be.true;
+        expect(setInactiveAlertStub.lastCall?.args).to.deep.equal([
+            "123",
+            "doesntmatter",
+        ]);
     });
 });
