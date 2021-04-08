@@ -9,12 +9,13 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const data = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
+    const { website, ...restSite } = site;
     return {
         parentLocationName: "Arlington Family Practice Group",
         timestamp: new Date(),
         individualLocationData: [
             {
-                ...site,
+                ...restSite,
                 signUpLink: site.website,
                 ...data,
             },

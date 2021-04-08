@@ -10,7 +10,6 @@ module.exports = async function GetAvailableAppointments(browser) {
         individualLocationData: [
             {
                 ...site,
-                signUpLink: site.website,
                 ...info,
             },
         ],
@@ -19,7 +18,7 @@ module.exports = async function GetAvailableAppointments(browser) {
 
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
-    await page.goto(site.website);
+    await page.goto(site.signUpLink);
     // evidently the loading spinner doesn't always show up? so we'll let these silently fail if they time out.
     await page
         .waitForSelector(".loadingSpinner", { visible: true })

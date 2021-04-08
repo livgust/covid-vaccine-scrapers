@@ -3,7 +3,7 @@ const site = {
     street: "887 Boston Rd",
     city: "Haverhill",
     zip: "01835",
-    website:
+    signUpLink:
         "https://app.acuityscheduling.com/schedule.php?owner=21713854&calendarID=5109380",
 };
 

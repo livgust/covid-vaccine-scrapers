@@ -245,7 +245,7 @@ function defaultPageService() {
             const classToWaitFor = ".scheduleday";
             const page = await browser.newPage();
             await Promise.all([
-                page.goto(site.website),
+                page.goto(site.signUpLink),
                 waitForLoadComplete(page, classToWaitFor),
             ]);
             return page;

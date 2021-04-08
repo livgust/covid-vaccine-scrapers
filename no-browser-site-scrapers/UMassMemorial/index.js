@@ -12,7 +12,7 @@ module.exports = async function GetAvailableAppointments() {
     for (const site of sites) {
         const { departmentID, ...restSite } = site;
         results.push({
-            ...webData[site.departmentID],
+            ...webData[departmentID],
             ...restSite,
         });
     }
