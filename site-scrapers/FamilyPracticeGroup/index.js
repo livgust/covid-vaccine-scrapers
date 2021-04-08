@@ -3,7 +3,7 @@ const { sendSlackMsg } = require("../../lib/slack");
 const s3 = require("../../lib/s3");
 
 const noAppointmentMatchString =
-    "No services or classes are available for booking at this time.";
+    "All appointment times are currently reserved.";
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
@@ -33,12 +33,18 @@ async function ScrapeWebsiteData(browser) {
     await page.goto(site.website);
     await page.waitForSelector("#nextBtn", { visible: true });
     await page.click("#nextBtn");
-    await waitForLoadComplete(page, ".schedulerPanelLoading");
+    await page.waitForSelector("#serviceTitle", { visible: true });
+    await page.waitForSelector("#nextBtn", { visible: true });
+    await page.waitForTimeout(300);
     await page.click("#nextBtn");
+    await page.waitForSelector("#screeningQuestionPassBtn", { visible: true });
+    await page.click("#screeningQuestionPassBtn");
+    await waitForLoadComplete(page, ".schedulerPanelLoading");
+
     const content = await (await page.$(".schedulerPanelBody")).evaluate(
         (node) => node.innerText
     );
-    const hasAvailability = content.indexOf(noAppointmentMatchString) == -1;
+    const hasAvailability = content.indexOf(noAppointmentMatchString) === -1;
     if (hasAvailability && !process.env.DEVELOPMENT) {
         await s3.savePageContent(site.name, page);
         await sendSlackMsg(
