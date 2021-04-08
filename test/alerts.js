@@ -256,3 +256,109 @@ describe("getLastAlertStartTime", () => {
         await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
     });
 });
+
+describe("mergeData", () => {
+    it("links locations with scraperRuns", () => {
+        expect(
+            alerts.mergeData({
+                locations: [
+                    {
+                        ref: { id: "123" },
+                    },
+                ],
+                scraperRunsAndAppointments: [
+                    {
+                        scraperRun: {
+                            ref: { id: "456" },
+                            data: {
+                                locationRef: { id: "123" },
+                            },
+                        },
+                        appointments: [{ ref: { id: "1" } }],
+                    },
+                    {
+                        scraperRun: {
+                            ref: { id: "789" },
+                            data: {
+                                locationRef: { id: "124" },
+                            },
+                        },
+                        appointments: [],
+                    },
+                ],
+                parentScraperRunRefId: "500", // not used here
+            })
+        ).to.deep.equal([
+            {
+                location: {
+                    ref: { id: "123" }, // this structure mimics how we access the ID from the Fauna object
+                },
+                scraperRun: {
+                    ref: { id: "456" },
+                    data: {
+                        locationRef: { id: "123" },
+                    },
+                },
+                appointments: [{ ref: { id: "1" } }],
+            },
+        ]);
+    });
+    it("returns no scraper runs if no link", () => {
+        expect(
+            alerts.mergeData({
+                locations: [
+                    {
+                        ref: { id: "123" },
+                    },
+                ],
+                scraperRunsAndAppointments: [
+                    {
+                        scraperRun: {
+                            ref: { id: "456" },
+                            data: {
+                                locationRef: { id: "124" }, //doesn't link to that loc
+                            },
+                        },
+                        appointments: [],
+                    },
+                ],
+                parentScraperRunRefId: "500",
+            })
+        ).to.deep.equal([
+            {
+                location: {
+                    ref: { id: "123" },
+                },
+                scraperRun: undefined,
+                appointments: undefined,
+            },
+        ]);
+    });
+});
+
+describe.only("aggregateAvailability", () => {
+    it("returns generic availability if we have one entry with no listed appts available", () => {
+        expect(alerts.aggregateAvailability([{ data: {} }])).to.deep.equal({
+            bookableAppointmentsFound: null,
+            availabilityWithNoNumbers: true,
+        });
+    });
+    it("returns no availability if no appointments are present", () => {
+        expect(alerts.aggregateAvailability([])).to.deep.equal({
+            bookableAppointmentsFound: 0,
+            availabilityWithNoNumbers: false,
+        });
+    });
+    it("accumulates availability otherwise", () => {
+        expect(
+            alerts.aggregateAvailability([
+                { data: { numberAvailable: 1 } },
+                { data: { numberAvailable: 9 } },
+                { data: { numberAvailable: 3 } },
+            ])
+        ).to.deep.equal({
+            bookableAppointmentsFound: 13,
+            availabilityWithNoNumbers: false,
+        });
+    });
+});

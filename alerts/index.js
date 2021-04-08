@@ -27,6 +27,7 @@ const dotenv = require("dotenv");
 const faunadb = require("faunadb"),
     fq = faunadb.query;
 const moment = require("moment");
+const scraperUtils = require("../lib/db/scraper_data");
 
 dotenv.config();
 
@@ -37,11 +38,16 @@ const alerts = {
     REPEAT_ALERT_TIME: () => 15,
     // exported functions:
     activeAlertExists,
+    aggregateAvailability,
     getActiveAlertRefId,
+    getChildData,
     getLastAlertStartTime,
+    handleGroupAlerts,
     handleIndividualAlert,
+    handleIndividualAlerts,
     handler,
     maybeContinueAlerting,
+    mergeData,
     runImmediateAlerts,
     setInactiveAlert,
     setUpNewAlert,
@@ -194,13 +200,103 @@ async function runImmediateAlerts(locationRefId, bookableAppointmentsFound) {
     return;
 }
 
-async function handleGroupAlerts({ parentLocationRefId, parentScraperRunId }) {}
+async function handleGroupAlerts({
+    parentLocationRefId,
+    parentScraperRunRefId,
+}) {
+    // TODO: If parentLocation isChain, have global alert as well
+    return;
+}
+
+async function getChildData({ parentLocationRefId, parentScraperRunRefId }) {
+    return {
+        locations: await scraperUtils.getLocationsByParentLocation(
+            parentLocationRefId
+        ),
+        scraperRunsAndAppointments: await scraperUtils.getScraperRunsAndAppointmentsByParentScraperRun(
+            parentScraperRunRefId
+        ),
+    };
+}
+
+function mergeData({ locations, scraperRunsAndAppointments }) {
+    // for each location, find the scraperRun (w/ associated appointments) that links to it
+    return locations.map((location) => {
+        const match = scraperRunsAndAppointments.find(
+            (run) => run.scraperRun.data.locationRef.id === location.ref.id
+        );
+        return {
+            location: location,
+            scraperRun: match?.scraperRun,
+            appointments: match?.appointments,
+        };
+    });
+}
+
+function aggregateAvailability(appointments = []) {
+    if (!appointments.length) {
+        return {
+            bookableAppointmentsFound: 0,
+            availabilityWithNoNumbers: false,
+        };
+    } else if (appointments.length === 1) {
+        return {
+            availabilityWithNoNumbers: true,
+            bookableAppointmentsFound: null,
+        };
+    } else {
+        return {
+            bookableAppointmentsFound: appointments.reduce(
+                (acc, cur) => acc + (cur?.data?.numberAvailable || 0),
+                0
+            ),
+            availabilityWithNoNumbers: false,
+        };
+    }
+}
+
+async function handleIndividualAlerts(locations, parentScraperRunRefId) {
+    return Promise.all(
+        locations.map((locationEntry) => {
+            const locationRefId = locationEntry.location.ref.id;
+            const scraperRunRefId = locationEntry.scraperRun
+                ? locationEntry.scraperRun.ref.id
+                : parentScraperRunRefId;
+            const {
+                bookableAppointmentsFound,
+                availabilityWithNoNumbers,
+            } = locationEntry.scraperRun
+                ? alerts.aggregateAvailability(locationEntry.appointments)
+                : {
+                      // if we have no scraper run, we assume nothing was found
+                      // for this location.
+                      bookableAppointmentsFound: 0,
+                      availabilityWithNoNumbers: false,
+                  };
+            return handleIndividualAlert({
+                locationRefId,
+                scraperRunRefId,
+                bookableAppointmentsFound,
+                availabilityWithNoNumbers,
+            });
+        })
+    );
+}
 
 async function handleIndividualAlert({
     locationRefId,
     scraperRunRefId,
     bookableAppointmentsFound,
+    availabilityWithNoNumbers, // TODO - currently we do nothing with this.
 }) {
+    console.log(
+        `Handling individual alert for ${JSON.stringify({
+            locationRefId,
+            scraperRunRefId,
+            bookableAppointmentsFound,
+            availabilityWithNoNumbers,
+        })}`
+    );
     if (await alerts.activeAlertExists(locationRefId)) {
         if (bookableAppointmentsFound === 0) {
             console.log("setting alert inactive.");
@@ -230,20 +326,42 @@ async function handleIndividualAlert({
                 bookableAppointmentsFound
             );
         }
+    } else {
+        console.log("Not doing anything.");
     }
     return;
 }
 
-async function handler({ parentLocationRefId, parentScraperRunId }) {
-    // TODO: now I get parentLocationRefId and parentScraperRunId.
-    // Get all scraperRuns from parentScraperRunId, and all locations from parentLocationRefId.
-    // Merge.
-    // If parentLocation isChain, have global alert as well
-    await alerts.handleGroupAlerts({ parentLocationRefId, parentScraperRunId });
-    const childData = alerts.getChildData({
+async function handler({ parentLocationRefId, parentScraperRunRefId }) {
+    console.dir(
+        { parentLocationRefId, parentScraperRunRefId },
+        { depth: null }
+    );
+    await alerts.handleGroupAlerts({
         parentLocationRefId,
-        parentScraperRunId,
+        parentScraperRunRefId,
     });
-    await alerts.handleIndividualAlerts(childData);
+    const { locations, scraperRunsAndAppointments } = await alerts.getChildData(
+        {
+            parentLocationRefId,
+            parentScraperRunRefId,
+        }
+    );
+    const mergedLocations = await alerts.mergeData({
+        locations,
+        scraperRunsAndAppointments,
+    });
+    await alerts.handleIndividualAlerts(mergedLocations, parentScraperRunRefId);
     return;
+}
+
+if (require.main === module) {
+    (async () => {
+        const args = process.argv.slice(2);
+        console.log("DEV MODE");
+        alerts.handler({
+            parentLocationRefId: args[0],
+            parentScraperRunRefId: args[1],
+        });
+    })();
 }

@@ -87,6 +87,7 @@ async function execute(usePuppeteer, scrapers) {
             if (WRITE_TO_FAUNA && process.env.FAUNA_DB) {
                 try {
                     if (returnValue) {
+                        console.log(returnValue);
                         await writeScrapedData(returnValue).then(
                             ({
                                 parentLocationRefId,

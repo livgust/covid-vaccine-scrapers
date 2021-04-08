@@ -279,15 +279,15 @@ describe("FaunaDB Utils", function () {
             ],
         });
 
-        const scraperRunRef = retrieveScraperRunResult.data[0].ref.value.id;
+        const scraperRunRef = retrieveScraperRunResult.data[0].ref.id;
 
         // assert that the appointmentAvailability is there
         const retrieveAppointmentsResult = await scraperTransactions.getAppointmentsByScraperRun(
             scraperRunRef
         );
 
-        const filteredResults = retrieveAppointmentsResult.data.map((entry) => {
-            const { scraperRunRef, ...rest } = entry;
+        const filteredResults = retrieveAppointmentsResult.map((entry) => {
+            const { scraperRunRef, ...rest } = entry.data;
             return rest;
         });
 
@@ -305,8 +305,8 @@ describe("FaunaDB Utils", function () {
                 date: "03/18/2021",
             },
         ]);
-        const appointmentRefIds = retrieveAppointmentsResult.data.map(
-            (entry) => entry.ref.value.id
+        const appointmentRefIds = retrieveAppointmentsResult.map(
+            (entry) => entry.ref.id
         );
 
         // clean up - delete it all

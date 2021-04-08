@@ -11,7 +11,7 @@ async function executeScrapers() {
 
 exports.handler = executeScrapers;
 
-if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test") {
+if (require.main === module) {
     (async () => {
         console.log("DEV MODE");
         await executeScrapers();
