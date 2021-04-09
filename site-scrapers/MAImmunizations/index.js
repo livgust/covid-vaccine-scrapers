@@ -1,5 +1,6 @@
 const { site } = require("./config");
 const fetch = require("node-fetch");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
@@ -7,7 +8,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} done.`);
     return {
         parentLocationName: "MA Immunizations",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: Object.values(webData),
     };
 };

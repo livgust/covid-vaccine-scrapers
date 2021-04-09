@@ -15,7 +15,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     return {
         parentLocationName: "Walgreens",
         isChain: true,
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: results,
     };
 };

@@ -12,7 +12,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     const { noAppointments, timeslotsUrl, ...restSite } = site;
     return {
         parentLocationName: "Mercy Medical Center",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: [
             {
                 ...restSite,

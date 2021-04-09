@@ -1,6 +1,7 @@
 const { site } = require("./config");
 const https = require("https");
 const crypto = require("crypto");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
@@ -43,7 +44,7 @@ module.exports = async function GetAvailableAppointments() {
         parentLocationName: "Price Chopper",
         isChain: true,
         individualLocationData,
-        timestamp: new Date(),
+        timestamp: moment().format(),
     };
 };
 

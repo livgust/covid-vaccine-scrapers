@@ -1,5 +1,6 @@
 const { sites, providers } = require("./config");
 const mychart = require("../../lib/MyChartAPI");
+const moment = require("moment");
 
 const departmentIDs = sites.map((site) => site.departmentID);
 
@@ -7,7 +8,7 @@ module.exports = async function GetAvailableAppointments() {
     console.log("UMassMemorial starting.");
     const webData = await ScrapeWebsiteData();
     const results = [];
-    const timestamp = new Date();
+    const timestamp = moment().format();
 
     for (const site of sites) {
         const { departmentID, ...restSite } = site;

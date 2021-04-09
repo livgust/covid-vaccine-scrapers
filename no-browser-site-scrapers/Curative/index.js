@@ -1,5 +1,6 @@
 const { site } = require("./config");
 const https = require("https");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
@@ -86,7 +87,7 @@ module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} done.`);
     return {
         parentLocationName: "Curative",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData,
     };
 };
