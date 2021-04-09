@@ -171,7 +171,9 @@ describe("writeParentScraperRun", () => {
             refId
         );
         expect(scraperRun.data.parentLocationRef.id).to.equal("123");
-        expect(scraperRun.data.timestamp).to.equal(timestamp);
+        expect(moment(scraperRun.data.timestamp.value).format()).to.equal(
+            timestamp
+        );
         await dbUtils.deleteItemByRefId("parentScraperRuns", refId);
     });
 });
@@ -219,12 +221,14 @@ describe("getScraperRunsByParentScraperRun", () => {
         const scraperRunRefId = await dbUtils.generateId();
         const parentScraperRunRefId = await scraperUtils.writeParentScraperRun({
             parentLocationRefId: "100",
+            timestamp: moment().format(),
         });
         const res = await scraperUtils.writeScraperRunsByRefIds([
             {
                 parentScraperRunRefId,
                 refId: scraperRunRefId,
                 locationRefId: "456",
+                timestamp: moment().format(),
             },
         ]);
         const response = await scraperUtils.getScraperRunsByParentScraperRun(
@@ -244,6 +248,7 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
     it("retrieves successfully", async () => {
         const parentScraperRunRefId = await scraperUtils.writeParentScraperRun({
             parentLocationRefId: "100",
+            timestamp: moment().format(),
         });
         const scraperRunRefIds = [
             await dbUtils.generateId(),
@@ -254,11 +259,13 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
                 parentScraperRunRefId,
                 refId: scraperRunRefIds[0],
                 locationRefId: "123",
+                timestamp: moment().format(),
             },
             {
                 parentScraperRunRefId,
                 refId: scraperRunRefIds[1],
                 locationRefId: "123",
+                timestamp: moment().format(),
             },
         ]);
         const appointmentEntries = (

@@ -24,14 +24,14 @@ async function createTestLocation() {
     return newLocationId;
 }
 
-async function createTestScraperRun(locationRef, bookableAppointmentsFound) {
+async function createTestScraperRun(locationRef) {
     const scraperRunId = await dbUtils.generateId();
     await scraperData.writeScraperRunsByRefIds([
         {
             refId: scraperRunId,
             locationRefId: locationRef,
             parentScraperRunRefId: "234",
-            bookableAppointmentsFound,
+            timestamp: moment().format(),
         },
     ]);
     scraperRunIds.push(scraperRunId);
@@ -141,7 +141,7 @@ describe("handleIndividualAlert behavior", () => {
 describe("setUpNewAlert", () => {
     it("creates a new alert", async () => {
         const locationRefId = await createTestLocation();
-        const scraperRunRefId = await createTestScraperRun(locationRefId, 100);
+        const scraperRunRefId = await createTestScraperRun(locationRefId);
 
         const alertId = await alerts.setUpNewAlert(
             locationRefId,
@@ -248,13 +248,13 @@ describe("getLastAlertStartTime", () => {
 
         const expectedTimestamp = await dbUtils
             .retrieveItemByRefId("appointmentAlerts", alertId)
-            .then((res) => res.ts);
+            .then((res) => res.data.startTime);
 
         await expect(
             alerts
                 .getLastAlertStartTime(locationRefId)
                 .then((ts) => ts.format())
-        ).to.eventually.equal(moment(expectedTimestamp / 1000).format());
+        ).to.eventually.equal(moment(expectedTimestamp).format());
 
         await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
     });
@@ -341,8 +341,12 @@ describe("mergeData", () => {
 
 describe("aggregateAvailability", () => {
     it("returns generic availability if we have one entry with no listed appts available", () => {
-        expect(alerts.aggregateAvailability([{ data: {} }])).to.deep.equal({
-            bookableAppointmentsFound: null,
+        expect(
+            alerts.aggregateAvailability([
+                { data: { availabilityWithNoNumbers: true } },
+            ])
+        ).to.deep.equal({
+            bookableAppointmentsFound: 0,
             availabilityWithNoNumbers: true,
         });
     });

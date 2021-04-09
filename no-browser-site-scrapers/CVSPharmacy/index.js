@@ -22,9 +22,9 @@ module.exports = async function GetAvailableAppointments() {
             .reduce((a, b) => b - a) /
         (3600 * 1000);
     // This would fail if offsetMountain were 2 digits, but it will only ever be 6 or 7.
-    const timestamp = new Date(
+    const timestamp = moment(
         `${webData.responsePayloadData.currentTime}-0${offsetMountain}:00`
-    );
+    ).format();
     const individualLocationData = webData.responsePayloadData.data.MA.map(
         (responseLocation) => {
             // Prior to Feb 22 or so, CVS's JSON returned:
@@ -70,7 +70,7 @@ module.exports = async function GetAvailableAppointments() {
         parentLocationName: "CVS Pharmacy",
         isChain: true,
         individualLocationData,
-        timestamp: new Date(),
+        timestamp: moment().format(),
     };
 };
 
