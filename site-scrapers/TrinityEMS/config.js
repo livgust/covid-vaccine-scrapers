@@ -5,6 +5,8 @@ const site = {
     zip: "01835",
     signUpLink:
         "https://app.acuityscheduling.com/schedule.php?owner=21713854&calendarID=5109380",
+    signUpLink:
+        "https://app.acuityscheduling.com/schedule.php?owner=21713854&calendarID=5109380",
 };
 
 module.exports = {
