@@ -22,11 +22,11 @@ module.exports = async function GetAvailableAppointments() {
         const rawAddress = location.address;
         const trimmedAddress = rawAddress.replace(/^\(|\)$/, ""); // Trim parens
         const [name, longAddress] = trimmedAddress.split(" - ");
-        const [address, city, state, zip] = longAddress.split(", ");
+        const [street, city, state, zip] = longAddress.split(", ");
         const retval = {
             name: name,
             city: city,
-            address: address,
+            street: street,
             state: state,
             zip: zip,
             hasAvailability: location.availability == "true",
