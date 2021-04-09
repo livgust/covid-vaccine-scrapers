@@ -161,7 +161,7 @@ async function getLastAlertStartTime(locationRefId) {
             )
         )
     );
-    return moment(nsTimestamp);
+    return moment(nsTimestamp.value);
 }
 
 async function setUpNewAlert(locationRefId, scraperRunRefId) {
