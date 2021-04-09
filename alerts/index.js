@@ -65,24 +65,42 @@ async function activeAlertExists(locationRefId) {
 }
 
 async function getActiveAlertRefId(locationRefId) {
-    const alert = await dbUtils.faunaQuery(
+    return dbUtils.faunaQuery(
         fq.If(
+            // If there is a recent alert,
             fq.Exists(
                 fq.Match(
                     "appointmentAlertsByLocationRefSortByStartTime",
                     fq.Ref(fq.Collection("locations"), locationRefId)
                 )
             ),
-            fq.Get(
-                fq.Match(
-                    "appointmentAlertsByLocationRefSortByStartTime",
-                    fq.Ref(fq.Collection("locations"), locationRefId)
+            fq.Let(
+                {
+                    alert: fq.Get(
+                        fq.Match(
+                            "appointmentAlertsByLocationRefSortByStartTime",
+                            fq.Ref(fq.Collection("locations"), locationRefId)
+                        )
+                    ),
+                },
+                fq.If(
+                    // And if the lastScraperRunRef is null,
+                    fq.IsNull(
+                        fq.Select(
+                            ["data", "lastScraperRunRef"],
+                            fq.Var("alert"),
+                            null
+                        )
+                    ),
+                    // Return the alert's ID.
+                    fq.Select(["ref", "id"], fq.Var("alert")),
+                    // Otherwise return null.
+                    null
                 )
             ),
             null
         )
     );
-    return alert?.ref.id;
 }
 
 async function setInactiveAlert(locationRefId, scraperRunRefId) {
@@ -135,16 +153,15 @@ async function getLastAlertStartTime(locationRefId) {
                         fq.Ref(fq.Collection("locations"), locationRefId)
                     )
                 ),
-                {}
-            ),
-            null
+                {
+                    // If we don't find a match, there has never been an alert for this location.
+                    // For ease of use, pretend there was one on Jan 1 2021.
+                    data: { startTime: fq.Time(moment("2021-01-01").format()) },
+                }
+            )
         )
     );
-    if (!nsTimestamp) {
-        throw new Error(`No alert found for location ${locationRefId}!`);
-    } else {
-        return moment(nsTimestamp);
-    }
+    return moment(nsTimestamp);
 }
 
 async function setUpNewAlert(locationRefId, scraperRunRefId) {
