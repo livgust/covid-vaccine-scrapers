@@ -1,16 +1,20 @@
 const { site } = require("./config");
-const { toTitleCase } = require("../../lib/stringUtil");
 const https = require("https");
-const { sendSlackMsg } = require("../../lib/slack");
+const fetch = require("node-fetch");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
-    const webData = await ScrapeWebsiteData();
-    console.log(`${site.name} done.`);
 
-    const massLocations = webData.filter(
+    const url = `${site.nationalStoresJson}?v=${new Date().valueOf()}`;
+
+    const nationalLocations = await fetch(url).then((res) => res.json());
+
+    const massLocations = nationalLocations.filter(
         (location) => location.region == "Massachusetts"
     );
+
+    console.log(`${site.name} done.`);
+
     return massLocations.map((location) => {
         // Raw address is like: (Star Market 4587 - 45 William T Morrissey Blvd, Dorchester, MA, 02125)
         // The format seems to be very consistent nationally, not to mention locally in MA. So we
@@ -29,27 +33,8 @@ module.exports = async function GetAvailableAppointments() {
             signUpLink: location.coach_url,
             latitude: location.lat,
             longitude: location.long,
+            timestamp: new Date(),
         };
         return retval;
     });
 };
-
-function urlContent(url, options) {
-    return new Promise((resolve) => {
-        let response = "";
-        https.get(url, options, (res) => {
-            let body = "";
-            res.on("data", (chunk) => (body += chunk));
-            res.on("end", () => {
-                response = body;
-                resolve(response);
-            });
-        });
-    });
-}
-
-async function ScrapeWebsiteData() {
-    const url = `${site.nationalStoresJson}?v=${new Date().valueOf()}`;
-    const options = { headers: { Referer: site.website } };
-    return JSON.parse(await urlContent(url, options));
-}
