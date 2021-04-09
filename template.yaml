@@ -49,10 +49,17 @@ Resources:
     Properties:
       StageName: !Sub "${Environment}"
       MinimumCompressionSize: 1000
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
       Cors:
         AllowMethods: "'*'"
         AllowHeaders: "'*'"
         AllowOrigin: "'*'"
+      MethodSettings:
+        - HttpMethod: GET
+          CacheTtlInSeconds: 5
+          ResourcePath: "/appointment_availability"
+          CachingEnabled: true
 
   MACovidVaccineScraper:
     Type: AWS::Serverless::Function
@@ -138,7 +145,7 @@ Resources:
           Properties:
             RestApiId: !Ref MACovidVaccinesApi
             Method: GET
-            Path: /get_data
+            Path: /appointment_availability
 
   MACovidVaccineAlerts:
     Type: AWS::Serverless::Function
