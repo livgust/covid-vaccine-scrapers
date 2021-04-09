@@ -237,14 +237,22 @@ async function publishGroupAlert(
         const last = sortedLocationCities.pop();
         joinedLocations = `${sortedLocationCities.join(", ")}, and ${last}`;
     }
-    const locationMessage = `${locationName} locations in ${joinedLocations}`;
+
+    // keep it short for Twitter's sake.
+    if (joinedLocations.length > 230) {
+        joinedLocations = "across Massachusetts";
+    } else {
+        joinedLocations = "in " + joinedLocations;
+    }
+
+    const locationMessage = `${locationName} locations ${joinedLocations}`;
 
     // we assume the "else" case is when availabilityWithNoNumbers is true; we pass it through to this function to be explicit.
     const appointmentsMessage = bookableAppointmentsFound
         ? `${bookableAppointmentsFound} appointments available`
         : `Appointments available`;
 
-    const message = `${appointmentsMessage} in ${locationMessage}. Visit https://macovidvaccines.com for more details and to sign up.`;
+    const message = `${appointmentsMessage} at ${locationMessage}. Visit https://macovidvaccines.com for more details and to sign up.`;
 
     const promises = [];
     if (bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()) {
@@ -268,19 +276,23 @@ async function handleGroupAlerts({
         for (const location of locations) {
             let locationBookableAppointmentsFound = 0;
             let locationAvailabilityWithNoNumbers = false;
-            for (const appointment of location.appointments) {
+            for (const appointment of location.appointments || []) {
                 locationBookableAppointmentsFound +=
-                    appointment.numberAvailable || 0;
+                    appointment.data?.numberAvailable || 0;
                 locationAvailabilityWithNoNumbers =
                     locationAvailabilityWithNoNumbers ||
-                    !!appointment.availabilityWithNoNumbers;
+                    !!appointment.data?.availabilityWithNoNumbers;
             }
             if (
                 locationBookableAppointmentsFound ||
                 locationAvailabilityWithNoNumbers
             ) {
-                if (!locationCities.includes(location.location.address.city)) {
-                    locationCities.push(location.location.address.city);
+                if (
+                    !locationCities.includes(
+                        location.location.data?.address?.city
+                    )
+                ) {
+                    locationCities.push(location.location.data?.address?.city);
                 }
             }
             bookableAppointmentsFound += locationBookableAppointmentsFound;
@@ -292,6 +304,7 @@ async function handleGroupAlerts({
         const alertExists = await alerts.activeAlertExists(
             parentLocation.ref.id
         );
+        console.log(`group alert does ${!alertExists ? "not " : ""}exist`);
 
         // 3. if alert doesn't exist and there is availability, start an alert & notify.
         if (
@@ -306,6 +319,9 @@ async function handleGroupAlerts({
                     moment().subtract(alerts.REPEAT_ALERT_TIME(), "minutes")
                 )
             ) {
+                console.log(
+                    `starting new group alert for ${parentLocation.ref.id}`
+                );
                 await alerts.setUpNewAlert(
                     parentLocation.ref.id,
                     parentScraperRunRefId,
@@ -320,6 +336,7 @@ async function handleGroupAlerts({
                 );
                 return;
             } else {
+                console.log(`doing nothing for ${parentLocation.ref.id}`);
                 return;
             }
         }
@@ -329,6 +346,7 @@ async function handleGroupAlerts({
             alertExists &&
             !(bookableAppointmentsFound || availabilityWithNoNumbers)
         ) {
+            console.log(`stopping group alert for ${parentLocation.ref.id}`);
             await alerts.setInactiveAlert(
                 parentLocation.ref.id,
                 parentScraperRunRefId
@@ -339,9 +357,11 @@ async function handleGroupAlerts({
         // 5. if alert exists and there is availability, bail.
         // 6. if alert doesn't exist and there is no avaialbility, bail.
         else {
+            console.log(`doing nothing for ${parentLocation.ref.id}`);
             return;
         }
     } else {
+        console.log(`doing nothing for ${parentLocation.ref.id}`);
         return;
     }
 }
