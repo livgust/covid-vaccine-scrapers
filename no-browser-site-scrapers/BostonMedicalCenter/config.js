@@ -36,36 +36,16 @@ const sites = [
         signUpLink,
     },
     {
-        name: "Dorchester COVID-19 Vaccination Site @ Russell Auditorium",
+        name: "Dorchester COVID-19 Vaccination Site @ Russell Auditoriume",
         street: "70 Talbot St.",
         city: "Dorchester",
         zip: "02124",
         departmentID: "10098245",
         signUpLink,
     },
-    {
-        name: "Boston Medical Center @ Dowling Building Grd Floor",
-        street: "850 Harrison Ave.",
-        city: "Boston",
-        zip: "02118",
-        departmentID: "10108801",
-        signUpLink,
-    },
 ];
 
-providerIDs = [
-    "10033319",
-    "10033364",
-    "10033367",
-    "10033370",
-    "10033373",
-    "10033822",
-    "10033823",
-    "10033824",
-    "10033825",
-    "10033826",
-    "10033827",
-];
+providerIDs = ["10033319", "10033364", "10033367", "10033370", "10033373"];
 
 module.exports = {
     sites,
