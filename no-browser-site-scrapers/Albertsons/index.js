@@ -38,7 +38,7 @@ function urlContent(url, options) {
 }
 
 async function ScrapeWebsiteData() {
-    const url = `${site.nationalStoresJson}`;
+    const url = `${site.nationalStoresJson}?v=${new Date().valueOf()}`;
     const options = { headers: { Referer: site.website } };
     return JSON.parse(await urlContent(url, options));
 }
