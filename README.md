@@ -8,14 +8,23 @@ This is the open-source portion of the back-end, website scraping software that 
 
 ## Setup
 
+1. If you do not have NodeJS installed, please go to the [NodeJS Downloads Page](https://nodejs.org/en/download/) to download and install it. Choose the latest version corresponding to the major version number defined in `.nvmrc`.
+
+      If you use [nvm](https://github.com/nvm-sh/nvm) to manage installed versions of `node` and `npm`, switch to the node version defined in `.nvmrc` via `nvm use`. Run `nvm install` if you get a "not yet installed" error.
+
+      _**NOTE:** If you use a different major version of `node`, you may experience errors when running commands from this repo with `node` or `npm`. Additionally, please ensure you're using `npm` version `7.0.0` or greater by running `npm --version`._
+
 1.  Download a recent version of Chromium locally: https://download-chromium.appspot.com/
-1.  Create a `.env` file with the following:
+1.  Create a [`.env`](https://www.npmjs.com/package/dotenv) file in the root directory of the project with the following:
 
         DEVELOPMENT=true
         CHROMEPATH="path/to/chromium/that/you/downloaded"
         # e.g. /Applications/Chromium.app/Contents/MacOS/Chromium
-        PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
-
+        # PROPRIETARY_SITE_SCRAPERS_PATH="./../proprietary/site-scrapers" (optional, example)
+        # SLACKWEBHOOKBOTCHANNEL=https://hooks.slack.com/services/your/token/here
+        # AWSACCESSKEYID=yourAccessKey
+        # AWSSECRETACCESSKEY=yourSecretKey
+        
 1.  Install `prettier` and `eslint`; make sure you run them before making any commits.
 
 ## Using this code
@@ -52,6 +61,22 @@ If you run this yourself with the default settings and with the proper permissio
 To scrape data from a site, you either need to:
 - figure out which API calls are made (Chrome devtools > Network tab) and make these calls yourself to fetch availability
 - interact with the site (clicking buttons, inspecting HTML elements, etc) using puppeteer
+
+Implement `GetAvailableAppointments` in your scraper to return a list of locations with pertinent location and availability data. For example, a dictionary specifying a CVS location might look like this:
+
+    {
+      city: 'North Andover',
+      name: 'CVS (North Andover)',
+      hasAvailability: false,
+      availability: {},
+      timestamp: 2021-04-07T18:27:37.498Z,
+      siteTimestamp: 2021-04-07T17:23:33.046Z,
+      signUpLink: 'https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-banner-1-link2-coronavirus-vaccine',
+      latitude: 42.6757741,
+      longitude: -71.12855859999999
+    },
+
+Some values, such as `latitude` and `longitude`, may be calculated based on the presence of other values such as `street`, `city` and `zip`. Look at existing scrapers for examples of how to populate the most important values.
 
 It's often the case that at the time you're trying to write a scraper, there is no availability to scrape. This makes it hard to know what to do in the case of availability.
 To start, you can just return `hasAvailability = true` or `false` and not report specific available appointments.
