@@ -1,5 +1,4 @@
-const signUpLink =
-    "https://mychartscheduling.bmc.org/MyChartscheduling/covid19#/scheduling";
+const signUpLink = "https://www.bmc.org/community-covid-vaccine-scheduling";
 
 const sites = [
     {
