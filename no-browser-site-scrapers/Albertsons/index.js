@@ -12,8 +12,19 @@ module.exports = async function GetAvailableAppointments() {
         (location) => location.region == "Massachusetts"
     );
     return massLocations.map((location) => {
+        // Raw address is like: (Star Market 4587 - 45 William T Morrissey Blvd, Dorchester, MA, 02125)
+        // The format seems to be very consistent nationally, not to mention locally in MA. So we 
+        // pull the specific parts out of the string.
+        const rawAddress = location.address;
+        const trimmedAddress = rawAddress.replace(/^\(|\)$/, ''); // Trim parens
+        const [name, longAddress] = trimmedAddress.split(' - ')
+        const [address, city, state, zip] = longAddress.split(', ')
         const retval = {
-            name: `${site.name} (${location.address})`,
+            name: name,
+            city: city,
+            address: address,            
+            state: state,
+            zip: zip,
             hasAvailability: location.availability == "true",
             signUpLink: location.coach_url,
             latitude: location.lat,
