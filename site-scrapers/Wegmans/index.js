@@ -31,6 +31,9 @@ async function ScrapeWebsiteData(browser) {
     await page.waitForXPath(paths.massOption);
     const massLinks = await page.$x(paths.massOption);
     massLinks[1].click();
+    await page.waitForTimeout(1000);
+    const scheduleBtns = await page.$x(paths.scheduleBtn);
+    scheduleBtns[1].click();
 
     // Wait for schedule chat bot response
     const lastMessageText = await new Promise((resolve) => {
