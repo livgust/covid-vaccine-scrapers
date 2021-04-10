@@ -35,6 +35,8 @@ dotenv.config();
 const alerts = {
     // How many appointments we must find to consider mass-alerting
     APPOINTMENT_NUMBER_THRESHOLD: () => 10,
+    // How many appointments we must find to consider alerting at all
+    SMALL_APPOINTMENT_NUMBER_THRESHOLD: () => 3,
     // How many minutes must pass between new alerts for the same location
     REPEAT_ALERT_TIME: () => 15,
     // exported functions:
@@ -210,7 +212,12 @@ async function runImmediateAlerts(
         ) {
             promises.push(sendTweet(message));
         }
-        promises.push(sendSlackMsg("bot", message));
+        if (
+            bookableAppointmentsFound >=
+            alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
+        ) {
+            promises.push(sendSlackMsg("bot", message));
+        }
     }
     // log any errors without failing.
     return Promise.all(promises).catch(console.error);
@@ -258,7 +265,11 @@ async function publishGroupAlert(
     if (bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()) {
         promises.push(sendTweet(message));
     }
-    promises.push(sendSlackMsg("bot", message));
+    if (
+        bookableAppointmentsFound >= alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
+    ) {
+        promises.push(sendSlackMsg("bot", message));
+    }
     return Promise.all(promises).catch(console.err);
 }
 
@@ -414,7 +425,7 @@ function aggregateAvailability(appointments = []) {
             preReturn.availabilityWithNoNumbers
         ) {
             console.err(
-                `Both bookableAppointmentFound and availabilityWithNoNumbers set for (first appt entry: ${JSON.stringify(
+                `Both bookableAppointmentsFound and availabilityWithNoNumbers set for (first appt entry: ${JSON.stringify(
                     appointments[0]
                 )})!`
             );
