@@ -49,10 +49,17 @@ Resources:
     Properties:
       StageName: !Sub "${Environment}"
       MinimumCompressionSize: 1000
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
       Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
+        AllowMethods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
+      MethodSettings:
+        - HttpMethod: GET
+          CacheTtlInSeconds: 5
+          ResourcePath: "/appointment_availability"
+          CachingEnabled: true
 
   MACovidVaccineScraper:
     Type: AWS::Serverless::Function
@@ -132,13 +139,16 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
             BucketName: "*"
+      Environment:
+        Variables:
+          FAUNA_DB: !Ref FaunaApiKey
       Events:
         GetMACovidVaccineScraperDataApi:
           Type: Api
           Properties:
             RestApiId: !Ref MACovidVaccinesApi
             Method: GET
-            Path: /get_data
+            Path: /appointment_availability
 
   MACovidVaccineAlerts:
     Type: AWS::Serverless::Function

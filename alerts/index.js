@@ -35,6 +35,8 @@ dotenv.config();
 const alerts = {
     // How many appointments we must find to consider mass-alerting
     APPOINTMENT_NUMBER_THRESHOLD: () => 10,
+    // How many appointments we must find to consider alerting at all
+    SMALL_APPOINTMENT_NUMBER_THRESHOLD: () => 3,
     // How many minutes must pass between new alerts for the same location
     REPEAT_ALERT_TIME: () => 15,
     // exported functions:
@@ -65,38 +67,42 @@ async function activeAlertExists(locationRefId) {
 }
 
 async function getActiveAlertRefId(locationRefId) {
-    const data = await dbUtils
-        .faunaQuery(
-            fq.Filter(
-                fq.Paginate(
-                    fq.Match(
-                        fq.Index("appointmentAlertsByLocationRef"),
-                        fq.Ref(fq.Collection("locations"), locationRefId)
-                    )
-                ),
-                fq.Lambda((x) =>
+    return dbUtils.faunaQuery(
+        fq.If(
+            // If there is a recent alert,
+            fq.Exists(
+                fq.Match(
+                    "appointmentAlertsByLocationRefSortByStartTime",
+                    fq.Ref(fq.Collection("locations"), locationRefId)
+                )
+            ),
+            fq.Let(
+                {
+                    alert: fq.Get(
+                        fq.Match(
+                            "appointmentAlertsByLocationRefSortByStartTime",
+                            fq.Ref(fq.Collection("locations"), locationRefId)
+                        )
+                    ),
+                },
+                fq.If(
+                    // And if the lastScraperRunRef is null,
                     fq.IsNull(
                         fq.Select(
                             ["data", "lastScraperRunRef"],
-                            fq.Get(x),
+                            fq.Var("alert"),
                             null
                         )
-                    )
+                    ),
+                    // Return the alert's ID.
+                    fq.Select(["ref", "id"], fq.Var("alert")),
+                    // Otherwise return null.
+                    null
                 )
-            )
+            ),
+            null
         )
-        .then((res) => {
-            return res.data;
-        });
-    if (data.length > 1) {
-        throw Error(
-            `Multiple active alerts found for location ${locationRefId}.`
-        );
-    } else if (data.length === 0) {
-        return null;
-    } else {
-        return data[0].id;
-    }
+    );
 }
 
 async function setInactiveAlert(locationRefId, scraperRunRefId) {
@@ -135,7 +141,7 @@ async function getLastAlertStartTime(locationRefId) {
      */
     const nsTimestamp = await dbUtils.faunaQuery(
         fq.Select(
-            "ts",
+            ["data", "startTime"],
             fq.If(
                 fq.Exists(
                     fq.Match(
@@ -149,16 +155,15 @@ async function getLastAlertStartTime(locationRefId) {
                         fq.Ref(fq.Collection("locations"), locationRefId)
                     )
                 ),
-                {}
-            ),
-            ""
+                {
+                    // If we don't find a match, there has never been an alert for this location.
+                    // For ease of use, pretend there was one on Jan 1 2021.
+                    data: { startTime: fq.Time(moment("2021-01-01").format()) },
+                }
+            )
         )
     );
-    if (!nsTimestamp) {
-        throw new Error(`No alert found for location ${locationRefId}!`);
-    } else {
-        return moment(nsTimestamp / 1000);
-    }
+    return moment(nsTimestamp.value);
 }
 
 async function setUpNewAlert(locationRefId, scraperRunRefId) {
@@ -171,7 +176,7 @@ async function setUpNewAlert(locationRefId, scraperRunRefId) {
                     fq.Collection("scraperRuns"),
                     scraperRunRefId
                 ),
-                startTime: fq.Time("now"),
+                startTime: fq.Now(),
             },
         })
     );
@@ -207,7 +212,12 @@ async function runImmediateAlerts(
         ) {
             promises.push(sendTweet(message));
         }
-        promises.push(sendSlackMsg("bot", message));
+        if (
+            bookableAppointmentsFound >=
+            alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
+        ) {
+            promises.push(sendSlackMsg("bot", message));
+        }
     }
     // log any errors without failing.
     return Promise.all(promises).catch(console.error);
@@ -234,20 +244,32 @@ async function publishGroupAlert(
         const last = sortedLocationCities.pop();
         joinedLocations = `${sortedLocationCities.join(", ")}, and ${last}`;
     }
-    const locationMessage = `${locationName} locations in ${joinedLocations}`;
+
+    // keep it short for Twitter's sake.
+    if (joinedLocations.length > 230) {
+        joinedLocations = "across Massachusetts";
+    } else {
+        joinedLocations = "in " + joinedLocations;
+    }
+
+    const locationMessage = `${locationName} locations ${joinedLocations}`;
 
     // we assume the "else" case is when availabilityWithNoNumbers is true; we pass it through to this function to be explicit.
     const appointmentsMessage = bookableAppointmentsFound
         ? `${bookableAppointmentsFound} appointments available`
         : `Appointments available`;
 
-    const message = `${appointmentsMessage} in ${locationMessage}. Visit https://macovidvaccines.com for more details and to sign up.`;
+    const message = `${appointmentsMessage} at ${locationMessage}. Visit https://macovidvaccines.com for more details and to sign up.`;
 
     const promises = [];
     if (bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()) {
         promises.push(sendTweet(message));
     }
-    promises.push(sendSlackMsg("bot", message));
+    if (
+        bookableAppointmentsFound >= alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
+    ) {
+        promises.push(sendSlackMsg("bot", message));
+    }
     return Promise.all(promises).catch(console.err);
 }
 
@@ -265,19 +287,23 @@ async function handleGroupAlerts({
         for (const location of locations) {
             let locationBookableAppointmentsFound = 0;
             let locationAvailabilityWithNoNumbers = false;
-            for (const appointment of location.appointments) {
+            for (const appointment of location.appointments || []) {
                 locationBookableAppointmentsFound +=
-                    appointment.numberAvailable || 0;
+                    appointment.data?.numberAvailable || 0;
                 locationAvailabilityWithNoNumbers =
                     locationAvailabilityWithNoNumbers ||
-                    !!appointment.availabilityWithNoNumbers;
+                    !!appointment.data?.availabilityWithNoNumbers;
             }
             if (
                 locationBookableAppointmentsFound ||
                 locationAvailabilityWithNoNumbers
             ) {
-                if (!locationCities.includes(location.location.address.city)) {
-                    locationCities.push(location.location.address.city);
+                if (
+                    !locationCities.includes(
+                        location.location.data?.address?.city
+                    )
+                ) {
+                    locationCities.push(location.location.data?.address?.city);
                 }
             }
             bookableAppointmentsFound += locationBookableAppointmentsFound;
@@ -289,6 +315,7 @@ async function handleGroupAlerts({
         const alertExists = await alerts.activeAlertExists(
             parentLocation.ref.id
         );
+        console.log(`group alert does ${!alertExists ? "not " : ""}exist`);
 
         // 3. if alert doesn't exist and there is availability, start an alert & notify.
         if (
@@ -303,6 +330,9 @@ async function handleGroupAlerts({
                     moment().subtract(alerts.REPEAT_ALERT_TIME(), "minutes")
                 )
             ) {
+                console.log(
+                    `starting new group alert for ${parentLocation.ref.id}`
+                );
                 await alerts.setUpNewAlert(
                     parentLocation.ref.id,
                     parentScraperRunRefId,
@@ -317,6 +347,7 @@ async function handleGroupAlerts({
                 );
                 return;
             } else {
+                console.log(`(1) doing nothing for ${parentLocation.ref.id}`);
                 return;
             }
         }
@@ -326,6 +357,7 @@ async function handleGroupAlerts({
             alertExists &&
             !(bookableAppointmentsFound || availabilityWithNoNumbers)
         ) {
+            console.log(`stopping group alert for ${parentLocation.ref.id}`);
             await alerts.setInactiveAlert(
                 parentLocation.ref.id,
                 parentScraperRunRefId
@@ -336,9 +368,11 @@ async function handleGroupAlerts({
         // 5. if alert exists and there is availability, bail.
         // 6. if alert doesn't exist and there is no avaialbility, bail.
         else {
+            console.log(`(2) doing nothing for ${parentLocation.ref.id}`);
             return;
         }
     } else {
+        console.log(`(3) doing nothing for ${parentLocation.ref.id}`);
         return;
     }
 }
@@ -374,19 +408,30 @@ function aggregateAvailability(appointments = []) {
             bookableAppointmentsFound: 0,
             availabilityWithNoNumbers: false,
         };
-    } else if (appointments.length === 1) {
-        return {
-            availabilityWithNoNumbers: true,
-            bookableAppointmentsFound: null,
-        };
     } else {
-        return {
+        const preReturn = {
             bookableAppointmentsFound: appointments.reduce(
                 (acc, cur) => acc + (cur?.data?.numberAvailable || 0),
                 0
             ),
-            availabilityWithNoNumbers: false,
+            availabilityWithNoNumbers: appointments.reduce(
+                (acc, cur) =>
+                    acc || cur?.data?.availabilityWithNoNumbers || false,
+                false
+            ),
         };
+        if (
+            preReturn.bookableAppointmentsFound &&
+            preReturn.availabilityWithNoNumbers
+        ) {
+            console.err(
+                `Both bookableAppointmentsFound and availabilityWithNoNumbers set for (first appt entry: ${JSON.stringify(
+                    appointments[0]
+                )})!`
+            );
+            preReturn.availabilityWithNoNumbers = false;
+        }
+        return preReturn;
     }
 }
 
@@ -440,17 +485,17 @@ async function handleIndividualAlert({
     );
     if (await alerts.activeAlertExists(locationRefId)) {
         if (!bookableAppointmentsFound && !availabilityWithNoNumbers) {
-            console.log("setting alert inactive.");
+            console.log(`setting alert inactive for ${locationRefId}.`);
             await alerts.setInactiveAlert(locationRefId, scraperRunRefId);
         } else {
-            console.log("continuing alert.");
+            console.log(`continuing alert for ${locationRefId}.`);
             await alerts.maybeContinueAlerting();
         }
     } else if (
         (bookableAppointmentsFound && bookableAppointmentsFound > 0) ||
         availabilityWithNoNumbers
     ) {
-        console.log("appointments found.");
+        console.log(`appointments found for ${locationRefId}.`);
         const alertStartTime = await alerts.getLastAlertStartTime(
             locationRefId
         );
@@ -460,7 +505,7 @@ async function handleIndividualAlert({
                 moment().subtract(alerts.REPEAT_ALERT_TIME(), "minutes")
             )
         ) {
-            console.log("starting new alert.");
+            console.log(`starting new alert for ${locationRefId}.`);
             await alerts.setUpNewAlert(
                 locationRefId,
                 scraperRunRefId,
@@ -481,16 +526,13 @@ async function handleIndividualAlert({
             );
         }
     } else {
-        console.log("Not doing anything.");
+        console.log(`Not doing anything for ${locationRefId}.`);
     }
     return;
 }
 
 async function handler({ parentLocationRefId, parentScraperRunRefId }) {
-    console.dir(
-        { parentLocationRefId, parentScraperRunRefId },
-        { depth: null }
-    );
+    console.log(JSON.stringify({ parentLocationRefId, parentScraperRunRefId }));
     const { locations, scraperRunsAndAppointments } = await alerts.getChildData(
         {
             parentLocationRefId,
@@ -501,14 +543,15 @@ async function handler({ parentLocationRefId, parentScraperRunRefId }) {
         locations,
         scraperRunsAndAppointments,
     });
-    console.dir(mergedLocations, { depth: null });
-    const parentLocation = await dbUtils
-        .retrieveItemByRefId("parentLocations", parentLocation.ref.id)
-        .then((res) => res.data);
+    console.log(JSON.stringify(mergedLocations));
+    const parentLocation = await dbUtils.retrieveItemByRefId(
+        "parentLocations",
+        parentLocationRefId
+    );
     await alerts.handleGroupAlerts({
         parentLocation,
         parentScraperRunRefId,
-        mergedLocations,
+        locations: mergedLocations,
     });
     await alerts.handleIndividualAlerts(
         mergedLocations,

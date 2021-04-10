@@ -117,7 +117,9 @@ describe("writeScrapedData", async () => {
                     scraperRunRefId: "234",
                     date: "4/5/21",
                     numberAvailable: 42,
+                    availabilityWithNoNumbers: false,
                     signUpLink: undefined,
+                    extraData: undefined,
                 },
             ],
         ]);
@@ -171,7 +173,9 @@ describe("writeParentScraperRun", () => {
             refId
         );
         expect(scraperRun.data.parentLocationRef.id).to.equal("123");
-        expect(scraperRun.data.timestamp).to.equal(timestamp);
+        expect(moment(scraperRun.data.timestamp.value).format()).to.equal(
+            timestamp
+        );
         await dbUtils.deleteItemByRefId("parentScraperRuns", refId);
     });
 });
@@ -219,12 +223,14 @@ describe("getScraperRunsByParentScraperRun", () => {
         const scraperRunRefId = await dbUtils.generateId();
         const parentScraperRunRefId = await scraperUtils.writeParentScraperRun({
             parentLocationRefId: "100",
+            timestamp: moment().format(),
         });
         const res = await scraperUtils.writeScraperRunsByRefIds([
             {
                 parentScraperRunRefId,
                 refId: scraperRunRefId,
                 locationRefId: "456",
+                timestamp: moment().format(),
             },
         ]);
         const response = await scraperUtils.getScraperRunsByParentScraperRun(
@@ -244,6 +250,7 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
     it("retrieves successfully", async () => {
         const parentScraperRunRefId = await scraperUtils.writeParentScraperRun({
             parentLocationRefId: "100",
+            timestamp: moment().format(),
         });
         const scraperRunRefIds = [
             await dbUtils.generateId(),
@@ -254,11 +261,13 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
                 parentScraperRunRefId,
                 refId: scraperRunRefIds[0],
                 locationRefId: "123",
+                timestamp: moment().format(),
             },
             {
                 parentScraperRunRefId,
                 refId: scraperRunRefIds[1],
                 locationRefId: "123",
+                timestamp: moment().format(),
             },
         ]);
         const appointmentEntries = (
@@ -293,12 +302,14 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
                                 entry.scraperRun.data.parentScraperRunRef.id,
                         },
                     },
-                    appointments: entry.appointments.map((appt) => ({
-                        refId: appt.ref.id,
-                        data: {
-                            scraperRunRefId: appt.data.scraperRunRef.id,
-                        },
-                    })),
+                    appointments: entry.appointments
+                        .map((appt) => ({
+                            refId: appt.ref.id,
+                            data: {
+                                scraperRunRefId: appt.data.scraperRunRef.id,
+                            },
+                        }))
+                        .sort((a, b) => a.refId - b.refId),
                 };
             })
         ).to.deep.include.members([
@@ -319,7 +330,7 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
                         refId: appointmentEntries[1],
                         data: { scraperRunRefId: scraperRunRefIds[0] },
                     },
-                ],
+                ].sort((a, b) => a.refId - b.refId),
             },
             {
                 scraperRun: {
@@ -338,5 +349,86 @@ describe("getScraperRunsAndAppointmentsByParentScraperRun", () => {
         );
         await dbUtils.deleteItemsByRefIds("scraperRuns", scraperRunRefIds);
         await dbUtils.deleteItemsByRefIds("appointments", appointmentEntries);
+    });
+});
+
+describe("spits out what we write", () => {
+    it("writes & reads", async () => {
+        const randomName = Math.random().toString(36).substring(7);
+        const timestamp = moment().format();
+        await scraperUtils.writeScrapedData({
+            parentLocationName: "Parent Location",
+            timestamp,
+            individualLocationData: [
+                {
+                    name: `RandomName-${randomName}`,
+                    street: "2240 Iyannough Road",
+                    city: "West Barnstable",
+                    zip: "02668",
+                    availability: {
+                        "03/16/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 2,
+                            signUpLink: "fake-signup-link-2",
+                        },
+                        "03/17/2021": {
+                            hasAvailability: true,
+                            numberAvailableAppointments: 1,
+                            signUpLink: null,
+                            extraData: "blah",
+                        },
+                        "03/20/2021": {
+                            hasAvailability: true,
+                        },
+                        "03/21/2021": {
+                            hasAvailability: false,
+                        },
+                    },
+                    hasAvailability: true,
+                    extraData: {
+                        "Vaccinations offered":
+                            "Pfizer-BioNTech COVID-19 Vaccine",
+                        "Age groups served": "Adults",
+                        "Services offered": "Vaccination",
+                        "Additional Information": "Pfizer vaccine",
+                        "Clinic Hours": "10:00 am - 03:00 pm",
+                    },
+                    signUpLink: "fake-signup-link",
+                },
+            ],
+        });
+        const res = await scraperUtils.getAppointmentsForAllLocations();
+        expect(
+            res.results.find((res) => res.name === `RandomName-${randomName}`)
+        ).to.shallowDeepEqual({
+            name: `RandomName-${randomName}`,
+            street: "2240 Iyannough Road",
+            city: "West Barnstable",
+            zip: "02668",
+            availability: {
+                "03/16/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 2,
+                    signUpLink: "fake-signup-link-2",
+                },
+                "03/17/2021": {
+                    hasAvailability: true,
+                    numberAvailableAppointments: 1,
+                    extraData: "blah",
+                },
+                "03/20/2021": {
+                    hasAvailability: true,
+                },
+            },
+            hasAvailability: true,
+            extraData: {
+                "Vaccinations offered": "Pfizer-BioNTech COVID-19 Vaccine",
+                "Age groups served": "Adults",
+                "Services offered": "Vaccination",
+                "Additional Information": "Pfizer vaccine",
+                "Clinic Hours": "10:00 am - 03:00 pm",
+            },
+            signUpLink: "fake-signup-link",
+        });
     });
 });

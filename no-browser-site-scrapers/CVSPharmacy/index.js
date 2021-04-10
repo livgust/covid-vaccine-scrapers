@@ -1,6 +1,7 @@
 const { site } = require("./config");
 const { toTitleCase } = require("../../lib/stringUtil");
 const https = require("https");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
@@ -21,9 +22,9 @@ module.exports = async function GetAvailableAppointments() {
             .reduce((a, b) => b - a) /
         (3600 * 1000);
     // This would fail if offsetMountain were 2 digits, but it will only ever be 6 or 7.
-    const timestamp = new Date(
+    const timestamp = moment(
         `${webData.responsePayloadData.currentTime}-0${offsetMountain}:00`
-    );
+    ).format();
     const individualLocationData = webData.responsePayloadData.data.MA.map(
         (responseLocation) => {
             // Prior to Feb 22 or so, CVS's JSON returned:
@@ -54,7 +55,7 @@ module.exports = async function GetAvailableAppointments() {
                 name: `${site.name} (${city})`,
                 hasAvailability: responseLocation.status !== "Fully Booked",
                 availability: {},
-                timestamp: new Date(),
+                timestamp: moment().format(),
                 siteTimestamp: timestamp,
                 signUpLink: site.website,
             };
@@ -69,7 +70,7 @@ module.exports = async function GetAvailableAppointments() {
         parentLocationName: "CVS Pharmacy",
         isChain: true,
         individualLocationData,
-        timestamp: new Date(),
+        timestamp: moment().format(),
     };
 };
 

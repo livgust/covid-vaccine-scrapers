@@ -176,11 +176,8 @@ describe("FaunaDB Utils", function () {
                             numberAvailableAppointments: 1,
                             signUpLink: null,
                         },
-                        "03/18/2021": true,
-                        "03/19/2021": false,
                         "03/20/2021": {
                             hasAvailability: true,
-                            numberAvailableAppointments: 0,
                         },
                     },
                     hasAvailability: true,
@@ -199,9 +196,6 @@ describe("FaunaDB Utils", function () {
 
         // Write the appopriate location (if it's not already there), scaperRun, and appointment(s)
         await scraperTransactions.writeScrapedData(scraperOutput);
-
-        // sleep while the DB writing happens...
-        await new Promise((r) => setTimeout(r, 1000));
 
         const locationId = scraperTransactions.generateLocationId({
             name: scraperOutput.individualLocationData[0].name,
@@ -244,40 +238,23 @@ describe("FaunaDB Utils", function () {
         const retrieveScraperRunResult = await scraperTransactions.getScraperRunsByLocation(
             locationId
         );
-        expect(retrieveScraperRunResult).to.be.shallowDeepEqual({
-            data: [
-                {
-                    ref: {
-                        value: {
-                            collection: {
-                                value: {
-                                    id: "scraperRuns",
-                                    collection: {
-                                        value: { id: "collections" },
-                                    },
-                                },
-                            },
-                        },
-                    },
+        expect(
+            retrieveScraperRunResult.data.map((res) => {
+                return {
                     data: {
-                        locationRef: {
-                            value: {
-                                id: locationId,
-                                collection: {
-                                    value: {
-                                        id: "locations",
-                                        collection: {
-                                            value: { id: "collections" },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                        timestamp: "2021-03-16T13:15:27.318Z",
+                        locationRefId: res.data?.locationRef?.id,
+                        timestamp: res.data?.timestamp?.value,
                     },
+                };
+            })
+        ).to.be.shallowDeepEqual([
+            {
+                data: {
+                    locationRefId: locationId,
+                    timestamp: "2021-03-16T13:15:27.318Z",
                 },
-            ],
-        });
+            },
+        ]);
 
         const scraperRunRef = retrieveScraperRunResult.data[0].ref.id;
 
@@ -296,13 +273,16 @@ describe("FaunaDB Utils", function () {
                 date: "03/16/2021",
                 numberAvailable: 2,
                 signUpLink: "fake-signup-link-2",
+                availabilityWithNoNumbers: false,
             },
             {
                 date: "03/17/2021",
                 numberAvailable: 1,
+                availabilityWithNoNumbers: false,
             },
             {
-                date: "03/18/2021",
+                date: "03/20/2021",
+                availabilityWithNoNumbers: true,
             },
         ]);
         const appointmentRefIds = retrieveAppointmentsResult.map(
@@ -316,9 +296,4 @@ describe("FaunaDB Utils", function () {
             await dbUtils.deleteItemByRefId("appointments", id);
         });
     }).timeout(5000);
-
-    it.skip("can get the availability for all locations' most recent scraper runs", async () => {
-        await scraperTransactions.getAppointmentsForAllLocations();
-        // the logic isn't here yet.
-    });
 });

@@ -24,14 +24,14 @@ async function createTestLocation() {
     return newLocationId;
 }
 
-async function createTestScraperRun(locationRef, bookableAppointmentsFound) {
+async function createTestScraperRun(locationRef) {
     const scraperRunId = await dbUtils.generateId();
     await scraperData.writeScraperRunsByRefIds([
         {
             refId: scraperRunId,
             locationRefId: locationRef,
             parentScraperRunRefId: "234",
-            bookableAppointmentsFound,
+            timestamp: moment().format(),
         },
     ]);
     scraperRunIds.push(scraperRunId);
@@ -141,7 +141,7 @@ describe("handleIndividualAlert behavior", () => {
 describe("setUpNewAlert", () => {
     it("creates a new alert", async () => {
         const locationRefId = await createTestLocation();
-        const scraperRunRefId = await createTestScraperRun(locationRefId, 100);
+        const scraperRunRefId = await createTestScraperRun(locationRefId);
 
         const alertId = await alerts.setUpNewAlert(
             locationRefId,
@@ -231,15 +231,12 @@ describe("setInactiveAlert", () => {
 });
 
 describe("getLastAlertStartTime", () => {
-    it("throws an error if there are no alerts", async () => {
-        const nonExistentId = await dbUtils.generateId();
-        let error;
-        try {
-            await alerts.getLastAlertStartTime(nonExistentId);
-        } catch (e) {
-            error = e;
-        }
-        expect(error).to.be.instanceOf(Error);
+    it("returns something more than a day old if there is no alert", async () => {
+        expect(
+            (
+                await alerts.getLastAlertStartTime(await dbUtils.generateId())
+            ).valueOf()
+        ).to.be.lessThan(moment().subtract(1, "day").valueOf());
     });
 
     it("returns the latest timestamp if it exists", async () => {
@@ -248,13 +245,13 @@ describe("getLastAlertStartTime", () => {
 
         const expectedTimestamp = await dbUtils
             .retrieveItemByRefId("appointmentAlerts", alertId)
-            .then((res) => res.ts);
+            .then((res) => res.data.startTime.value);
 
         await expect(
             alerts
                 .getLastAlertStartTime(locationRefId)
                 .then((ts) => ts.format())
-        ).to.eventually.equal(moment(expectedTimestamp / 1000).format());
+        ).to.eventually.equal(moment(expectedTimestamp).format());
 
         await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
     });
@@ -341,8 +338,12 @@ describe("mergeData", () => {
 
 describe("aggregateAvailability", () => {
     it("returns generic availability if we have one entry with no listed appts available", () => {
-        expect(alerts.aggregateAvailability([{ data: {} }])).to.deep.equal({
-            bookableAppointmentsFound: null,
+        expect(
+            alerts.aggregateAvailability([
+                { data: { availabilityWithNoNumbers: true } },
+            ])
+        ).to.deep.equal({
+            bookableAppointmentsFound: 0,
             availabilityWithNoNumbers: true,
         });
     });
@@ -425,18 +426,22 @@ describe("handleGroupAlerts", () => {
             parentScraperRunRefId: "doesntmatter",
             locations: [
                 {
-                    location: { address: { city: "Haverhill" } },
+                    location: { data: { address: { city: "Haverhill" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
                 {
-                    location: { address: { city: "Cambridge" } },
+                    location: { data: { address: { city: "Cambridge" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
@@ -472,18 +477,22 @@ describe("handleGroupAlerts", () => {
             parentScraperRunRefId: "doesntmatter",
             locations: [
                 {
-                    location: { address: { city: "Haverhill" } },
+                    location: { data: { address: { city: "Haverhill" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
                 {
-                    location: { address: { city: "Cambridge" } },
+                    location: { data: { address: { city: "Cambridge" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
@@ -510,11 +519,11 @@ describe("handleGroupAlerts", () => {
             parentScraperRunRefId: "doesntmatter",
             locations: [
                 {
-                    location: { address: { city: "Haverhill" } },
+                    location: { data: { address: { city: "Haverhill" } } },
                     appointments: [],
                 },
                 {
-                    location: { address: { city: "Cambridge" } },
+                    location: { data: { address: { city: "Cambridge" } } },
                     appointments: [],
                 },
             ],

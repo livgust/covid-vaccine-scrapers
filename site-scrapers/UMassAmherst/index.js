@@ -1,4 +1,5 @@
 const { site } = require("./config");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
@@ -6,7 +7,7 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} done.`);
     return {
         parentLocationName: "UMass Amherst",
-        timestamp: new Date(),
+        timestamp: moment().format(),
         individualLocationData: [
             {
                 ...site,
