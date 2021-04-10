@@ -31,6 +31,10 @@ jobs:
           CHROMEPATH: /usr/bin/chromium-browser
           FAUNA_DB: ${{ secrets.FAUNA_DB_DEV }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          TWITTER_API_KEY: "TEST"
+          TWITTER_API_SECRET: "TEST"
+          TWITTER_ACCESS_TOKEN_KEY: "TEST"
+          TWITTER_ACCESS_TOKEN_SECRET: "TEST"
         run: |
           if [ -z "${{ secrets.FAUNA_DB_DEV }}" ] || [ -z "${{ secrets.GOOGLE_API_KEY }}" ]
           then
