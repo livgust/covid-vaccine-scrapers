@@ -3,9 +3,6 @@ const fetch = require("node-fetch");
 const htmlParser = require("node-html-parser");
 const moment = require("moment");
 
-const { sendSlackMsg } = require("../../lib/slack");
-const s3 = require("../../lib/s3");
-
 module.exports = async function GetAvailableAppointments(
     _ignored,
     fetchService = liveFetchService()
