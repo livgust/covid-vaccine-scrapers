@@ -174,7 +174,7 @@ async function setUpNewAlert(locationRefId, scraperRunRefId) {
                     fq.Collection("scraperRuns"),
                     scraperRunRefId
                 ),
-                startTime: fq.Time("now"),
+                startTime: fq.Now(),
             },
         })
     );
@@ -336,7 +336,7 @@ async function handleGroupAlerts({
                 );
                 return;
             } else {
-                console.log(`doing nothing for ${parentLocation.ref.id}`);
+                console.log(`(1) doing nothing for ${parentLocation.ref.id}`);
                 return;
             }
         }
@@ -357,11 +357,11 @@ async function handleGroupAlerts({
         // 5. if alert exists and there is availability, bail.
         // 6. if alert doesn't exist and there is no avaialbility, bail.
         else {
-            console.log(`doing nothing for ${parentLocation.ref.id}`);
+            console.log(`(2) doing nothing for ${parentLocation.ref.id}`);
             return;
         }
     } else {
-        console.log(`doing nothing for ${parentLocation.ref.id}`);
+        console.log(`(3) doing nothing for ${parentLocation.ref.id}`);
         return;
     }
 }

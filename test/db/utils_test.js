@@ -296,9 +296,4 @@ describe("FaunaDB Utils", function () {
             await dbUtils.deleteItemByRefId("appointments", id);
         });
     }).timeout(5000);
-
-    it.skip("can get the availability for all locations' most recent scraper runs", async () => {
-        await scraperTransactions.getAppointmentsForAllLocations();
-        // the logic isn't here yet.
-    });
 });

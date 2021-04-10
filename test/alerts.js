@@ -231,15 +231,12 @@ describe("setInactiveAlert", () => {
 });
 
 describe("getLastAlertStartTime", () => {
-    it("throws an error if there are no alerts", async () => {
-        const nonExistentId = await dbUtils.generateId();
-        let error;
-        try {
-            await alerts.getLastAlertStartTime(nonExistentId);
-        } catch (e) {
-            error = e;
-        }
-        expect(error).to.be.instanceOf(Error);
+    it("returns something more than a day old if there is no alert", async () => {
+        expect(
+            (
+                await alerts.getLastAlertStartTime(await dbUtils.generateId())
+            ).valueOf()
+        ).to.be.lessThan(moment().subtract(1, "day").valueOf());
     });
 
     it("returns the latest timestamp if it exists", async () => {
@@ -248,7 +245,7 @@ describe("getLastAlertStartTime", () => {
 
         const expectedTimestamp = await dbUtils
             .retrieveItemByRefId("appointmentAlerts", alertId)
-            .then((res) => res.data.startTime);
+            .then((res) => res.data.startTime.value);
 
         await expect(
             alerts
@@ -429,18 +426,22 @@ describe("handleGroupAlerts", () => {
             parentScraperRunRefId: "doesntmatter",
             locations: [
                 {
-                    location: { address: { city: "Haverhill" } },
+                    location: { data: { address: { city: "Haverhill" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
                 {
-                    location: { address: { city: "Cambridge" } },
+                    location: { data: { address: { city: "Cambridge" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
@@ -476,18 +477,22 @@ describe("handleGroupAlerts", () => {
             parentScraperRunRefId: "doesntmatter",
             locations: [
                 {
-                    location: { address: { city: "Haverhill" } },
+                    location: { data: { address: { city: "Haverhill" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
                 {
-                    location: { address: { city: "Cambridge" } },
+                    location: { data: { address: { city: "Cambridge" } } },
                     appointments: [
                         {
-                            numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
                         },
                     ],
                 },
@@ -514,11 +519,11 @@ describe("handleGroupAlerts", () => {
             parentScraperRunRefId: "doesntmatter",
             locations: [
                 {
-                    location: { address: { city: "Haverhill" } },
+                    location: { data: { address: { city: "Haverhill" } } },
                     appointments: [],
                 },
                 {
-                    location: { address: { city: "Cambridge" } },
+                    location: { data: { address: { city: "Cambridge" } } },
                     appointments: [],
                 },
             ],
