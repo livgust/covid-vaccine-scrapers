@@ -176,11 +176,8 @@ describe("FaunaDB Utils", function () {
                             numberAvailableAppointments: 1,
                             signUpLink: null,
                         },
-                        "03/18/2021": true,
-                        "03/19/2021": false,
                         "03/20/2021": {
                             hasAvailability: true,
-                            numberAvailableAppointments: 0,
                         },
                     },
                     hasAvailability: true,
@@ -276,13 +273,16 @@ describe("FaunaDB Utils", function () {
                 date: "03/16/2021",
                 numberAvailable: 2,
                 signUpLink: "fake-signup-link-2",
+                availabilityWithNoNumbers: false,
             },
             {
                 date: "03/17/2021",
                 numberAvailable: 1,
+                availabilityWithNoNumbers: false,
             },
             {
-                date: "03/18/2021",
+                date: "03/20/2021",
+                availabilityWithNoNumbers: true,
             },
         ]);
         const appointmentRefIds = retrieveAppointmentsResult.map(
