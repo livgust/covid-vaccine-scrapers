@@ -14,7 +14,7 @@ module.exports = async function GetAvailableAppointments() {
         return {
             parentLocationName: "Pediatric Associates of Greater Salem",
             timestamp: moment().format(),
-            individualLocationData: [DoGetAvailableAppointments()],
+            individualLocationData: await DoGetAvailableAppointments(),
         };
     } finally {
         console.log("Pediatric Associates of Greater Salem done.");
