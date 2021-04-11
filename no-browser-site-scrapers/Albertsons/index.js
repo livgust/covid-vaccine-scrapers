@@ -1,6 +1,7 @@
 const { site } = require("./config");
 const https = require("https");
 const fetch = require("node-fetch");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
@@ -15,26 +16,30 @@ module.exports = async function GetAvailableAppointments() {
 
     console.log(`${site.name} done.`);
 
-    return massLocations.map((location) => {
-        // Raw address is like: (Star Market 4587 - 45 William T Morrissey Blvd, Dorchester, MA, 02125)
-        // The format seems to be very consistent nationally, not to mention locally in MA. So we
-        // pull the specific parts out of the string.
-        const rawAddress = location.address;
-        const trimmedAddress = rawAddress.replace(/^\(|\)$/, ""); // Trim parens
-        const [name, longAddress] = trimmedAddress.split(" - ");
-        const [street, city, state, zip] = longAddress.split(", ");
-        const retval = {
-            name: name,
-            city: city,
-            street: street,
-            state: state,
-            zip: zip,
-            hasAvailability: location.availability == "true",
-            signUpLink: location.coach_url,
-            latitude: location.lat,
-            longitude: location.long,
-            timestamp: new Date(),
-        };
-        return retval;
-    });
+    return {
+        parentLocationName: "Shaw's/Star Market",
+        isChain: true,
+        timestamp: moment().format(),
+        individualLocationData: massLocations.map((location) => {
+            // Raw address is like: (Star Market 4587 - 45 William T Morrissey Blvd, Dorchester, MA, 02125)
+            // The format seems to be very consistent nationally, not to mention locally in MA. So we
+            // pull the specific parts out of the string.
+            const rawAddress = location.address;
+            const trimmedAddress = rawAddress.replace(/^\(|\)$/, ""); // Trim parens
+            const [name, longAddress] = trimmedAddress.split(" - ");
+            const [street, city, state, zip] = longAddress.split(", ");
+            const retval = {
+                name: name,
+                city: city,
+                street: street,
+                state: state,
+                zip: zip,
+                hasAvailability: location.availability === "true",
+                signUpLink: location.coach_url,
+                latitude: location.lat,
+                longitude: location.long,
+            };
+            return retval;
+        }),
+    };
 };
