@@ -44,14 +44,14 @@ async function ScrapeWebsiteData(browser) {
     // Wait for schedule chat bot response
     const lastMessageText = await new Promise((resolve) => {
         const interval = setInterval(async () => {
-            // wait for count of chat bot responses to be at least 2
+            // wait for count of chat bot responses to be at least 4
             const botMessages = await page.$x(paths.botMessage);
             const count = botMessages.length;
             const lastMessage = botMessages.pop();
             const messageText = await lastMessage.evaluate(
                 (node) => node.innerText
             );
-            if (count > 2) {
+            if (count >= 4) {
                 clearInterval(interval);
                 resolve(messageText);
             }
