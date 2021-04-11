@@ -71,7 +71,7 @@ describe("GLFHC availability test using scraper and saved HTML", function () {
 /* utilities */
 
 /**
- * Loads the saved HTML of the website. The file is expected to be in the test/TrinityEMS/ folder.
+ * Loads the saved HTML of the website.
  *
  * @param {String} filename The filename only, include its extension
  */
