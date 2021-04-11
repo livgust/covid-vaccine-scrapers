@@ -54,7 +54,7 @@ const sites = [
         massVax: true, // This is a MassVax site that only allows preregistration
     },
     {
-        name: "South Lawrence Easy School",
+        name: "South Lawrence East School",
         siteUrl: "South%20Lawrence%20East%20School",
         street: "165 Crawford St.",
         city: "Lawrence",
