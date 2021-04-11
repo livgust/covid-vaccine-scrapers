@@ -11,7 +11,11 @@ const DAYSTOSEARCH = 16;
 module.exports = async function GetAvailableAppointments() {
     console.log("Pediatric Associates of Greater Salem starting.");
     try {
-        return DoGetAvailableAppointments();
+        return {
+            parentLocationName: "Pediatric Associates of Greater Salem",
+            timestamp: moment().format(),
+            individualLocationData: [DoGetAvailableAppointments()],
+        };
     } finally {
         console.log("Pediatric Associates of Greater Salem done.");
     }
@@ -40,7 +44,6 @@ async function DoGetAvailableAppointments() {
             name: `${name} (${location.city})`,
             ...location,
             ...webData,
-            timestamp: moment().format(),
         };
     });
 }

@@ -19,7 +19,7 @@ describe("Atrius GetAvailabilities", async () => {
            "availability: {}
           }
         */
-        await expect(atrius())
+        await expect(atrius().then((res) => res.individualLocationData[0]))
             .to.eventually.deep.include({
                 hasAvailability: false,
             })
@@ -66,7 +66,7 @@ describe("Atrius GetAvailabilities", async () => {
            }
           }
         */
-        const result = atrius();
+        const result = atrius().then((res) => res.individualLocationData[0]);
         await expect(result).to.eventually.include(resultingAvailability);
         nock.cleanAll();
     });

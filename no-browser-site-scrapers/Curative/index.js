@@ -1,5 +1,6 @@
 const { site } = require("./config");
 const https = require("https");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
@@ -23,8 +24,7 @@ module.exports = async function GetAvailableAppointments() {
         rawData[id] = await p;
     }
 
-    console.log(`${site.name} (basically) done.`);
-    return site.locations.map((loc) => {
+    const individualLocationData = site.locations.map((loc) => {
         const data = rawData[loc.id];
         const results = {
             name: data.name,
@@ -39,7 +39,6 @@ module.exports = async function GetAvailableAppointments() {
             massVax: !!loc.massVax, // This is a MassVax site that only allows preregistration
             hasAvailability: false,
             availability: {}, //date (MM/DD/YYYY) => hasAvailability, numberAvailableAppointments
-            timestamp: new Date(),
         };
         // If this is a massVax site that is invite-only, then we don't
         // need availability data.
@@ -85,4 +84,10 @@ module.exports = async function GetAvailableAppointments() {
         }
         return results;
     });
+    console.log(`${site.name} done.`);
+    return {
+        parentLocationName: "Curative",
+        timestamp: moment().format(),
+        individualLocationData,
+    };
 };

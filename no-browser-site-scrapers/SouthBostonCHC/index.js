@@ -1,5 +1,6 @@
 const { site } = require("./config");
 const mychart = require("../../lib/MyChartAPI");
+const moment = require("moment");
 
 const siteId = "1900119";
 const vt = "1089";
@@ -10,9 +11,14 @@ module.exports = async function GetAvailableAppointments() {
     const webData = await ScrapeWebsiteData();
     console.log(`${site.name} done.`);
     return {
-        ...site,
-        ...webData[dept],
-        timestamp: new Date(),
+        parentLocationName: "South Boston Community Health Center",
+        timestamp: moment().format(),
+        individualLocationData: [
+            {
+                ...site,
+                ...webData[dept],
+            },
+        ],
     };
 };
 

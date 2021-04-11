@@ -6,7 +6,9 @@ const { site } = require("./../site-scrapers/HeywoodHealthcare/config");
 
 describe(`${site.name}`, function () {
     it("Test against live site", async function () {
-        await expect(heywood(browser)).to.eventually.have.keys([
+        await expect(
+            heywood(browser).then((res) => res.individualLocationData[0])
+        ).to.eventually.have.keys([
             "name",
             "street",
             "city",
@@ -15,7 +17,6 @@ describe(`${site.name}`, function () {
             "signUpLink",
             "hasAvailability",
             "totalAvailability",
-            "timestamp",
         ]);
     });
 });

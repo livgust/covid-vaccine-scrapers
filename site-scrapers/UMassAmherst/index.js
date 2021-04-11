@@ -1,13 +1,19 @@
 const { site } = require("./config");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const info = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
     return {
-        ...site,
-        ...info,
-        timestamp: new Date(),
+        parentLocationName: "UMass Amherst",
+        timestamp: moment().format(),
+        individualLocationData: [
+            {
+                ...site,
+                ...info,
+            },
+        ],
     };
 };
 

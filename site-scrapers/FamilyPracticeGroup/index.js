@@ -1,6 +1,7 @@
 const { site } = require("./config");
 const { sendSlackMsg } = require("../../lib/slack");
 const s3 = require("../../lib/s3");
+const moment = require("moment");
 
 const noAppointmentMatchString =
     "All appointment times are currently reserved.";
@@ -11,10 +12,15 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} done.`);
     const { website, ...restSite } = site;
     return {
-        ...restSite,
-        signUpLink: site.website,
-        ...data,
-        timestamp: new Date(),
+        parentLocationName: "Arlington Family Practice Group",
+        timestamp: moment().format(),
+        individualLocationData: [
+            {
+                ...restSite,
+                signUpLink: site.website,
+                ...data,
+            },
+        ],
     };
 };
 

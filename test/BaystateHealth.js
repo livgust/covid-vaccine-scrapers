@@ -7,7 +7,9 @@ const { site } = require("./../site-scrapers/BaystateHealth/config");
 describe(`${site.name}`, function () {
     this.timeout(5000);
     it("Test against live site", async function () {
-        await expect(baystatehealth(browser)).to.eventually.have.keys([
+        await expect(
+            baystatehealth(browser).then((res) => res.individualLocationData[0])
+        ).to.eventually.have.keys([
             "name",
             "street",
             "city",
@@ -16,7 +18,6 @@ describe(`${site.name}`, function () {
             "signUpLink",
             "hasAvailability",
             "totalAvailability",
-            "timestamp",
         ]);
     });
 });

@@ -67,4 +67,8 @@ jobs:
           BucketName=${{ secrets.AWSS3BUCKETNAME }} \
           RecaptchaToken=${{ secrets.RECAPTCHA_TOKEN }} \
           SlackWebhook=${{ secrets.SLACK_WEBHOOK_BOT_CHANNEL }} \
+          TwitterApiKey=${{ secrets.TWITTER_API_KEY }} \
+          TwitterApiSecret=${{ secrets.TWITTER_API_SECRET }} \
+          TwitterAccessTokenKey=${{ secrets.TWITTER_ACCESS_TOKEN_KEY }} \
+          TwitterAccessTokenSecret=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }} \
           Environment=prod

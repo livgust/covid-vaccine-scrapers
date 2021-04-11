@@ -1,12 +1,12 @@
 const { site } = require("./config");
 const https = require("https");
 const crypto = require("crypto");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData();
-    console.log(`${site.name} done.`);
-    return site.locations.map((loc) => {
+    const individualLocationData = site.locations.map((loc) => {
         const locHash = md5HashString(loc.street + loc.city);
         const responseLocation = webData[locHash];
         let hasAvailability = false;
@@ -37,9 +37,15 @@ module.exports = async function GetAvailableAppointments() {
             availability,
             signUpLink: site.signUpLink,
             ...loc,
-            timestamp: new Date(),
         };
     });
+    console.log(`${site.name} done.`);
+    return {
+        parentLocationName: "Price Chopper",
+        isChain: true,
+        individualLocationData,
+        timestamp: moment().format(),
+    };
 };
 
 function md5HashString(string) {
