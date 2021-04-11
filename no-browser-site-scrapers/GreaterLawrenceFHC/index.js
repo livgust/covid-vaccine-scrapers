@@ -35,7 +35,6 @@ async function ScrapeWebsiteData(site, fetchService) {
     return {
         ...site.public,
         ...results,
-        hasAvailability: Object.keys(results.availability).length > 0,
         timestamp: moment().format(),
     };
 }
@@ -62,6 +61,7 @@ async function fetchAvailability(site) {
 function extractAvailability(calendarHtml) {
     const results = {
         availability: {},
+        hasAvailability: false,
     };
     if (calendarHtml.includes("no-times-available-message")) {
         return results;
@@ -69,10 +69,10 @@ function extractAvailability(calendarHtml) {
         // parse calendarHtml
         const root = htmlParser.parse(calendarHtml);
         const slots = root.querySelectorAll(".time-selection");
-        results.availability = {
-            numberAvailableAppointments: slots.length,
-            hasAvailability: true,
-        };
+        if (slots.length > 0) {
+            results.totalAvailability = slots.length;
+            results.hasAvailability = true;
+        }
         return results;
     }
 }
