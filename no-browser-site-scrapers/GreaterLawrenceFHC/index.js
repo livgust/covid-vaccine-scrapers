@@ -88,27 +88,3 @@ function bodyParamString(calendar) {
         "calendarID=",
     ].join("&");
 }
-
-/*
-node-fetch (Chrome)
-fetch("https://glfhccovid19iz.as.me/schedule.php?action=showCalendar&fulldate=1&owner=21956779&template=weekly&location=Central+Plaza%2C+2+Water+Street%2C+Haverhill+MA", {
-  "headers": {
-    "accept": "*\/*",
-    "accept-language": "en-US,en;q=0.9",
-    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-    "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
-    "sec-ch-ua-mobile": "?0",
-    "sec-fetch-dest": "empty",
-    "sec-fetch-mode": "cors",
-    "sec-fetch-site": "same-origin",
-    "x-requested-with": "XMLHttpRequest",
-    "cookie": "PHPSESSID=s722u406dvg4rrcmu226r3hq1u"
-  },
-  "referrer": "https://glfhccovid19iz.as.me/schedule.php?location=Central+Plaza%2C+2+Water+Street%2C+Haverhill+MA",
-  "referrerPolicy": "same-origin",
-  "body": "type=20223228&calendar=5236989&skip=true&options%5Bqty%5D=1&options%5BnumDays%5D=3&ignoreAppointment=&appointmentType=&calendarID=",
-  "method": "POST",
-  "mode": "cors"
-});
-
-*/
