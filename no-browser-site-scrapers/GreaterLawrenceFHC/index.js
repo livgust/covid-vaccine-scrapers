@@ -13,9 +13,7 @@ module.exports = async function GetAvailableAppointments(
 
     for (const site of sites) {
         const websiteData = await ScrapeWebsiteData(site, fetchService);
-        console.log(
-            `${site.public.name}: slots = ${websiteData.availability.numberAvailableAppointments}`
-        );
+
         results.push(websiteData);
     }
 
