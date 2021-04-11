@@ -82,19 +82,20 @@ async function ScrapeWebsiteData(browser) {
                 rawExtraData.forEach((text) => {
                     if (text.indexOf("Available Appointments") !== -1) {
                         availableAppointments = parseInt(text.match(/\d+/)[0]);
-                    } else {
+                    } else if (
+                        // we're not going to show vaccine type; if we add it back in we need to restructure extraData completely
+                        // so that it writes correctly to Fauna (one location instead of one per vaccine type) and shows correctly
+                        // as well. Maybe we could do extraData per day and then do some aggregation when they're the same?
+                        text.substring(0, text.indexOf(":")).trim() !==
+                        "Vaccinations offered"
+                    ) {
                         extraData[
                             text.substring(0, text.indexOf(":")).trim()
                         ] = text.substring(text.indexOf(":") + 1).trim();
                     }
                 });
 
-                const uniqueID =
-                    locationName +
-                    street +
-                    city +
-                    zip +
-                    extraData["Vaccinations offered"];
+                const uniqueID = locationName + street + city + zip;
 
                 if (!results[uniqueID]) {
                     results[uniqueID] = {
