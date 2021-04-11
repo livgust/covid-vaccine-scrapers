@@ -9,13 +9,19 @@ module.exports = async function GetAvailableAppointments(
 ) {
     console.log(`${provider} starting.`);
 
-    const results = [];
+    const individualLocationData = [];
 
     for (const site of sites) {
         const websiteData = await ScrapeWebsiteData(site, fetchService);
 
-        results.push(websiteData);
+        individualLocationData.push(websiteData);
     }
+
+    const results = {
+        parentLocationName: "Greater Lawrence FHC",
+        timestamp: moment().format(),
+        individualLocationData: individualLocationData,
+    };
 
     console.log(`${provider} done.`);
     return results;
