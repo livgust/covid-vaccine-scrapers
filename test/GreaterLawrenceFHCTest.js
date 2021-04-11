@@ -30,20 +30,21 @@ describe("GLFHC availability test using scraper and saved HTML", function () {
         const results = await scraper(false, testFetchService);
 
         const expected = [false, false, true, false];
-        const hasAvailability = Object.values(results).map(
-            (result) => result.hasAvailability
-        );
+        const hasAvailability = Object.values(
+            results.individualLocationData
+        ).map((result) => result.hasAvailability);
         const afterTime = moment();
 
         expect(hasAvailability).is.deep.equal(expected);
 
         const expectedSlotCounts = [0, 0, 53, 0];
-        const slotCounts = Object.values(results).map((result) =>
-            Object.values(result.availability)
-                .map((value) => value.numberAvailableAppointments)
-                .reduce(function (total, number) {
-                    return total + number;
-                }, 0)
+        const slotCounts = Object.values(results.individualLocationData).map(
+            (result) =>
+                Object.values(result.availability)
+                    .map((value) => value.numberAvailableAppointments)
+                    .reduce(function (total, number) {
+                        return total + number;
+                    }, 0)
         );
 
         expect(expectedSlotCounts).is.deep.equal(slotCounts);
@@ -54,7 +55,7 @@ describe("GLFHC availability test using scraper and saved HTML", function () {
             and after when the scraper was executed
         - Each site's results object must have a property named "hasAvailability"
          */
-        results.forEach((result) => {
+        results.individualLocationData.forEach((result) => {
             expect(moment(result.timestamp).isBetween(beforeTime, afterTime));
             expect(result.hasAvailability).is.not.undefined;
         });
