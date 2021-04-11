@@ -10,6 +10,7 @@ function* filenames() {
     yield "noAvailability.html";
     yield "sampleAvailability.html";
     yield "noAvailability.html";
+    yield "noAvailability.html";
 }
 
 describe("GLFHC availability test using scraper and saved HTML", function () {
@@ -38,12 +39,14 @@ describe("GLFHC availability test using scraper and saved HTML", function () {
 
         const expectedSlotCounts = [0, 0, 53, 0];
         const slotCounts = Object.values(results).map((result) =>
-            result.availability.hasAvailability
-                ? result.availability.numberAvailableAppointments
-                : 0
+            Object.values(result.availability)
+                .map((value) => value.numberAvailableAppointments)
+                .reduce(function (total, number) {
+                    return total + number;
+                }, 0)
         );
 
-        expect(slotCounts).is.deep.equal(expectedSlotCounts);
+        expect(expectedSlotCounts).is.deep.equal(slotCounts);
         /*
         Structure conformance expectations:
 
