@@ -59,12 +59,14 @@ const sites = [
         street: "165 Crawford St.",
         city: "Lawrence",
         zip: "01843",
+        signUpLink: "https://home.color.com/vaccine/register/lawrencegeneral",
     },
     {
         name: "City of Lawrence Mobile Unit",
         siteUrl: "City%20of%20Lawrence%20Mobile%20Unit",
         city: "Lawrence",
         zip: "01843",
+        signUpLink: "https://home.color.com/vaccine/register/lawrencegeneral",
     },
 ];
 
