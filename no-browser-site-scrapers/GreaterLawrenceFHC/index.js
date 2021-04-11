@@ -80,7 +80,6 @@ async function fetchAvailability(site, startDate, nextPrev) {
         startDate,
         nextPrev
     );
-    console.log(`bodyString: ${bodyString}`);
 
     const response = await fetch(site.private.scrapeUrl, {
         headers: {
