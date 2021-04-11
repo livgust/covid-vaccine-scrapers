@@ -69,7 +69,7 @@ async function ScrapeWebsiteData(site, fetchService) {
     return {
         ...site.public,
         ...results,
-        hasAvailability: Object.keys(results).length > 0,
+        hasAvailability: Object.keys(results.availability).length > 0,
         timestamp: moment().format(),
     };
 }
