@@ -61,7 +61,6 @@ jobs:
           WalgreensEmail=${{ secrets.WALGREENS_EMAIL }} \
           WalgreensPassword=${{ secrets.WALGREENS_PASSWORD }} \
           WalgreensChallenge=${{ secrets.WALGREENS_CHALLENGE }} \
-          WalgreensApiKey=${{ secrets. WALGREENS_API_KEY }} \
           FaunaApiKey=${{ secrets.FAUNA_DB_PROD }} \
           NodeEnv=production \
           BucketName=${{ secrets.AWSS3BUCKETNAME }} \

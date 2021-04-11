@@ -83,7 +83,6 @@ Resources:
           WALGREENS_EMAIL: !Ref WalgreensEmail
           WALGREENS_PASSWORD: !Ref WalgreensPassword
           WALGREENS_CHALLENGE: !Ref WalgreensChallenge
-          WALGREENS_API_KEY: !Ref WalgreensApiKey
           FAUNA_DB: !Ref FaunaApiKey
           NODE_ENV: !Ref NodeEnv
           AWSS3BUCKETNAME: !Ref BucketName
@@ -142,6 +141,7 @@ Resources:
       Environment:
         Variables:
           FAUNA_DB: !Ref FaunaApiKey
+          NODE_ENV: !Ref NodeEnv
       Events:
         GetMACovidVaccineScraperDataApi:
           Type: Api
@@ -171,3 +171,4 @@ Resources:
           TWITTER_API_SECRET: !Ref TwitterApiSecret
           TWITTER_ACCESS_TOKEN_KEY: !Ref TwitterAccessTokenKey
           TWITTER_ACCESS_TOKEN_SECRET: !Ref TwitterAccessTokenSecret
+          NODE_ENV: !Ref NodeEnv
