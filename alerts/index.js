@@ -34,7 +34,7 @@ dotenv.config();
 
 const alerts = {
     // How many appointments we must find to consider mass-alerting
-    APPOINTMENT_NUMBER_THRESHOLD: () => 10,
+    APPOINTMENT_NUMBER_THRESHOLD: () => 25,
     // How many appointments we must find to consider alerting at all
     SMALL_APPOINTMENT_NUMBER_THRESHOLD: () => 3,
     // How many minutes must pass between new alerts for the same location
