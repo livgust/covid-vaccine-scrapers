@@ -3,7 +3,6 @@ const fetch = require("node-fetch");
 const htmlParser = require("node-html-parser");
 const moment = require("moment");
 
-let currentSite = null;
 module.exports = async function GetAvailableAppointments(
     _ignored,
     fetchService = liveFetchService()
@@ -13,7 +12,6 @@ module.exports = async function GetAvailableAppointments(
     const results = [];
 
     for (const site of sites) {
-        currentSite = site;
         const websiteData = await ScrapeWebsiteData(site, fetchService);
 
         results.push(websiteData);
@@ -23,6 +21,10 @@ module.exports = async function GetAvailableAppointments(
     return results;
 };
 
+/**
+ * Dependency injection: in live scraping, the fetchAvailability() in this module is used.
+ * In testing, a mock fetchAvailability() is injected.
+ */
 function liveFetchService() {
     return {
         async fetchAvailability(site, startDate, nextPrev) {
@@ -32,26 +34,27 @@ function liveFetchService() {
 }
 
 async function ScrapeWebsiteData(site, fetchService) {
-    // get current listing, and then advance month until no further availability
-    let monthAvailabilityMap = new Map();
-    // let [startDate, nextPrev] = [null, null];
-    let startDate = null;
-    let nextPrev = null;
     const results = {
         availability: {},
         hasAvailability: false,
     };
 
+    let monthAvailabilityMap = new Map();
+    let startDate = null;
+    let nextPrev = null;
+
+    // Advance the calendar of each site until no availability is found.
     do {
         const calendarHtml = await fetchService.fetchAvailability(
             site,
             startDate,
             nextPrev
         );
-        // parse calendarHtml
+
         const root = htmlParser.parse(calendarHtml);
 
-        monthAvailabilityMap = extractAvailability(root);
+        monthAvailabilityMap = getDailyAvailabilityCountsInCalendar(root);
+
         // Add all day objects to results.availability
         monthAvailabilityMap.forEach((value, key) => {
             results.availability[key] = {
@@ -59,14 +62,8 @@ async function ScrapeWebsiteData(site, fetchService) {
                 hasAvailability: !!value,
             };
         });
-        // Array.from(monthAvailabilityMap.entries()).reduce(
-        //     (acc, [key, value]) => ({ ...acc, [key]: value }),
-        //     results.availability
-        // );
+        // Get the next startDate, and nextPrev option string used in advancing the calendar in the fetch
         [startDate, nextPrev] = getStartDateAndNextPrevParams(root);
-        // console.log(
-        //     `site: ${site.public.name} :: startDate: ${startDate}, nextprev: ${nextPrev}`
-        // );
     } while (monthAvailabilityMap.size > 0);
 
     return {
@@ -101,21 +98,16 @@ async function fetchAvailability(site, startDate, nextPrev) {
     return response;
 }
 
-function extractAvailability(root) {
-    const map = getDailyAvailabilityCountsForMonth(root);
-    return map;
-    /*
-        const slots = root.querySelectorAll(".time-selection");
-        if (slots.length > 0) {
-            results.totalAvailability = slots.length;
-            results.hasAvailability = true;
-        }
-        return results;
-        */
-}
-
+/**
+ * Gets the bodyParam string for the fetch. Initially, it has no startDate, or nextprev, but
+ * does when stepping the calendar forward in time.
+ * @param {String} calendar (specific to location)
+ * @param {String} startDate
+ * @param {String} nextPrev
+ * @returns
+ */
 function bodyParamString(calendar, startDate, nextPrev) {
-    /* Example with nextprev and month=
+    /* Example with options[nextprev] and month=
     'type=20223228&calendar=5236989&month=2021-05-12&skip=true&options%5Bnextprev%5D%5B2021-05-12%5D=2021-04-11&options%5BnumDays%5D=5&ignoreAppointment=&appointmentType=&calendarID='
     */
     const paramsList = [
@@ -130,27 +122,21 @@ function bodyParamString(calendar, startDate, nextPrev) {
     ];
     if (startDate) {
         paramsList.push(`month=${startDate}`);
-        // nextprev%5D%5B2021-05-12%5D=2021-04-11
         paramsList.push(`options%5B${nextPrev}`);
     }
     return paramsList.join("&");
 }
 
 /**
- *
+ * Gets the availability in a calendar.
  * @param {HTMLElement} root
  * @returns
  */
-function getDailyAvailabilityCountsForMonth(root) {
+function getDailyAvailabilityCountsInCalendar(root) {
     function reformatDate(dateStr) {
         return moment(`${dateStr}T00:00:00`).format("M/D/YYYY");
     }
 
-    /*
-        The website seems to have changed to "alert-danger" for its "no
-        times available" message. Keeping the old way ("#no-times-availabile-message")
-        in case they switch back.
-     */
     if (hasNoAvailabilityMessage(root)) {
         return new Map();
     }
@@ -173,6 +159,13 @@ function getDailyAvailabilityCountsForMonth(root) {
 
     return dailySlotCountsMap ? dailySlotCountsMap : new Map();
 }
+
+/**
+ * If there's no availability, Acuity indicates it in a number of ways. Check
+ * for them.
+ * @param {HTMLElement} root
+ * @returns true if one of the Acuity no availability indicators is found
+ */
 function hasNoAvailabilityMessage(root) {
     const noTimesAvailable = root.querySelector("#no-times-available-message");
     const alertDanger = root.querySelector("#alert-danger");
@@ -193,18 +186,12 @@ function getStartDateAndNextPrevParams(root) {
 
     const str = root.querySelector(".calendar-next").getAttribute("href");
     const content = str.match(/\(.*\)/);
-    // console.log(`match parens content: ${content}`);
 
     const split = content[0].split(",");
-    // console.log(split);
 
-    const parensPattern = /[()']/g;
-
-    const result = split.map((s) => s.replace(parensPattern, "").trim());
-    // console.log(`startDate and nextprev: ${result}`);
+    const result = split.map((s) => s.replace(/[()']/g, "").trim());
 
     const nextPrev = result[1].match(/nextprev.*/)[0].replace(/%22%7D%7D/, "");
-    console.log(`nextprev: ${nextPrev}`);
 
     return [result[0], nextPrev];
 }
