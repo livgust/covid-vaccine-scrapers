@@ -1,5 +1,4 @@
 const scraper = require("../no-browser-site-scrapers/GreaterLawrenceFHC/index");
-const config = require("../no-browser-site-scrapers/GreaterLawrenceFHC/config");
 
 const { expect } = require("chai");
 const moment = require("moment");
@@ -26,7 +25,7 @@ describe("GLFHC availability test using scraper and saved HTML", function () {
     };
     const beforeTime = moment();
 
-    it("should provide availability for each site, and the results objects structure should conform", async function () {
+    it("should provide availability for one site, and the results objects structure should conform", async function () {
         const results = await scraper(false, testFetchService);
 
         const expected = [false, false, true, false];
