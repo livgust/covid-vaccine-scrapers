@@ -2,7 +2,6 @@
     {
         scraperRunRefId: 123,
         locationRefId: 234,
-        bookableAppointmentsFound: 456
     }
 
 DB structure:
@@ -11,7 +10,8 @@ DB structure:
 appointmentAlerts: {
     locationRef,
     firstScraperRunRef,
-    lastScraperRunRef
+    lastScraperRunRef,
+    startTime,
 }
 
 (for an alert, what zip codes we have texted and when)
@@ -196,7 +196,7 @@ async function runImmediateAlerts(
 
     let message;
     if (bookableAppointmentsFound) {
-        message = `${bookableAppointmentsFound} appointments available at ${location.name} in ${location.address.city}. Visit macovidvaccines.com to book.`;
+        message = `${bookableAppointmentsFound} appointments available at ${location.name} in ${location.address.city}. Visit https://macovidvaccines.com to book.`;
     } else if (availabilityWithNoNumbers) {
         message = `Appointments available at ${location.name} in ${location.address.city}. Visit https://macovidvaccines.com to book.`;
     } else {
@@ -252,7 +252,11 @@ async function publishGroupAlert(
         joinedLocations = "in " + joinedLocations;
     }
 
-    const locationMessage = `${locationName} locations ${joinedLocations}`;
+    const locationClause = `${locationName}${
+        sortedLocationCities.length > 1 ? " locations" : ""
+    }`;
+
+    const locationMessage = `${locationClause} ${joinedLocations}`;
 
     // we assume the "else" case is when availabilityWithNoNumbers is true; we pass it through to this function to be explicit.
     const appointmentsMessage = bookableAppointmentsFound
