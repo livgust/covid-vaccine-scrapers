@@ -7,16 +7,14 @@ module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
-    const results = dataFormatter.formatAndMergeData(
-        webData,
-        site.locations,
-        site.website
-    );
     return {
         parentLocationName: "Walgreens",
         isChain: true,
         timestamp: moment().format(),
-        individualLocationData: await results,
+        individualLocationData: dataFormatter.formatData(
+            site.locations,
+            site.website
+        ),
     };
 };
 
@@ -112,6 +110,7 @@ async function ScrapeWebsiteData(browser) {
             longitude,
             todayString
         );
+        console.log(postResponse);
         if (postResponse && postResponse.locations) {
             postResponse.locations.forEach((location) => {
                 availableLocations[location.partnerLocationId] = location;
