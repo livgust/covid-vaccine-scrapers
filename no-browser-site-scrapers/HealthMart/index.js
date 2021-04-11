@@ -33,7 +33,7 @@ module.exports = async function GetAvailableAppointments() {
                 }
             }
             return {
-                name: `Price Chopper (${toTitleCase(responseLocation.city)})`,
+                name: responseLocation.name,
                 street: toTitleCase(responseLocation.address1),
                 city: toTitleCase(responseLocation.city),
                 state: responseLocation.state,
@@ -46,7 +46,7 @@ module.exports = async function GetAvailableAppointments() {
     );
     console.log(`${site.name} done.`);
     return {
-        parentLocationName: "Price Chopper",
+        parentLocationName: "Health Mart Pharmacy",
         isChain: true,
         individualLocationData,
         timestamp: moment().format(),
