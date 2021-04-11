@@ -6,12 +6,17 @@ const {
     groupAppointmentsByDate,
     getNodeId,
 } = require("./functions");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
-    return webData;
+    return {
+        parentLocationName: "Lowell General",
+        timestamp: moment().format(),
+        individualLocationData: [webData],
+    };
 };
 
 async function ScrapeWebsiteData(browser) {
@@ -27,7 +32,6 @@ async function ScrapeWebsiteData(browser) {
             hasAvailability,
             availability,
             ...restSite,
-            timestamp: new Date(),
         };
     }
     const stationSelector = "[id*='time_slots_for_doctor_']";

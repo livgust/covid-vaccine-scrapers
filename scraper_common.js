@@ -18,8 +18,11 @@ const file = require("./lib/file");
 const Recaptcha = require("puppeteer-extra-plugin-recaptcha");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const s3 = require("./lib/s3");
-const dbUtils = require("./lib/db-utils");
+const { writeScrapedData } = require("./lib/db/scraper_data");
 const moment = require("moment");
+const AWS = require("aws-sdk");
+const { Lambda } = require("faunadb");
+const alertsLambda = new AWS.Lambda();
 
 const WRITE_TO_FAUNA = true;
 
@@ -55,61 +58,66 @@ async function execute(usePuppeteer, scrapers) {
         for (const scraper of scrapers) {
             const startTime = new Date();
             let isSuccess = true;
-            const returnValue = await scraper
-                .run(browser)
-                .catch((error) => {
-                    //print out the issue but don't fail, this way we still publish updates
-                    //for other locations even if this website's scrape doesn't work
-                    console.log(error);
-                    isSuccess = false;
-                    return null;
-                })
-                .then(async (result) => {
-                    const numberAppointments = getTotalNumberOfAppointments(
-                        result
-                    );
-                    await logScraperRun(
-                        scraper.name,
-                        isSuccess,
-                        new Date() - startTime,
-                        startTime,
-                        numberAppointments
-                    );
-                    return result;
-                });
-            results.push(returnValue);
+            const returnValue = await scraper.run(browser).catch((error) => {
+                //print out the issue but don't fail, this way we still publish updates
+                //for other locations even if this website's scrape doesn't work
+                console.log(error);
+                isSuccess = false;
+                return null;
+            });
+            const numberAppointments = getTotalNumberOfAppointments(
+                returnValue?.individualLocationData
+            );
+            await logScraperRun(
+                scraper.name,
+                isSuccess,
+                new Date() - startTime,
+                startTime,
+                numberAppointments
+            );
+            results.push(returnValue?.individualLocationData);
             // Coerce the results into the format we want.
             let returnValueArray = [];
-            if (Array.isArray(returnValue)) {
-                returnValueArray = returnValue;
-            } else if (returnValue) {
-                returnValueArray = [returnValue];
+            if (Array.isArray(returnValue?.individualLocationData)) {
+                returnValueArray = returnValue.individualLocationData;
+            } else if (returnValue?.individualLocationData) {
+                returnValueArray = [returnValue.individualLocationData];
             }
             // Write the data to FaunaDB.
             if (WRITE_TO_FAUNA && process.env.FAUNA_DB) {
                 try {
-                    await Promise.all(
-                        returnValueArray.map(async (res) => {
-                            await dbUtils.writeScrapedData({
-                                name: res.name,
-                                street: res.street,
-                                city: res.city,
-                                zip: res.zip,
-                                availability: res.availability,
-                                hasAvailability: res.availability,
-                                extraData: res.extraData,
-                                timestamp: moment().utc().format(),
-                                signUpLink: res.signUpLink,
-                                restrictions: res.restrictions,
-                                massVax: res.massVax,
-                                siteTimestamp: res.siteTimestamp
-                                    ? JSON.parse(
-                                          JSON.stringify(res.siteTimestamp)
-                                      )
-                                    : null,
-                            });
-                        })
-                    );
+                    if (returnValue) {
+                        console.log(JSON.stringify(returnValue));
+                        await writeScrapedData(returnValue).then(
+                            ({
+                                parentLocationRefId,
+                                parentScraperRunRefId,
+                            }) => {
+                                if (process.env.NODE_ENV === "production") {
+                                    alertsLambda.invoke(
+                                        {
+                                            FunctionName:
+                                                process.env.ALERTSFUNCTIONNAME,
+                                            InvocationType: "Event",
+                                            Payload: JSON.stringify({
+                                                parentLocationRefId,
+                                                parentScraperRunRefId,
+                                            }),
+                                        },
+                                        () => {}
+                                    );
+                                } else {
+                                    console.log(
+                                        "would call alerting function with the following args:"
+                                    );
+                                    console.log({
+                                        parentLocationRefId,
+                                        parentScraperRunRefId,
+                                    });
+                                }
+                            }
+                        );
+                    }
                 } catch (e) {
                     console.error("Failed to write to Fauna, got error:", e);
                 }
@@ -159,44 +167,28 @@ async function execute(usePuppeteer, scrapers) {
             // Add geocoding for all locations
             results: await getAllCoordinates(finalResultsArray, cachedResults),
         };
-
+        logGlobalMetric(
+            usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
+            1,
+            new Date()
+        );
+        logGlobalMetric(
+            usePuppeteer ? "Duration" : "NoBrowserDuration",
+            new Date() - globalStartTime,
+            new Date()
+        );
         const webData = JSON.stringify(responseJson);
         if (process.env.NODE_ENV !== "production") {
             const outFile = usePuppeteer ? "out.json" : "out_no_browser.json";
             console.log(
                 "The data that would be published is in '" + outFile + "'"
             );
-            //console.log("The following data would be published:");
-            //console.dir(responseJson, { depth: null });
             file.write(outFile, webData);
-
-            /* -- Don't record metrics in development --
-            logGlobalMetric(
-                usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
-                1,
-                new Date()
-            );
-            logGlobalMetric(
-                usePuppeteer ? "Duration" : "NoBrowserDuration",
-                new Date() - globalStartTime,
-                new Date()
-            );
-            */
             return responseJson;
         } else {
             const uploadResponse = await s3.saveWebData(
                 webData,
                 responseJson.timestamp
-            );
-            logGlobalMetric(
-                usePuppeteer ? "SuccessfulRun" : "SuccessfulNoBrowserRun",
-                1,
-                new Date()
-            );
-            logGlobalMetric(
-                usePuppeteer ? "Duration" : "NoBrowserDuration",
-                new Date() - globalStartTime,
-                new Date()
             );
             return uploadResponse;
         }

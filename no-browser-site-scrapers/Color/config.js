@@ -53,6 +53,21 @@ const sites = [
         signUpLink: "https://home.color.com/vaccine/register/fenway-hynes",
         massVax: true, // This is a MassVax site that only allows preregistration
     },
+    {
+        name: "South Lawrence East School",
+        siteUrl: "South%20Lawrence%20East%20School",
+        street: "165 Crawford St.",
+        city: "Lawrence",
+        zip: "01843",
+        signUpLink: "https://home.color.com/vaccine/register/lawrencegeneral",
+    },
+    {
+        name: "City of Lawrence Mobile Unit",
+        siteUrl: "City%20of%20Lawrence%20Mobile%20Unit",
+        city: "Lawrence",
+        zip: "01843",
+        signUpLink: "https://home.color.com/vaccine/register/lawrencegeneral",
+    },
 ];
 
 module.exports = sites;

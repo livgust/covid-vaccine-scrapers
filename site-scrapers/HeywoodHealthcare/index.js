@@ -1,4 +1,5 @@
 const { site } = require("./config");
+const moment = require("moment");
 
 const noAppointmentMatchString =
     "All appointment types are private, none are available for scheduling.";
@@ -15,9 +16,14 @@ module.exports = async function GetAvailableAppointments(browser) {
     const webData = await ScrapeWebsiteData(browser);
     console.log(`${site.name} done.`);
     return {
-        ...site,
-        ...webData,
-        timestamp: new Date(),
+        parentLocationName: "Heywood Healthcare",
+        timestamp: moment().format(),
+        individualLocationData: [
+            {
+                ...site,
+                ...webData,
+            },
+        ],
     };
 };
 

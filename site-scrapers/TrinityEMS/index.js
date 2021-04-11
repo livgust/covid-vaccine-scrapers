@@ -1,6 +1,7 @@
 const s3 = require("../../lib/s3");
 const { site } = require("./config.js");
 const { sendSlackMsg } = require("../../lib/slack");
+const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(
     browser,
@@ -15,7 +16,6 @@ module.exports = async function GetAvailableAppointments(
         browser,
         pageService
     );
-    console.log(`${site.name} done.`);
     const results = {
         ...site,
         ...availability,
@@ -23,7 +23,12 @@ module.exports = async function GetAvailableAppointments(
     if (extraData) {
         results["extraData"] = extraData;
     }
-    return results;
+    console.log(`${site.name} done.`);
+    return {
+        parentLocationName: "Trinity EMS",
+        timestamp: moment().format(),
+        individualLocationData: [results],
+    };
 };
 
 let activeDayPageContentSavedToS3 = false; // becomes true upon first save to s3

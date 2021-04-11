@@ -1,18 +1,35 @@
-const site = {
-    name: "Southbridge Community Center",
+const townRestricted = {
+    name: "Harrington Healthcare (Local Residents)",
     street: "153 Chestnut Street",
     city: "Southbridge",
     zip: "01550",
     website:
-        "https://signup.com/api/events?accesskey=6775657374&activity_id=3500438&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3500438",
-    signUpLink: "https://forms.gle/tMDnRLcXzZnPUxqP9",
-    signUpDotComLink: "https://signup.com/go/JDcgTZB",
-    restrictedWebsite:
-        "https://signup.com/api/events?accesskey=6775657374&activity_id=3532310&enddate=2021%2F12%2F31&include_comments=false&include_jobassignments=true&include_jobs=true&my_jobs=false&selected_activity=3532310",
-    restrictedSignUpLink: "https://forms.gle/dU1WroZZQPaqLh8YA",
-    restrictedSignUpDotComLink: "https://signup.com/go/eEwLxrn",
+        "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202050",
+    extraData:
+        "All vaccinations are performed at the Southbridge Community Center at 153 Chestnut St. Southbridge, MA 01550.",
+    restrictions:
+        "Registration is open to only those who live in the following towns: Auburn, Brimfield, Brookfield, (North, East, West) Charlton, Dudley, Holland, Leicester, Oxford, Southbridge, Spencer, Sturbridge, Sutton, Uxbridge, Wales, Warren, Webster",
+    signUpLink:
+        "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202050",
+};
+const unRestricted = {
+    name: "Harrington Healthcare (All Eligible Residents)",
+    street: "153 Chestnut Street",
+    city: "Southbridge",
+    zip: "01550",
+    website:
+        "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202038",
+    extraData:
+        "All vaccinations are performed at the Southbridge Community Center at 153 Chestnut St. Southbridge, MA 01550.",
+    signUpLink:
+        "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202038",
 };
 
+const monthCount = 2;
+
 module.exports = {
-    site,
+    entity: "Harrington Healthcare",
+    townRestricted,
+    unRestricted,
+    monthCount,
 };

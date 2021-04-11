@@ -46,7 +46,7 @@ const fakeAvailabilityResponse = {
 };
 
 function removeTimestamps(results) {
-    return results.map((entry) => {
+    return results.individualLocationData.map((entry) => {
         const { timestamp, ...rest } = entry;
         return rest;
     });

@@ -5,18 +5,24 @@ const moment = require("moment");
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
     const webData = await rxTouch.ScrapeRxTouch(browser, site, "StopAndShop");
-    console.log(`${site.name} done.`);
-    return site.locations.map((loc) => {
-        const response = webData[loc.zip];
+    const individualLocationData = Object.values(webData).map((loc) => {
         return {
             name: `Stop & Shop (${loc.city})`,
-            hasAvailability: !!Object.keys(response.availability).length,
-            extraData: response.message,
-            debug: response.debug,
-            availability: response.availability,
+            street: loc.street,
+            city: loc.city,
+            zip: loc.zip,
+            hasAvailability: !!Object.keys(loc.availability).length,
+            extraData: loc.message,
+            debug: loc.debug,
+            availability: loc.availability,
             signUpLink: site.website,
-            ...loc,
-            timestamp: moment().format(),
         };
     });
+    console.log(`${site.name} done.`);
+    return {
+        parentLocationName: "Stop & Shop",
+        timestamp: moment().format(),
+        isChain: true,
+        individualLocationData,
+    };
 };

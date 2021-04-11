@@ -11,8 +11,9 @@ describe("PriceChopper GetAvailabilities", () => {
 
         const apiResponse = [
             {
-                address1: "555 Hubbard Ave",
-                city: "Pittsfield",
+                address1: "555 HUBBARD AVE",
+                zipCode: "12345",
+                city: "PITTSFIELD",
                 visibleTimeSlots: [{ time: "2021-03-05T10:00Z" }],
             },
         ];
@@ -36,6 +37,8 @@ describe("PriceChopper GetAvailabilities", () => {
 
         // run the test and assert that the result containss availability:
         const result = await scraper();
-        return expect(result).to.containSubset(resultingAvailability);
+        return expect(result.individualLocationData).to.containSubset(
+            resultingAvailability
+        );
     }).timeout(60000);
 });

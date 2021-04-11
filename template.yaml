@@ -30,6 +30,14 @@ Parameters:
     Type: String
   SlackWebhook:
     Type: String
+  TwitterApiKey:
+    Type: String
+  TwitterApiSecret:
+    Type: String
+  TwitterAccessTokenKey:
+    Type: String
+  TwitterAccessTokenSecret:
+    Type: String
 
 Globals:
   Function:
@@ -41,10 +49,17 @@ Resources:
     Properties:
       StageName: !Sub "${Environment}"
       MinimumCompressionSize: 1000
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
       Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
+        AllowMethods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
+      MethodSettings:
+        - HttpMethod: GET
+          CacheTtlInSeconds: 5
+          ResourcePath: "/appointment_availability"
+          CachingEnabled: true
 
   MACovidVaccineScraper:
     Type: AWS::Serverless::Function
@@ -60,18 +75,20 @@ Resources:
         - CloudWatchPutMetricPolicy: {}
         - S3CrudPolicy:
             BucketName: "*"
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MACovidVaccineAlerts
       Environment:
         Variables:
           GOOGLE_API_KEY: !Ref GoogleApiKey
           WALGREENS_EMAIL: !Ref WalgreensEmail
           WALGREENS_PASSWORD: !Ref WalgreensPassword
           WALGREENS_CHALLENGE: !Ref WalgreensChallenge
-          WALGREENS_API_KEY: !Ref WalgreensApiKey
           FAUNA_DB: !Ref FaunaApiKey
           NODE_ENV: !Ref NodeEnv
           AWSS3BUCKETNAME: !Ref BucketName
           RECAPTCHATOKEN: !Ref RecaptchaToken
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+          ALERTSFUNCTIONNAME: !Ref MACovidVaccineAlerts
       Events:
         ScraperSchedule:
           Type: Schedule
@@ -92,6 +109,8 @@ Resources:
         - CloudWatchPutMetricPolicy: {}
         - S3CrudPolicy:
             BucketName: "*"
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MACovidVaccineAlerts
       Environment:
         Variables:
           GOOGLE_API_KEY: !Ref GoogleApiKey
@@ -99,6 +118,7 @@ Resources:
           NODE_ENV: !Ref NodeEnv
           AWSS3BUCKETNAME: !Ref BucketName
           SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+          ALERTSFUNCTIONNAME: !Ref MACovidVaccineAlerts
       Events:
         ScraperSchedule:
           Type: Schedule
@@ -118,10 +138,37 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
             BucketName: "*"
+      Environment:
+        Variables:
+          FAUNA_DB: !Ref FaunaApiKey
+          NODE_ENV: !Ref NodeEnv
       Events:
         GetMACovidVaccineScraperDataApi:
           Type: Api
           Properties:
             RestApiId: !Ref MACovidVaccinesApi
             Method: GET
-            Path: /get_data
+            Path: /appointment_availability
+
+  MACovidVaccineAlerts:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "MACovidVaccineAlertsFunction-${Environment}"
+      Handler: alerts/alerts.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 256
+      Timeout: 60
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - CloudWatchPutMetricPolicy: {}
+      Environment:
+        Variables:
+          GOOGLE_API_KEY: !Ref GoogleApiKey
+          FAUNA_DB: !Ref FaunaApiKey
+          SLACKWEBHOOKBOTCHANNEL: !Ref SlackWebhook
+          TWITTER_API_KEY: !Ref TwitterApiKey
+          TWITTER_API_SECRET: !Ref TwitterApiSecret
+          TWITTER_ACCESS_TOKEN_KEY: !Ref TwitterAccessTokenKey
+          TWITTER_ACCESS_TOKEN_SECRET: !Ref TwitterAccessTokenSecret
+          NODE_ENV: !Ref NodeEnv

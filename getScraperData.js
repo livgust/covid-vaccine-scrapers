@@ -1,18 +1,11 @@
-const AWS = require("aws-sdk");
-
-const s3 = new AWS.S3();
-
+const scraperData = require("./lib/db/scraper_data");
 exports.handler = async () => {
-    const data = await s3
-        .getObject({
-            Bucket: "ma-covid-vaccine",
-            Key: "data.json",
-        })
-        .promise();
+    const data = await scraperData.getAppointmentsForAllLocations();
 
     const response = {
         statusCode: 200,
-        body: JSON.parse(data.Body.toString()),
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify(data),
     };
     return response;
 };

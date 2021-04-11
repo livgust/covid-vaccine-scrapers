@@ -61,10 +61,13 @@ jobs:
           WalgreensEmail=${{ secrets.WALGREENS_EMAIL }} \
           WalgreensPassword=${{ secrets.WALGREENS_PASSWORD }} \
           WalgreensChallenge=${{ secrets.WALGREENS_CHALLENGE }} \
-          WalgreensApiKey=${{ secrets. WALGREENS_API_KEY }} \
           FaunaApiKey=${{ secrets.FAUNA_DB_PROD }} \
           NodeEnv=production \
           BucketName=${{ secrets.AWSS3BUCKETNAME }} \
           RecaptchaToken=${{ secrets.RECAPTCHA_TOKEN }} \
           SlackWebhook=${{ secrets.SLACK_WEBHOOK_BOT_CHANNEL }} \
+          TwitterApiKey=${{ secrets.TWITTER_API_KEY }} \
+          TwitterApiSecret=${{ secrets.TWITTER_API_SECRET }} \
+          TwitterAccessTokenKey=${{ secrets.TWITTER_ACCESS_TOKEN_KEY }} \
+          TwitterAccessTokenSecret=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }} \
           Environment=prod

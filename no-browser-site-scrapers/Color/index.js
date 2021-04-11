@@ -1,5 +1,6 @@
 const https = require("https");
 const sites = require("./config");
+const moment = require("moment");
 
 const token = "bcd282a6fe22e6fc47e14be11a35b33fe1bc";
 async function GetAvailableAppointments() {
@@ -16,11 +17,14 @@ async function GetAvailableAppointments() {
         finalSites.push({
             ...rest,
             ...webData,
-            timestamp: new Date(),
         });
     }
     console.log("Color locations complete");
-    return finalSites;
+    return {
+        parentLocationName: "Color",
+        timestamp: moment().format(),
+        individualLocationData: finalSites,
+    };
 }
 
 async function ScrapeWebsiteData(siteName, siteUrl, massVax) {

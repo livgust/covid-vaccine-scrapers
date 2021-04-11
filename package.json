@@ -20,6 +20,7 @@
         "puppeteer-extra-plugin-recaptcha": "^3.3.5",
         "puppeteer-extra-plugin-stealth": "^2.7.6",
         "rimraf": "^3.0.2",
+        "twit": "^2.2.11",
         "us-zips": "^4.0.2"
     },
     "devDependencies": {
@@ -41,7 +42,7 @@
     },
     "scripts": {
         "predeploy": "rimraf lambda.zip && npm ci --production && bestzip lambda.zip ./*",
-        "test": "cross-env NODE_ENV=test mocha --exit",
+        "test": "cross-env NODE_ENV=test mocha --recursive --exit --timeout 10000",
         "verifyLockfile": "node -e \"if(require('./package-lock.json').lockfileVersion !== 2) {process.exit(1);};\""
     }
 }

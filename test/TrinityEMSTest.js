@@ -23,7 +23,8 @@ describe("TrinityEMS :: test all appointments are private", function () {
                 return page;
             },
         };
-        const results = await trinityEms(browser, pageService);
+        const results = (await trinityEms(browser, pageService))
+            .individualLocationData[0];
 
         expect(results).to.have.property("extraData");
         expect(results).to.have.property("availability");
@@ -85,11 +86,13 @@ describe("TrinityEMS :: test 3 months with availability", function () {
         "Should return 13 days with an ascending number of available slots each day; total = 91. " +
             "Should also send s3 and slackMsg notifications once.",
         async () => {
-            const results = await trinityEms(
-                browser,
-                activeDayPageService,
-                testNotificationService
-            );
+            const results = (
+                await trinityEms(
+                    browser,
+                    activeDayPageService,
+                    testNotificationService
+                )
+            ).individualLocationData[0];
 
             expect(results).to.have.property("availability");
             expect(results).to.have.property("hasAvailability");
@@ -135,7 +138,8 @@ describe("TrinityEMS :: test with 'no-dates-available' class present", function 
     };
 
     it.skip("should return no availability", async function () {
-        const results = await trinityEms(browser, noDatesPageService);
+        const results = (await trinityEms(browser, noDatesPageService))
+            .individualLocationData[0];
 
         expect(results).to.have.property("availability");
         expect(results).to.have.property("hasAvailability");
