@@ -49,11 +49,12 @@ const alerts = {
     handleIndividualAlert,
     handleIndividualAlerts,
     handler,
-    maybeContinueAlerting,
+    massAlertAlreadySent,
     mergeData,
     publishGroupAlert,
-    runImmediateAlerts,
+    runAlerts,
     setInactiveAlert,
+    setMassAlert,
     setUpNewAlert,
 };
 
@@ -105,6 +106,19 @@ async function getActiveAlertRefId(locationRefId) {
     );
 }
 
+async function massAlertAlreadySent(locationRefId) {
+    return dbUtils
+        .faunaQuery(
+            fq.Get(
+                fq.Match(
+                    "appointmentAlertsByLocationRefSortByStartTime",
+                    fq.Ref(fq.Collection("locations"), locationRefId)
+                )
+            )
+        )
+        .then((alert) => !!alert.data.massAlertScraperRunRef);
+}
+
 async function setInactiveAlert(locationRefId, scraperRunRefId) {
     /* find the entry in appointmentAlerts for this location with a null
      * lastScraperRunRef, and set lastScraperRunRef to scraperRunRef
@@ -125,14 +139,6 @@ async function setInactiveAlert(locationRefId, scraperRunRefId) {
         })
     );
     return id;
-}
-
-// TODO
-function maybeContinueAlerting() {
-    /* if appointments are still available, maybe send out more
-     * emails or texts?
-     */
-    return;
 }
 
 async function getLastAlertStartTime(locationRefId) {
@@ -166,7 +172,11 @@ async function getLastAlertStartTime(locationRefId) {
     return moment(nsTimestamp.value);
 }
 
-async function setUpNewAlert(locationRefId, scraperRunRefId) {
+async function setUpNewAlert(
+    locationRefId,
+    scraperRunRefId,
+    setMassAlertScraperRunRef
+) {
     // create a new entry in appointmentAlerts with locationRef and firstScraperRunRef set to scraperRunRef.
     const record = await dbUtils.faunaQuery(
         fq.Create(fq.Collection("appointmentAlerts"), {
@@ -176,6 +186,9 @@ async function setUpNewAlert(locationRefId, scraperRunRefId) {
                     fq.Collection("scraperRuns"),
                     scraperRunRefId
                 ),
+                massAlertScraperRunRef: setMassAlertScraperRunRef
+                    ? fq.Ref(fq.Collection("scraperRuns"), scraperRunRefId)
+                    : null,
                 startTime: fq.Now(),
             },
         })
@@ -184,11 +197,13 @@ async function setUpNewAlert(locationRefId, scraperRunRefId) {
     return record.ref.id;
 }
 
-async function runImmediateAlerts(
+async function runAlerts(
     locationRefId,
     bookableAppointmentsFound,
     availabilityWithNoNumbers,
-    parentIsChain
+    parentIsChain,
+    sendMassAlert,
+    sendRegularAlert
 ) {
     const location = await dbUtils
         .retrieveItemByRefId("locations", locationRefId)
@@ -201,21 +216,16 @@ async function runImmediateAlerts(
         message = `Appointments available at ${location.name} in ${location.address.city}. Visit https://macovidvaccines.com to book.`;
     } else {
         console.error(
-            `runImmediateAlerts was called for location ref ${locationRefId} but no appointments were passed in`
+            `runAlerts was called for location ref ${locationRefId} but no appointments were passed in`
         );
     }
 
     const promises = [];
     if (message && !parentIsChain) {
-        if (
-            bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()
-        ) {
+        if (sendMassAlert) {
             promises.push(sendTweet(message));
         }
-        if (
-            bookableAppointmentsFound >=
-            alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
-        ) {
+        if (sendRegularAlert) {
             promises.push(sendSlackMsg("bot", message));
         }
     }
@@ -227,7 +237,9 @@ async function publishGroupAlert(
     locationName,
     locationCities,
     bookableAppointmentsFound,
-    availabilityWithNoNumbers
+    availabilityWithNoNumbers,
+    sendMassAlert,
+    sendRegularAlert
 ) {
     if (!bookableAppointmentsFound && !availabilityWithNoNumbers) {
         throw new Error(
@@ -266,12 +278,10 @@ async function publishGroupAlert(
     const message = `${appointmentsMessage} at ${locationMessage}. Visit https://macovidvaccines.com for more details and to sign up.`;
 
     const promises = [];
-    if (bookableAppointmentsFound >= alerts.APPOINTMENT_NUMBER_THRESHOLD()) {
+    if (sendMassAlert) {
         promises.push(sendTweet(message));
     }
-    if (
-        bookableAppointmentsFound >= alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
-    ) {
+    if (sendRegularAlert) {
         promises.push(sendSlackMsg("bot", message));
     }
     return Promise.all(promises).catch(console.err);
@@ -340,20 +350,46 @@ async function handleGroupAlerts({
                 await alerts.setUpNewAlert(
                     parentLocation.ref.id,
                     parentScraperRunRefId,
-                    bookableAppointmentsFound,
-                    availabilityWithNoNumbers
+                    bookableAppointmentsFound >=
+                        alerts.APPOINTMENT_NUMBER_THRESHOLD()
                 );
                 await alerts.publishGroupAlert(
                     parentLocation.data.name,
                     locationCities,
                     bookableAppointmentsFound,
-                    availabilityWithNoNumbers
+                    availabilityWithNoNumbers,
+                    bookableAppointmentsFound >=
+                        alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                    bookableAppointmentsFound >=
+                        alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
                 );
                 return;
             } else {
                 console.log(`(1) doing nothing for ${parentLocation.ref.id}`);
                 return;
             }
+        }
+        // 3.5. if alert exists but a mass alert hasn't been sent,
+        // send one IF we meet the threshold.
+        else if (
+            alertExists &&
+            bookableAppointmentsFound > alerts.APPOINTMENT_NUMBER_THRESHOLD() &&
+            !(await alerts.massAlertAlreadySent(parentLocation.ref.id))
+        ) {
+            console.log(`sending mass alert for ${parentLocation.ref.id}`);
+            await alerts.setMassAlert(
+                parentLocation.ref.id,
+                parentScraperRunRefId
+            );
+            await alerts.publishGroupAlert(
+                parentLocation.data.name,
+                locationCities,
+                bookableAppointmentsFound,
+                availabilityWithNoNumbers,
+                true,
+                false
+            );
+            return;
         }
 
         // 4. if alert exists and no availability, end it.
@@ -369,7 +405,7 @@ async function handleGroupAlerts({
             return;
         }
 
-        // 5. if alert exists and there is availability, bail.
+        // 5. if alert exists and there is availability and mass alert was sent, bail.
         // 6. if alert doesn't exist and there is no avaialbility, bail.
         else {
             console.log(`(2) doing nothing for ${parentLocation.ref.id}`);
@@ -379,6 +415,24 @@ async function handleGroupAlerts({
         console.log(`(3) doing nothing for ${parentLocation.ref.id}`);
         return;
     }
+}
+
+async function setMassAlert(locationRefId, scraperRunRefId) {
+    const id = await alerts.getActiveAlertRefId(locationRefId);
+    if (!id) {
+        throw Error(`No active alert found for location ${locationRefId}!`);
+    }
+
+    return dbUtils.faunaQuery(
+        fq.Update(fq.Ref(fq.Collection("appointmentAlerts"), id), {
+            data: {
+                massAlertScraperRunRef: fq.Ref(
+                    fq.Collection("scraperRuns"),
+                    scraperRunRefId
+                ),
+            },
+        })
+    );
 }
 
 async function getChildData({ parentLocationRefId, parentScraperRunRefId }) {
@@ -429,9 +483,8 @@ function aggregateAvailability(appointments = []) {
             preReturn.availabilityWithNoNumbers
         ) {
             console.err(
-                `Both bookableAppointmentsFound and availabilityWithNoNumbers set for (first appt entry: ${JSON.stringify(
-                    appointments[0]
-                )})!`
+                `Both bookableAppointmentsFound and availabilityWithNoNumbers set 
+                for (first appt entry: ${JSON.stringify(appointments[0])})!`
             );
             preReturn.availabilityWithNoNumbers = false;
         }
@@ -491,9 +544,23 @@ async function handleIndividualAlert({
         if (!bookableAppointmentsFound && !availabilityWithNoNumbers) {
             console.log(`setting alert inactive for ${locationRefId}.`);
             await alerts.setInactiveAlert(locationRefId, scraperRunRefId);
+        } else if (
+            bookableAppointmentsFound >=
+                alerts.APPOINTMENT_NUMBER_THRESHOLD() &&
+            !(await alerts.massAlertAlreadySent(locationRefId))
+        ) {
+            console.log(`sending mass alert for ${locationRefId}.`);
+            await alerts.setMassAlert(locationRefId, scraperRunRefId);
+            await alerts.runAlerts(
+                locationRefId,
+                bookableAppointmentsFound,
+                availabilityWithNoNumbers,
+                parentIsChain,
+                true,
+                false
+            );
         } else {
-            console.log(`continuing alert for ${locationRefId}.`);
-            await alerts.maybeContinueAlerting();
+            console.log(`(1) Not doing anything for ${locationRefId}.`);
         }
     } else if (
         (bookableAppointmentsFound && bookableAppointmentsFound > 0) ||
@@ -513,8 +580,8 @@ async function handleIndividualAlert({
             await alerts.setUpNewAlert(
                 locationRefId,
                 scraperRunRefId,
-                bookableAppointmentsFound,
-                availabilityWithNoNumbers
+                bookableAppointmentsFound >=
+                    alerts.APPOINTMENT_NUMBER_THRESHOLD()
             );
 
             /*
@@ -522,15 +589,19 @@ async function handleIndividualAlert({
              * Prioritize emails in one go (50,000 daily, 14 per second or 840/min)
              * Start the first round of text alerts (don't know throughput really)
              */
-            await alerts.runImmediateAlerts(
+            await alerts.runAlerts(
                 locationRefId,
                 bookableAppointmentsFound,
                 availabilityWithNoNumbers,
-                parentIsChain
+                parentIsChain,
+                bookableAppointmentsFound >=
+                    alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                bookableAppointmentsFound >=
+                    alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
             );
         }
     } else {
-        console.log(`Not doing anything for ${locationRefId}.`);
+        console.log(`(2) Not doing anything for ${locationRefId}.`);
     }
     return;
 }
