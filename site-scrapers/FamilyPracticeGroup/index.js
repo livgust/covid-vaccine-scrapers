@@ -46,12 +46,5 @@ async function ScrapeWebsiteData(browser) {
         (node) => node.innerText
     );
     const hasAvailability = content.indexOf(noAppointmentMatchString) === -1;
-    if (hasAvailability && !process.env.DEVELOPMENT) {
-        await s3.savePageContent(site.name, page);
-        await sendSlackMsg(
-            "bot",
-            "Arlington Family Practice Group may have appointments."
-        );
-    }
     return { hasAvailability };
 }
