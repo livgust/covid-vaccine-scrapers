@@ -231,7 +231,7 @@ function defaultPageService() {
             const classToWaitFor = "#step-pick-appointment";
             const page = await browser.newPage();
             await Promise.all([
-                page.goto(site.website),
+                page.goto(site.signUpLink),
                 waitForLoadComplete(page, classToWaitFor),
             ]);
             return page;
