@@ -42,7 +42,6 @@ module.exports = async function GetAvailableAppointments(
         allResults.push({
             ...unRestricted,
             ...unRestrictedAvailability,
-            timestamp: moment().format(),
         });
     } catch (error) {
         console.error(`Harrington :: GetAvailableAppointments(): ${error}`);

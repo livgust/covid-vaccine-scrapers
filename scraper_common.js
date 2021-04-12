@@ -75,7 +75,16 @@ async function execute(usePuppeteer, scrapers) {
                 startTime,
                 numberAppointments
             );
+
+            // Add the current timestamp to each individual location
+            const nowTimestamp = moment().format();
+            returnValue?.individualLocationData.map((loc) => {
+                loc.timestamp = nowTimestamp;
+            });
+
+            // Save the individualLocationData for the out.json file.
             results.push(returnValue?.individualLocationData);
+
             // Coerce the results into the format we want.
             let returnValueArray = [];
             if (Array.isArray(returnValue?.individualLocationData)) {
