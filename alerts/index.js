@@ -350,18 +350,31 @@ async function handleGroupAlerts({
                 await alerts.setUpNewAlert(
                     parentLocation.ref.id,
                     parentScraperRunRefId,
+                    // this counts as a "mass alert" if we have more than APPOINTMENT_NUMBER_THRESHOLD
+                    // appointments OR locations (locations b/c some places we only know if they have
+                    // availability but not how much - we assume at least 1 which is safe.)
                     bookableAppointmentsFound >=
-                        alerts.APPOINTMENT_NUMBER_THRESHOLD()
+                        alerts.APPOINTMENT_NUMBER_THRESHOLD() ||
+                        locationCities.length >
+                            alerts.APPOINTMENT_NUMBER_THRESHOLD()
                 );
                 await alerts.publishGroupAlert(
                     parentLocation.data.name,
                     locationCities,
                     bookableAppointmentsFound,
                     availabilityWithNoNumbers,
+                    // this counts as a "mass alert" if we have more than APPOINTMENT_NUMBER_THRESHOLD
+                    // appointments OR locations (locations b/c some places we only know if they have
+                    // availability but not how much - we assume at least 1 which is safe.)
                     bookableAppointmentsFound >=
-                        alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                        alerts.APPOINTMENT_NUMBER_THRESHOLD() ||
+                        locationCities.length >=
+                            alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                    // similar logic but for regular alerts
                     bookableAppointmentsFound >=
-                        alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
+                        alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD() ||
+                        locationCities.length >=
+                            alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
                 );
                 return;
             } else {
