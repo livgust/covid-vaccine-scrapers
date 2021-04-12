@@ -31,7 +31,6 @@ module.exports = async function GetAvailableAppointments(
         allResults.push({
             ...townRestricted,
             ...townRestrictedAvailability,
-            timestamp: moment().format(),
         });
 
         const unRestrictedAvailability = await ScrapeWebsiteData(
@@ -51,7 +50,11 @@ module.exports = async function GetAvailableAppointments(
 
     console.log(`${entity} done.`);
 
-    return allResults;
+    return {
+        parentLocationName: "Harrington",
+        timestamp: moment().format(),
+        individualLocationData: allResults,
+    };
 };
 
 /**
