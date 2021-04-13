@@ -1,7 +1,7 @@
 const sinon = require("sinon");
-const alerts = require("../alerts");
-const scraperData = require("../lib/db/scraper_data");
-const dbUtils = require("../lib/db/utils");
+const alerts = require("../../alerts");
+const scraperData = require("../../lib/db/scraper_data");
+const dbUtils = require("../../lib/db/utils");
 const chai = require("chai");
 chai.use(require("chai-as-promised"));
 const expect = chai.expect;
