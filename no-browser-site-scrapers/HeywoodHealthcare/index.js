@@ -34,8 +34,8 @@ module.exports = async function GetAvailableAppointments(
  */
 function liveFetchService() {
     return {
-        async fetchAvailability(site, pageVisitCount) {
-            return await fetchAvailability(site, pageVisitCount);
+        async fetchAvailability(site, calendarAdvanceOffset) {
+            return await fetchAvailability(site, calendarAdvanceOffset);
         },
     };
 }
@@ -47,13 +47,13 @@ async function ScrapeWebsiteData(site, fetchService) {
     };
 
     let monthAvailabilityMap = new Map();
-    let pageVisitCount = 0;
+    let calendarAdvanceOffset = 0;
 
     // Advance the calendar of each site until no availability is found.
     do {
         const calendarHtml = await fetchService.fetchAvailability(
             site,
-            pageVisitCount
+            calendarAdvanceOffset
         );
 
         const root = htmlParser.parse(calendarHtml);
@@ -61,10 +61,7 @@ async function ScrapeWebsiteData(site, fetchService) {
         if (hasNoAvailabilityMessage(root)) {
             status = STATUS.FINISHED;
         } else {
-            monthAvailabilityMap = getDailyAvailabilityCountsInCalendar(
-                root,
-                pageVisitCount
-            );
+            monthAvailabilityMap = getDailyAvailabilityCountsInCalendar(root);
 
             // Add all day objects to results.availability
             monthAvailabilityMap.forEach((value, key) => {
@@ -79,13 +76,15 @@ async function ScrapeWebsiteData(site, fetchService) {
                     hasAvailability: !!value,
                 };
             });
-            pageVisitCount += 1;
 
-            status = hasMorePages(root) ? STATUS.CONTINUE : STATUS.FINISHED;
+            if (hasMorePages(root)) {
+                status = STATUS.CONTINUE;
+                calendarAdvanceOffset = getOffset(root);
+            } else {
+                status = STATUS.FINISHED;
+            }
         }
     } while (status == STATUS.CONTINUE);
-
-    // console.log(`pageVisitCount: ${pageVisitCount}`);
 
     return {
         ...site.public,
@@ -95,8 +94,8 @@ async function ScrapeWebsiteData(site, fetchService) {
     };
 }
 
-async function fetchAvailability(site, pageVisitCount) {
-    const bodyString = bodyParamString(pageVisitCount);
+async function fetchAvailability(site, calendarAdvanceOffset) {
+    const bodyString = bodyParamString(calendarAdvanceOffset);
 
     const response = await fetch(site.private.fetchRequestUrl, {
         headers: {
@@ -117,20 +116,20 @@ async function fetchAvailability(site, pageVisitCount) {
 /**
  * Gets the bodyParam string for the fetch. Initially, it has no startDate, or nextprev, but
  * does when stepping the calendar forward in time.
- * @param {Int} pageVisitCount (specific to location)
+ * @param {Int} calendarAdvanceOffset
  * @returns
  */
-function bodyParamString(pageVisitCount) {
+function bodyParamString(calendarAdvanceOffset) {
     /*
-    Body when first hitting site (i.e., pageVisitCount == 0):
+    Body when first hitting site (i.e., calendarAdvanceOffset == 0, no offset parameter):
     "type=&calendar=&skip=true&options%5Bqty%5D=1&options%5BnumDays%5D=3&ignoreAppointment=&appointmentType=&calendarID="
 
-    Body when pressing "More Times" button (i.e., pageVisitCount > 0):
+    Body when pressing "More Times" button (i.e., calendarAdvanceOffset > 0, offset parameter is updated):
     "type=&calendar=&month=&skip=true&options%5Boffset%5D=15&options%5BnumDays%5D=5&ignoreAppointment=&appointmentType=&calendarID="
     */
 
     const paramsList =
-        pageVisitCount == 0
+        calendarAdvanceOffset == 0
             ? [
                   "type=",
                   "calendar=",
@@ -146,7 +145,7 @@ function bodyParamString(pageVisitCount) {
                   "calendar=",
                   "month=",
                   "skip=true",
-                  `options%5Boffset%5D=${15 * pageVisitCount}`,
+                  `options%5Boffset%5D=${calendarAdvanceOffset}`,
                   "options%5BnumDays%5D=5",
                   "ignoreAppointment=",
                   "appointmentType=",
@@ -161,7 +160,7 @@ function bodyParamString(pageVisitCount) {
  * @param {HTMLElement} root
  * @returns
  */
-function getDailyAvailabilityCountsInCalendar(root, pageVisitCount) {
+function getDailyAvailabilityCountsInCalendar(root) {
     function reformatDate(dateStr) {
         return moment(`${dateStr}`).format("M/D/YYYY");
     }
@@ -185,10 +184,14 @@ function getDailyAvailabilityCountsInCalendar(root, pageVisitCount) {
                 const date = container
                     .querySelector(".btn-class-signup")
                     .getAttribute("data-time");
-                const count = parseInt(
-                    container.querySelector("div.class-spots span.babel-ignore")
-                        .innerText
-                );
+
+                // If parseInt fails, the default is 0.
+                const count =
+                    parseInt(
+                        container.querySelector(
+                            "div.class-spots span.babel-ignore"
+                        ).innerText
+                    ) || 0;
                 return [reformatDate(date), count];
             })
             .reduce((acc, [date, count]) => {
@@ -225,4 +228,13 @@ function hasNoAvailabilityMessage(root) {
 function hasMorePages(root) {
     const isMoreTimesButtonPresent = root.querySelector(".calendar-next");
     return isMoreTimesButtonPresent;
+}
+
+function getOffset(root) {
+    const offset = root
+        .querySelector(".calendar-next")
+        .getAttribute("href")
+        .match(/\offset:\d{0,2}/)[0]
+        .split(":")[1];
+    return offset;
 }
