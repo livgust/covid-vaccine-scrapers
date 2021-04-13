@@ -3,8 +3,6 @@ const townRestricted = {
     street: "153 Chestnut Street",
     city: "Southbridge",
     zip: "01550",
-    website:
-        "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202050",
     extraData:
         "All vaccinations are performed at the Southbridge Community Center at 153 Chestnut St. Southbridge, MA 01550.",
     restrictions:
@@ -17,8 +15,6 @@ const unRestricted = {
     street: "153 Chestnut Street",
     city: "Southbridge",
     zip: "01550",
-    website:
-        "https://app.acuityscheduling.com/schedule.php?owner=22192301&calendarID=5202038",
     extraData:
         "All vaccinations are performed at the Southbridge Community Center at 153 Chestnut St. Southbridge, MA 01550.",
     signUpLink:

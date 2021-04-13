@@ -31,7 +31,6 @@ module.exports = async function GetAvailableAppointments(
         allResults.push({
             ...townRestricted,
             ...townRestrictedAvailability,
-            timestamp: moment().format(),
         });
 
         const unRestrictedAvailability = await ScrapeWebsiteData(
@@ -43,7 +42,6 @@ module.exports = async function GetAvailableAppointments(
         allResults.push({
             ...unRestricted,
             ...unRestrictedAvailability,
-            timestamp: moment().format(),
         });
     } catch (error) {
         console.error(`Harrington :: GetAvailableAppointments(): ${error}`);
@@ -51,7 +49,11 @@ module.exports = async function GetAvailableAppointments(
 
     console.log(`${entity} done.`);
 
-    return allResults;
+    return {
+        parentLocationName: "Harrington",
+        timestamp: moment().format(),
+        individualLocationData: allResults,
+    };
 };
 
 /**
@@ -229,7 +231,7 @@ function defaultPageService() {
             const classToWaitFor = "#step-pick-appointment";
             const page = await browser.newPage();
             await Promise.all([
-                page.goto(site.website),
+                page.goto(site.signUpLink),
                 waitForLoadComplete(page, classToWaitFor),
             ]);
             return page;

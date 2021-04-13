@@ -60,8 +60,10 @@ describe("handleIndividualAlert behavior", () => {
     });
 
     it("does not make a new alert if an active alert exists", async () => {
-        sinon.stub(alerts, "activeAlertExists").returns(true);
-        sinon.stub(alerts, "maybeContinueAlerting");
+        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(true));
+        sinon
+            .stub(alerts, "massAlertAlreadySent")
+            .returns(Promise.resolve(true));
         sinon.stub(alerts, "setInactiveAlert");
         const setUpNewAlertStub = sinon.stub(alerts, "setUpNewAlert");
 
@@ -85,26 +87,11 @@ describe("handleIndividualAlert behavior", () => {
         expect(setInactiveAlertStub.called).to.be.true;
     });
 
-    it("does continued alerting if an active alert exists", async () => {
-        sinon.stub(alerts, "activeAlertExists").returns(true);
-        const maybeContinueAlertingStub = sinon.stub(
-            alerts,
-            "maybeContinueAlerting"
-        );
-
-        await alerts.handleIndividualAlert({
-            locationRefId: "123",
-            scraperRunRefId: "456",
-            bookableAppointmentsFound: 100,
-        });
-        expect(maybeContinueAlertingStub.called).to.be.true;
-    });
-
     it("starts a new alert if we see appointments and no alert is active", async () => {
         sinon.stub(alerts, "activeAlertExists").returns(false);
         sinon.stub(alerts, "REPEAT_ALERT_TIME").returns(0);
         sinon.stub(alerts, "APPOINTMENT_NUMBER_THRESHOLD").returns(0);
-        sinon.stub(alerts, "runImmediateAlerts").returns(Promise.resolve());
+        sinon.stub(alerts, "runAlerts").returns(Promise.resolve());
         sinon
             .stub(alerts, "getLastAlertStartTime")
             .returns(moment().subtract(1, "minute"));
@@ -122,7 +109,7 @@ describe("handleIndividualAlert behavior", () => {
     it("does nothing if no appts found and no active alert", async () => {
         sinon.stub(alerts, "activeAlertExists").returns(false);
         const actionStubs = [
-            sinon.stub(alerts, "maybeContinueAlerting"),
+            sinon.stub(alerts, "setMassAlert"),
             sinon.stub(alerts, "setInactiveAlert"),
             sinon.stub(alerts, "setUpNewAlert"),
         ];
@@ -135,6 +122,35 @@ describe("handleIndividualAlert behavior", () => {
         for (const stub of actionStubs) {
             expect(stub.notCalled).to.be.true;
         }
+    });
+
+    it("sends a mass alert if an active alert hasn't sent one already", async () => {
+        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(true));
+        sinon
+            .stub(alerts, "massAlertAlreadySent")
+            .returns(Promise.resolve(false));
+        const setMassAlertStub = sinon
+            .stub(alerts, "setMassAlert")
+            .returns(Promise.resolve());
+        const runAlertsStub = sinon
+            .stub(alerts, "runAlerts")
+            .returns(Promise.resolve());
+
+        await alerts.handleIndividualAlert({
+            locationRefId: "123",
+            scraperRunRefId: "456",
+            bookableAppointmentsFound: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+        });
+        expect(setMassAlertStub.lastCall?.args).to.deep.equal(["123", "456"]);
+        const [
+            one,
+            two,
+            three,
+            four,
+            sendMassAlert,
+            sendRegularAlert,
+        ] = runAlertsStub.lastCall?.args;
+        expect([sendMassAlert, sendRegularAlert]).to.deep.equal([true, false]);
     });
 });
 
@@ -450,8 +466,7 @@ describe("handleGroupAlerts", () => {
         expect(setUpNewAlertStub.lastCall?.args).to.deep.equal([
             "123",
             "doesntmatter",
-            2 * alerts.APPOINTMENT_NUMBER_THRESHOLD(),
-            false,
+            true,
         ]);
         expect(setInactiveAlertStub.notCalled).to.be.true;
     });
@@ -533,5 +548,61 @@ describe("handleGroupAlerts", () => {
             "123",
             "doesntmatter",
         ]);
+    });
+
+    it("sends a mass alert if an active alert hasn't sent one already", async () => {
+        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(true));
+        sinon
+            .stub(alerts, "massAlertAlreadySent")
+            .returns(Promise.resolve(false));
+        const setMassAlertStub = sinon
+            .stub(alerts, "setMassAlert")
+            .returns(Promise.resolve());
+        const publishGroupAlertStub = sinon
+            .stub(alerts, "publishGroupAlert")
+            .returns(Promise.resolve());
+
+        await alerts.handleGroupAlerts({
+            parentLocation: {
+                ref: { id: "123" },
+                data: { isChain: true },
+            },
+            parentScraperRunRefId: "doesntmatter",
+            locations: [
+                {
+                    location: { data: { address: { city: "Haverhill" } } },
+                    appointments: [
+                        {
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
+                        },
+                    ],
+                },
+                {
+                    location: { data: { address: { city: "Cambridge" } } },
+                    appointments: [
+                        {
+                            data: {
+                                numberAvailable: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+                            },
+                        },
+                    ],
+                },
+            ],
+        });
+        expect(setMassAlertStub.lastCall?.args).to.deep.equal([
+            "123",
+            "doesntmatter",
+        ]);
+        const [
+            locationName,
+            locationCities,
+            bookableAppointmentsFound,
+            availabilityWithNoNumbers,
+            sendMassAlert,
+            sendRegularAlert,
+        ] = publishGroupAlertStub.lastCall.args;
+        expect([sendMassAlert, sendRegularAlert]).to.deep.equal([true, false]);
     });
 });
