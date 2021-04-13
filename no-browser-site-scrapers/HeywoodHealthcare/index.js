@@ -3,7 +3,6 @@ const fetch = require("node-fetch");
 const htmlParser = require("node-html-parser");
 const moment = require("moment");
 
-// debug
 /**
  * enum used for determining whether to continue advancing through the calendar
  */
@@ -230,6 +229,16 @@ function hasMorePages(root) {
     return isMoreTimesButtonPresent;
 }
 
+/**
+ * The "More Times" button's javascript contains the offset for advancing the calendar:
+ *
+ * <a href="javascript:self.showCalendar('', {offset:15})"
+ *      class="calendar-next"><span id="class-list-next">More Times</span>
+ *      <i class="fa fa-chevron-right"></i>
+ * </a>
+ * @param {HTMLElement} root
+ * @returns
+ */
 function getOffset(root) {
     const offset = root
         .querySelector(".calendar-next")
