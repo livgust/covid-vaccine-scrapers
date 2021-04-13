@@ -75,7 +75,15 @@ async function execute(usePuppeteer, scrapers) {
                 startTime,
                 numberAppointments
             );
+
+            // Add the parentLocation's timestamp to each individual location
+            returnValue?.individualLocationData.map((loc) => {
+                loc.timestamp = returnValue.timestamp;
+            });
+
+            // Save the individualLocationData for the out.json file.
             results.push(returnValue?.individualLocationData);
+
             // Coerce the results into the format we want.
             let returnValueArray = [];
             if (Array.isArray(returnValue?.individualLocationData)) {

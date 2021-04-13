@@ -59,7 +59,7 @@ describe("Harrington Health Care :: test with availability", function () {
             browser,
             hasAvailabilityPageService,
             testNotificationService
-        );
+        ).then((res) => res.individualLocationData);
 
         /*
         These "have.property" tests may be unnecessary because subsequent
@@ -133,7 +133,7 @@ describe("Harrington Health Care :: test with 'no-dates-available' class present
         const results = await harringtonScraper(
             browser,
             noAvailabilityPageService
-        );
+        ).then((res) => res.individualLocationData);
 
         const townRestricted = 0;
         expect(results[townRestricted]).to.have.property("availability");

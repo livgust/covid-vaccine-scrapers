@@ -34,7 +34,7 @@ module.exports = async function GetAvailableAppointments() {
                 street: street,
                 state: state,
                 zip: zip,
-                hasAvailability: location.availability === "true",
+                hasAvailability: location.availability === "yes",
                 signUpLink: location.coach_url,
                 latitude: location.lat,
                 longitude: location.long,

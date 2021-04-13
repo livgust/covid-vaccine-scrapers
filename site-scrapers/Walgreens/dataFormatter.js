@@ -39,7 +39,6 @@ function formatData(data, website) {
             signUpLink: website,
             hasAvailability,
             availability: availability,
-            timestamp: new Date(),
         };
     });
 }

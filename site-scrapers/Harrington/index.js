@@ -42,7 +42,6 @@ module.exports = async function GetAvailableAppointments(
         allResults.push({
             ...unRestricted,
             ...unRestrictedAvailability,
-            timestamp: moment().format(),
         });
     } catch (error) {
         console.error(`Harrington :: GetAvailableAppointments(): ${error}`);
@@ -232,7 +231,7 @@ function defaultPageService() {
             const classToWaitFor = "#step-pick-appointment";
             const page = await browser.newPage();
             await Promise.all([
-                page.goto(site.website),
+                page.goto(site.signUpLink),
                 waitForLoadComplete(page, classToWaitFor),
             ]);
             return page;
