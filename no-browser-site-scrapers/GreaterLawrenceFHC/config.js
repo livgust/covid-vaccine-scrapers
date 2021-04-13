@@ -24,7 +24,6 @@ const sites = [
             street: "147 Pelham St.",
             city: "Methuen",
             zip: "01844",
-            restrictions: "Non Patients / No Pacientes",
             signUpLink:
                 "https://glfhccovid19iz.as.me/schedule.php?calendarID=5114836",
         },
@@ -40,7 +39,6 @@ const sites = [
             street: "2 Water St.",
             city: "Haverhill",
             zip: "01830",
-            restrictions: "Non Patients / No Pacientes",
             signUpLink:
                 "https://glfhccovid19iz.as.me/schedule.php?location=Central+Plaza%2C+2+Water+Street%2C+Haverhill+MA",
         },
