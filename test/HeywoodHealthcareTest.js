@@ -4,7 +4,7 @@ const { expect } = require("chai");
 const moment = require("moment");
 const file = require("../lib/file");
 
-describe("HeywoodHealthCare availability test using scraper and saved HTML", function () {
+describe("HeywoodHealthcare availability test using scraper and saved HTML", function () {
     const beforeTime = moment();
 
     it("should show no availability, and the results objects structure should conform", async function () {
@@ -99,7 +99,7 @@ const noAvailabilityFilenameGenerator = noAvailabilityFilenames();
 const noAvailabilityFetchService = {
     async fetchAvailability(/*site*/) {
         return loadTestHtmlFromFile(
-            "HeywoodHealthCare",
+            "HeywoodHealthcare",
             noAvailabilityFilenameGenerator.next().value
         );
     },
@@ -116,7 +116,7 @@ const availabilityFilenameGenerator = availabilityFilenames();
 const availabilityFetchService = {
     async fetchAvailability(/*site*/) {
         return loadTestHtmlFromFile(
-            "HeywoodHealthCare",
+            "HeywoodHealthcare",
             availabilityFilenameGenerator.next().value
         );
     },
