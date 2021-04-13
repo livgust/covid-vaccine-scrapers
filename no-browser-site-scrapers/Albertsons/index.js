@@ -28,13 +28,19 @@ module.exports = async function GetAvailableAppointments() {
             const trimmedAddress = rawAddress.replace(/^\(|\)$/, ""); // Trim parens
             const [name, longAddress] = trimmedAddress.split(" - ");
             const [street, city, state, zip] = longAddress.split(", ");
+            const storeName = name.match(/([^\d]*) /g)[0].trim();
+            const storeNumber = name.substring(storeName.length).trim();
+
             const retval = {
-                name: name,
+                name: storeName,
                 city: city,
                 street: street,
                 state: state,
                 zip: zip,
                 hasAvailability: location.availability === "yes",
+                extraData: {
+                    "Store Number": storeNumber,
+                },
                 signUpLink: location.coach_url,
                 latitude: location.lat,
                 longitude: location.long,
