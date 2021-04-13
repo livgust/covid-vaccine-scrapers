@@ -29,7 +29,7 @@ module.exports = async function GetAvailableAppointments() {
             const [name, longAddress] = trimmedAddress.split(" - ");
             const [street, city, state, zip] = longAddress.split(", ");
             const storeName = name.match(/([^\d]*) /g)[0].trim();
-            const storeNumber = name.substring(storeName.length).trim();
+            // const storeNumber = name.substring(storeName.length).trim();
 
             const retval = {
                 name: storeName,
@@ -38,9 +38,6 @@ module.exports = async function GetAvailableAppointments() {
                 state: state,
                 zip: zip,
                 hasAvailability: location.availability === "yes",
-                extraData: {
-                    "Store Number": storeNumber,
-                },
                 signUpLink: location.coach_url,
                 latitude: location.lat,
                 longitude: location.long,
