@@ -76,7 +76,7 @@ async function ScrapeWebsiteData(site, fetchService) {
                 };
             });
 
-            if (hasMorePages(root)) {
+            if (hasMoreTimes(root)) {
                 status = STATUS.CONTINUE;
                 calendarAdvanceOffset = getOffset(root);
             } else {
@@ -93,6 +93,13 @@ async function ScrapeWebsiteData(site, fetchService) {
     };
 }
 
+/**
+ * Fetches HTML
+ *
+ * @param {Object} site
+ * @param {String} calendarAdvanceOffset as a string
+ * @returns HTML
+ */
 async function fetchAvailability(site, calendarAdvanceOffset) {
     const bodyString = bodyParamString(calendarAdvanceOffset);
 
@@ -113,8 +120,10 @@ async function fetchAvailability(site, calendarAdvanceOffset) {
 }
 
 /**
- * Gets the bodyParam string for the fetch. Initially, it has no startDate, or nextprev, but
- * does when stepping the calendar forward in time.
+ * Gets the body parameter string for the fetch. Initially, there is no offset parameter.
+ * To advance to the next segment of the calendar, add the offset parameter and assign
+ * it the value found in the javascript snippet in the href of the button.
+ *
  * @param {Int} calendarAdvanceOffset
  * @returns
  */
@@ -155,9 +164,10 @@ function bodyParamString(calendarAdvanceOffset) {
 }
 
 /**
- * Gets the availability in a calendar.
+ * Gets the availability in a calendar segment (page).
+ *
  * @param {HTMLElement} root
- * @returns
+ * @returns a map keyed by date (M/D/YYYY) with the number of slots as the value.
  */
 function getDailyAvailabilityCountsInCalendar(root) {
     function reformatDate(dateStr) {
@@ -205,8 +215,10 @@ function getDailyAvailabilityCountsInCalendar(root) {
 }
 
 /**
- * If there's no availability, Acuity indicates it in a number of ways. Check
- * for them.
+ * Check for indicators that there are no slots available. Acuity
+ * seems to use several ways, and they seem to change over time.
+ * The two most common ways are tested here.
+ *
  * @param {HTMLElement} root
  * @returns true if one of the Acuity no availability indicators is found
  */
@@ -220,11 +232,12 @@ function hasNoAvailabilityMessage(root) {
 }
 
 /**
+ * Tests to see if the "More Times" button is present.
  *
  * @param {HTMLElement} root
- * @returns false if there is no
+ * @returns not null if "More Times" link is present, false if not found (null, undefined)
  */
-function hasMorePages(root) {
+function hasMoreTimes(root) {
     const isMoreTimesButtonPresent = root.querySelector(".calendar-next");
     return isMoreTimesButtonPresent;
 }
@@ -237,7 +250,8 @@ function hasMorePages(root) {
  *      <i class="fa fa-chevron-right"></i>
  * </a>
  * @param {HTMLElement} root
- * @returns
+ * @returns the text represent the numeric offset. Guard that this is called when it is
+ * known that the "More Times" button exists.
  */
 function getOffset(root) {
     const offset = root
