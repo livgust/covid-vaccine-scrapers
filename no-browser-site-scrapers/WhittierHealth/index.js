@@ -11,16 +11,12 @@ module.exports = async function GetAvailableAppointments(
 ) {
     console.log(`${site.name} starting.`);
 
-    const individualLocationData = [];
-
     const websiteData = await ScrapeWebsiteData(site, fetchService);
-
-    individualLocationData.push(websiteData);
 
     const results = {
         parentLocationName: `${site.name}`,
         timestamp: moment().format(),
-        individualLocationData: individualLocationData,
+        individualLocationData: websiteData,
     };
 
     return results;
@@ -48,33 +44,39 @@ async function ScrapeWebsiteData(site, fetchService) {
     };
 
     const linksArray = await getCalendarLinks(fetchService, site.signUpLink);
+
+    let hasAvailability = false;
+
     // Advance the calendar of each site until no availability is found.
-    linksArray.forEach(async (link) => {
-        console.log(`calendarPageLink: ${link}`);
+    await Promise.all([
+        linksArray.forEach(async (link) => {
+            console.log(`calendarPageLink: ${link}`);
 
-        const monthAvailabilityMap = await getSlotsFromPage(fetchService, link);
+            const monthAvailabilityMap = await getSlotsFromPage(
+                fetchService,
+                link
+            );
 
-        // Add all day objects to results.availability
-        monthAvailabilityMap.forEach((value, key) => {
-            availabilityContainer.availability[key] = {
-                numberAvailableAppointments: value,
-                hasAvailability: !!value,
-            };
-        });
-    });
+            // Add all day objects to results.availability
+            monthAvailabilityMap.forEach((value, key) => {
+                availabilityContainer.availability[key] = {
+                    numberAvailableAppointments: value,
+                    hasAvailability: !!value,
+                };
+            });
 
-    const results = {
-        parentLocationName: `${site.name}`,
-        timestamp: moment().format(),
-        individualLocationData: [
-            {
-                ...site,
-                ...availabilityContainer,
-            },
-        ],
-    };
+            hasAvailability ||=
+                Object.keys(availabilityContainer.availability).length > 0;
+        }),
+    ]);
 
-    return results;
+    return [
+        {
+            ...site,
+            ...availabilityContainer,
+            hasAvailability: hasAvailability,
+        },
+    ];
 }
 
 async function getCalendarLinks(fetchService, frontPageUrl) {
@@ -93,7 +95,9 @@ async function getCalendarLinks(fetchService, frontPageUrl) {
         .map((a) => a.getAttribute("href"))
         .filter((href) => href.includes("signupgenius"));
 
-    return calendarLinks;
+    return calendarLinks.length == 0
+        ? ["https://www.signupgenius.com/go/409054ca9ab2ca2fa7-415"]
+        : calendarLinks;
 }
 
 async function fetchCalendarLinks(link) {
@@ -162,7 +166,9 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
     // const date = text.match(/\d{1,2}\/\d{1,2}\/\d{4}/)[0];
 
     try {
-        const times = root.querySelectorAll(".SUGsignups");
+        const times = root
+            .querySelectorAll("span.SUGbigbold")
+            .filter((t) => t.innerText.includes("slots filled"));
         // There should be ~19 appointment time blocks per calendar page.
         // From the SignUpGenius vaccine scheduling guides at
         // https://www.signupgenius.com/faq/create-time-slot-sign-up-appointments.cfm
@@ -193,15 +199,16 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
 
         Use the following to do the math to get slots remaining:
 
-            const values = innerText.match(/\d+/g);
-            const slotsRemaining = values[1] - values[0]);
 
         */
+
         dailySlotCountsMap = times
-            .map((time) => time.innerText)
-            .filter((text) => parseInt(text) >= 0)
-            .reduce((acc, text) => {
-                const slotCount = parseInt(text) || 0;
+            .map((time) => {
+                const values = time.innerText.match(/\d+/g);
+                const slotCount = values[1] - values[0];
+                return slotCount;
+            })
+            .reduce((acc, slotCount) => {
                 acc.set(date, (acc.get(date) || 0) + slotCount);
                 return acc;
             }, new Map());
