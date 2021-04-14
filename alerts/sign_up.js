@@ -14,6 +14,7 @@ const signUp = {
 module.exports = signUp;
 
 async function handler(req) {
+    console.log(JSON.stringify(req));
     return signUp
         .addOrUpdateSubscription(JSON.parse(req.body))
         .catch(console.error);
