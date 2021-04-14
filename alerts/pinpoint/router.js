@@ -10,8 +10,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const pinpoint = new AWS.Pinpoint();
 
-module.exports = eventRouter;
-module.handler = eventRouter;
+module.exports = { handler: eventRouter };
 
 async function eventRouter(event) {
     console.log(`Received event ${event}`);

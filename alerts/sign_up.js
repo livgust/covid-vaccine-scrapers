@@ -8,14 +8,16 @@ const signUp = {
     addOrUpdateSubscription,
     cancelSubscription,
     getSubscription,
+    handler,
 };
 
 module.exports = signUp;
-module.handler = async function handler(req) {
+
+async function handler(req) {
     return signUp
         .addOrUpdateSubscription(JSON.parse(req.body))
         .catch(console.error);
-};
+}
 
 async function addOrUpdateSubscription({ phoneNumber, email, zip, radius }) {
     const data = {
