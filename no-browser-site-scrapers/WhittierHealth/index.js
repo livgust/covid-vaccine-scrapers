@@ -3,8 +3,6 @@ const fetch = require("node-fetch");
 const htmlParser = require("node-html-parser");
 const moment = require("moment");
 
-let pageVisitCount = 0;
-
 module.exports = async function GetAvailableAppointments(
     _ignored,
     fetchService = liveFetchService()
@@ -80,6 +78,14 @@ async function ScrapeWebsiteData(site, fetchService) {
     return results;
 }
 
+/**
+ * Gets links that might be on the vaccine site's front page which
+ * point to pages containing a calendar for a specific date.
+ *
+ * @param {*} fetchService
+ * @param {String} frontPageUrl is the website URL
+ * @returns an array of links (URLs): may be empty, or contain one or more links. Guaranteed not null.
+ */
 async function getCalendarLinks(fetchService, frontPageUrl) {
     const frontPageHtml = await fetchService.fetchFrontPage(frontPageUrl);
     // parse response
@@ -100,9 +106,10 @@ async function getCalendarLinks(fetchService, frontPageUrl) {
 }
 
 /**
+ * Fetches the HTML for the front page of the vaccination site.
  *
- * @param {String} link to the Whittier Vaccine Clinic front page
- * @returns an array containing no, one, or more, links to calendar pages. Guaranteed to not be null.
+ * @param {String} link to the Whittier Vaccine Clinic front page (see config.js -> signUpLink)
+ * @returns HTML of the front page of the vaccination site.
  */
 async function fetchFrontPage(link) {
     const response = await fetch(link)
@@ -142,6 +149,15 @@ async function fetchCalendarPage(calendarUrl) {
     return response;
 }
 
+/**
+ * Gets the slots available on the calendar page. Parses the page for
+ * the date, and gets the availability for that date from the calendar page.
+ *
+ * @param {*} fetchService
+ * @param {*} link
+ * @returns a Map keyed by date; value = number of available slots. Expect only on entry
+ * because each calendar page is for a specific date.
+ */
 async function getSlotsFromPage(fetchService, link) {
     const calendarHtml = await fetchService.fetchCalendarPage(link);
 
@@ -155,7 +171,7 @@ async function getSlotsFromPage(fetchService, link) {
 }
 
 /**
- * Gets the availability in a calendar.
+ * Gets the available slots in a calendar.
  * @param {HTMLElement} root
  * @returns
  */
@@ -189,29 +205,30 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
         // just availability.
 
         /*
-        From Butler County General Health District, Ohio site:
-            http://health.bcohio.us/news_detail_T6_R141.php
-        one can find signup links.
+            From Butler County General Health District, Ohio site:
+                http://health.bcohio.us/news_detail_T6_R141.php
+            one can find signup links.
 
-        It looks like ".SUGbigbold" will net the # of slots!
+            *** That page has been saved for provided a test sample of availability. ***
 
-        <div style="padding-top:5px !important;">
-			<span class="SUGbigbold" style="line-height: 18px;">129 of 139 slots filled</span>
-		</div>
-        <div class="SUGbuttonContainer link_cursor" data-toggle="popover"
-            data-trigger="hover" data-placement="top"
-            data-content="Sign Up is Locked"
-            style="margin-top:10px;"
-            data-original-title="" title="">
-			<span class="SUGbutton rounded" data-toggle="modal" data-target="#addLockModal">
-				<span>Sign Up&nbsp;</span>
-				<img src="/images/icons/lock-icon-14x14.png">
-			</span>
-		</div>
+            It looks like "span.SUGbigbold" nets the # of slots, filtered by innerText containing
+            "slots filled"!
 
-        Use the following to do the math to get slots remaining:
+            <div style="padding-top:5px !important;">
+                <span class="SUGbigbold" style="line-height: 18px;">129 of 139 slots filled</span>
+            </div>
+            <div class="SUGbuttonContainer link_cursor" data-toggle="popover"
+                data-trigger="hover" data-placement="top"
+                data-content="Sign Up is Locked"
+                style="margin-top:10px;"
+                data-original-title="" title="">
+                <span class="SUGbutton rounded" data-toggle="modal" data-target="#addLockModal">
+                    <span>Sign Up&nbsp;</span>
+                    <img src="/images/icons/lock-icon-14x14.png">
+                </span>
+            </div>
 
-
+            Parse the two number, subtract the first from the second, and we have # of slots available.
         */
 
         dailySlotCountsMap = times
@@ -228,21 +245,16 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
         console.error(`error trying to get day numbers: ${error}`);
     }
 
-    pageVisitCount += 1;
-
-    console.log(`pageVisitCount: ${pageVisitCount}`);
-
     return dailySlotCountsMap ? dailySlotCountsMap : new Map();
 }
 
 /**
- * If there's no availability, Acuity indicates it in a number of ways. Check
- * for them.
+ * Checks for ("#submitfooter h1").innerText == "NO SLOTS AVAILABLE. SIGN UP IS FULL."
+ *
  * @param {HTMLElement} root
- * @returns true if one of the Acuity no availability indicators is found
+ * @returns true if the banner is there
  */
 function signUpIsFull(root) {
-    // look for ("#submitfooter h1").innerText == "NO SLOTS AVAILABLE. SIGN UP IS FULL."
     let isFull = false;
     try {
         isFull =
