@@ -1,4 +1,5 @@
 const sinon = require("sinon");
+const pinpointWorkflow = require("../../alerts/pinpoint/new_subscriber");
 const signUp = require("../../alerts/sign_up");
 const chai = require("chai");
 const expect = chai.expect;
@@ -21,6 +22,9 @@ describe("getSubscription", () => {
 });
 describe("addSubscription", () => {
     it("sets and retrieves a phone number subscription", async () => {
+        sinon
+            .stub(pinpointWorkflow, "validateNumberAndAddSubscriber")
+            .returns(Promise.resolve());
         await signUp.addOrUpdateSubscription({
             phoneNumber: "8578675309",
             zip: "12345",

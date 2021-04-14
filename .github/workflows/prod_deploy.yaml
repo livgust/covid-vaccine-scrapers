@@ -70,4 +70,6 @@ jobs:
           TwitterApiSecret=${{ secrets.TWITTER_API_SECRET }} \
           TwitterAccessTokenKey=${{ secrets.TWITTER_ACCESS_TOKEN_KEY }} \
           TwitterAccessTokenSecret=${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }} \
+          PinpointApplicationId=${{ secrets.PINPOINT_APPLICATION_ID }} \
+          PinpointOriginationNumber=${{ secrets.PINPOINT_ORIGINATION_NUMBER }} \
           Environment=prod
