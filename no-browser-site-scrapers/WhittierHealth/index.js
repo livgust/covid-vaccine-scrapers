@@ -161,6 +161,19 @@ async function fetchCalendarPage(calendarUrl) {
 async function getSlotsFromPage(fetchService, link) {
     const calendarHtml = await fetchService.fetchCalendarPage(link);
 
+    /*
+        <div class="col-md-12 col-body-100 SUGmain">
+            <strong>Date: </strong>04/15/2021 (Thu.)<p></p>
+            ...
+        </div>
+
+        Note:
+
+            const text = root.querySelector(".col-md-12.col-body-100.SUGmain").innerText;
+
+        does not retrieve the date.
+    */
+
     const date = calendarHtml.match(/\d{1,2}\/\d{1,2}\/\d{4}/)[0];
 
     const root = htmlParser.parse(calendarHtml);
@@ -186,23 +199,10 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
 
     let dailySlotCountsMap; // keyed by date, value accumulates slot counts per date.
 
-    // <div class="col-md-12 col-body-100 SUGmain">
-    //     <strong>Date: </strong>04/15/2021 (Thu.)<p></p>
-    //     ...
-    // const text = root.querySelector(".col-md-12,.col-body-100,.SUGmain")
-    //     .innerText;
-    // const date = text.match(/\d{1,2}\/\d{1,2}\/\d{4}/)[0];
-
     try {
         const times = root
             .querySelectorAll("span.SUGbigbold")
             .filter((t) => t.innerText.includes("slots filled"));
-        // There should be ~19 appointment time blocks per calendar page.
-        // From the SignUpGenius vaccine scheduling guides at
-        // https://www.signupgenius.com/faq/create-time-slot-sign-up-appointments.cfm
-        // it looks like the "Already filled" will be replaced by a button (<a href..>)
-        // when slots are available. But no count will be available. So we cannot report numbers,
-        // just availability.
 
         /*
             From Butler County General Health District, Ohio site:
