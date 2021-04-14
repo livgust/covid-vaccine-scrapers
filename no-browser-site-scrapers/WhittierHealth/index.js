@@ -255,14 +255,10 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
  * @returns true if the banner is there
  */
 function signUpIsFull(root) {
-    let isFull = false;
-    try {
-        isFull =
-            root.querySelector("#submitfooter h1").innerText ==
-            "NO SLOTS AVAILABLE. SIGN UP IS FULL.";
-    } catch (error) {
-        console.log(`cannot find #submitfooter h1`);
-    }
+    const submitFooter = root.querySelector("#submitfooter h1");
+    let isFull =
+        submitFooter &&
+        submitFooter.innerText == "NO SLOTS AVAILABLE. SIGN UP IS FULL.";
 
     return isFull;
 }
