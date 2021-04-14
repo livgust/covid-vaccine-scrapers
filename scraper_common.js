@@ -185,7 +185,7 @@ async function execute(usePuppeteer, scrapers) {
             new Date() - globalStartTime,
             new Date()
         );
-        const webData = JSON.stringify(responseJson);
+        const webData = JSON.stringify(responseJson, null, 2);
         if (process.env.NODE_ENV !== "production") {
             const outFile = usePuppeteer ? "out.json" : "out_no_browser.json";
             console.log(
