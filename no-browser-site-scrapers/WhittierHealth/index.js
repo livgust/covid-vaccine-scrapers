@@ -16,8 +16,10 @@ module.exports = async function GetAvailableAppointments(
     const results = {
         parentLocationName: `${site.name}`,
         timestamp: moment().format(),
-        individualLocationData: websiteData,
+        individualLocationData: [websiteData],
     };
+
+    console.log(`${site.name} done.`);
 
     return results;
 };
@@ -28,8 +30,8 @@ module.exports = async function GetAvailableAppointments(
  */
 function liveFetchService() {
     return {
-        async fetchCalendarLinks(frontPageUrl) {
-            return await fetchCalendarLinks(frontPageUrl);
+        async fetchFrontPage(frontPageUrl) {
+            return await fetchFrontPage(frontPageUrl);
         },
         async fetchCalendarPage(calendarUrl) {
             return await fetchCalendarPage(calendarUrl);
@@ -70,17 +72,16 @@ async function ScrapeWebsiteData(site, fetchService) {
         }),
     ]);
 
-    return [
-        {
-            ...site,
-            ...availabilityContainer,
-            hasAvailability: hasAvailability,
-        },
-    ];
+    const results = {
+        ...site,
+        ...availabilityContainer,
+        hasAvailability: hasAvailability,
+    };
+    return results;
 }
 
 async function getCalendarLinks(fetchService, frontPageUrl) {
-    const frontPageHtml = await fetchService.fetchCalendarLinks(frontPageUrl);
+    const frontPageHtml = await fetchService.fetchFrontPage(frontPageUrl);
     // parse response
     /* look for
         <a href="https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413">
@@ -95,12 +96,15 @@ async function getCalendarLinks(fetchService, frontPageUrl) {
         .map((a) => a.getAttribute("href"))
         .filter((href) => href.includes("signupgenius"));
 
-    return calendarLinks.length == 0
-        ? ["https://www.signupgenius.com/go/409054ca9ab2ca2fa7-415"]
-        : calendarLinks;
+    return calendarLinks;
 }
 
-async function fetchCalendarLinks(link) {
+/**
+ *
+ * @param {String} link to the Whittier Vaccine Clinic front page
+ * @returns an array containing no, one, or more, links to calendar pages. Guaranteed to not be null.
+ */
+async function fetchFrontPage(link) {
     const response = await fetch(link)
         .then((res) => res.text())
         .then((html) => {
@@ -115,6 +119,14 @@ async function fetchCalendarLinks(link) {
     return response;
 }
 
+/**
+ * Get the HTML containing a calendar by fetchings the link.
+ * The link should look like this:
+ * 'https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413'
+ *
+ * @param {String} link to the calendar page
+ * @returns HTML containing a SignupGenius calendar
+ */
 async function fetchCalendarPage(calendarUrl) {
     const response = await fetch(calendarUrl)
         .then((res) => res.text())

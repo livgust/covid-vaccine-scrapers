@@ -20,7 +20,7 @@ describe("WhittierHealth availability test using scraper and saved HTML", functi
          *
          * @returns an array of meaningless <a href> snippets.
          */
-        async fetchCalendarLinks(/*frontPageUrl*/) {
+        async fetchFrontPage(/*frontPageUrl*/) {
             return [
                 `<a href="https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413">
             Tuesday April 13 at Whittier Rehabilitation Hospital Bradford, 145 Ward Hill Ave, Haverhill 01835&nbsp;
@@ -70,20 +70,11 @@ describe("WhittierHealth availability test using scraper and saved HTML", functi
             return count.reduce((acc, c) => (acc += c));
         }, []);
 
-        // const slotCounts = results.individualLocationData.map((result) =>
-        //     Object.values(result[0].availability)
-        //         .map((value) => value.numberAvailableAppointments)
-        //         .reduce(function (total, number) {
-        //             return total + number;
-        //         }, 0)
-        // );
-
         expect(expectedSlotCounts).is.deep.equal(slotCounts);
-        /*
-        Structure conformance expectations:
 
-        - The timestamps is expected to be between before
-            and after when the scraper was executed
+        /*
+          The timestamp is expected to be between before
+            and after execution of the scraper in this test.
          */
         expect(moment(results.timestamp).isBetween(beforeTime, afterTime));
     });
