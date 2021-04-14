@@ -38,6 +38,10 @@ Parameters:
     Type: String
   TwitterAccessTokenSecret:
     Type: String
+  PinpointApplicationId:
+    Type: String
+  PinpointOriginationNumber:
+    Type: String
 
 Globals:
   Function:
@@ -172,3 +176,55 @@ Resources:
           TWITTER_ACCESS_TOKEN_KEY: !Ref TwitterAccessTokenKey
           TWITTER_ACCESS_TOKEN_SECRET: !Ref TwitterAccessTokenSecret
           NODE_ENV: !Ref NodeEnv
+
+  SMSRouter:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "SMSRouter-${Environment}"
+      Handler: ./alerts/pinpoint/router.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 256
+      Timeout: 5
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - PinpointEndpointAccessPolicy:
+            PinpointApplicationId: !Ref PinpointApplicationId
+      Environment:
+        Variables:
+          FAUNA_DB: !Ref FaunaApiKey
+          NODE_ENV: !Ref NodeEnv
+          PINPOINT_APPLICATION_ID: !Ref PinpointApplicationId
+          PINPOINT_ORIGINATION_NUMBER: !Ref PinpointOriginationNumber
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: arn:aws:sns:us-east-1:952391375996:macovidvaccinesAlertsSNS
+
+  AddSubscription:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddSubscription-${Environment}"
+      Handler: ./alerts/sign_up.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 256
+      Timeout: 5
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - PinpointEndpointAccessPolicy:
+            PinpointApplicationId: !Ref PinpointApplicationId
+      Environment:
+        Variables:
+          FAUNA_DB: !Ref FaunaApiKey
+          NODE_ENV: !Ref NodeEnv
+          PINPOINT_APPLICATION_ID: !Ref PinpointApplicationId
+          PINPOINT_ORIGINATION_NUMBER: !Ref PinpointOriginationNumber
+      Events:
+        AddSubscriptionApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MACovidVaccinesApi
+            Method: POST
+            Path: /subscription

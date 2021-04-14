@@ -1,6 +1,7 @@
 const faunadb = require("faunadb"),
     fq = faunadb.query;
 const dbUtils = require("../lib/db/utils");
+const pinpointWorkflow = require("./pinpoint/new_subscriber");
 
 const signUp = {
     activateSubscription,
@@ -10,6 +11,11 @@ const signUp = {
 };
 
 module.exports = signUp;
+module.handler = async function handler(req) {
+    return signUp
+        .addOrUpdateSubscription(JSON.parse(req.body))
+        .catch(console.error);
+};
 
 async function addOrUpdateSubscription({ phoneNumber, email, zip, radius }) {
     const data = {
@@ -24,23 +30,32 @@ async function addOrUpdateSubscription({ phoneNumber, email, zip, radius }) {
         throw new Error("phone number and email both set!");
     }
     if (phoneNumber) {
-        return dbUtils.faunaQuery(
-            fq.If(
-                fq.Exists(fq.Match("subscriptionByPhoneNumber", phoneNumber)),
-                fq.Update(
-                    fq.Select(
-                        "ref",
-                        fq.Get(
-                            fq.Match("subscriptionByPhoneNumber", phoneNumber)
-                        )
+        return dbUtils
+            .faunaQuery(
+                fq.If(
+                    fq.Exists(
+                        fq.Match("subscriptionByPhoneNumber", phoneNumber)
                     ),
-                    {
-                        data,
-                    }
-                ),
-                fq.Create(fq.Collection("subscriptions"), { data })
+                    fq.Update(
+                        fq.Select(
+                            "ref",
+                            fq.Get(
+                                fq.Match(
+                                    "subscriptionByPhoneNumber",
+                                    phoneNumber
+                                )
+                            )
+                        ),
+                        {
+                            data,
+                        }
+                    ),
+                    fq.Create(fq.Collection("subscriptions"), { data })
+                )
             )
-        );
+            .then(() =>
+                pinpointWorkflow.validateNumberAndAddSubscriber(phoneNumber)
+            );
     } else if (email) {
         return dbUtils.faunaQuery(
             fq.If(
