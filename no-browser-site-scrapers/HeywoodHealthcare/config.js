@@ -8,7 +8,7 @@ const site = {
         signUpLink: " https://gardnervaccinations.as.me/schedule.php",
         extraData: {
             Note:
-                "Vaccinations will be at the Polish American Citizens Club (PACC), 171 Kendall Pond Rd W, Gardner, MA 01440",
+                "Vaccinations will be at the Polish American Citizens Club (PACC).",
         },
     },
     private: {
