@@ -215,6 +215,12 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - PinpointEndpointAccessPolicy:
             PinpointApplicationId: !Ref PinpointApplicationId
+        - Version: "2012-10-17" # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - mobiletargeting:PhoneNumberValidate
+              Resource: "*"
       Environment:
         Variables:
           FAUNA_DB: !Ref FaunaApiKey
