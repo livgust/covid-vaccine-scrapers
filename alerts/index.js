@@ -635,7 +635,7 @@ async function handleIndividualAlert({
     } else if (
         (bookableAppointmentsFound &&
             bookableAppointmentsFound >
-                alert.SMALL_APPOINTMENT_NUMBER_THRESHOLD()) ||
+                alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()) ||
         availabilityWithNoNumbers
     ) {
         console.log(`enough appointments found for ${locationRefId}.`);
