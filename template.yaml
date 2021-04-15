@@ -166,6 +166,8 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - CloudWatchPutMetricPolicy: {}
+        - LambdaInvokePolicy:
+            FunctionName: !Ref TextAndEmailSender
       Environment:
         Variables:
           GOOGLE_API_KEY: !Ref GoogleApiKey
