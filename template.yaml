@@ -176,6 +176,7 @@ Resources:
           TWITTER_ACCESS_TOKEN_KEY: !Ref TwitterAccessTokenKey
           TWITTER_ACCESS_TOKEN_SECRET: !Ref TwitterAccessTokenSecret
           NODE_ENV: !Ref NodeEnv
+          PINPOINTFUNCTIONNAME: !Ref TextAndEmailSender
 
   SMSRouter:
     Type: AWS::Serverless::Function
@@ -242,3 +243,30 @@ Resources:
             RestApiId: !Ref MACovidVaccinesApi
             Method: POST
             Path: /subscription
+
+  TextAndEmailSender:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "TextAndEmailSender-${Environment}"
+      Handler: ./alerts/send_texts_and_emails.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      MemorySize: 256
+      Timeout: 5
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - PinpointEndpointAccessPolicy:
+            PinpointApplicationId: !Ref PinpointApplicationId
+        - Version: "2012-10-17" # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - mobiletargeting:PhoneNumberValidate
+                - mobiletargeting:SendMessages
+              Resource: "*"
+      Environment:
+        Variables:
+          FAUNA_DB: !Ref FaunaApiKey
+          NODE_ENV: !Ref NodeEnv
+          PINPOINT_APPLICATION_ID: !Ref PinpointApplicationId
+          PINPOINT_ORIGINATION_NUMBER: !Ref PinpointOriginationNumber

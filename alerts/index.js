@@ -21,6 +21,7 @@ appointmentAlertBatchZips: {
     count,
 }
 */
+
 const { sendSlackMsg } = require("../lib/slack");
 const { sendTweet } = require("../lib/twitter");
 const dbUtils = require("../lib/db/utils");
@@ -29,6 +30,10 @@ const faunadb = require("faunadb"),
     fq = faunadb.query;
 const moment = require("moment");
 const scraperUtils = require("../lib/db/scraper_data");
+
+const AWS = require("aws-sdk");
+const { Lambda } = require("faunadb");
+const lambda = new AWS.Lambda();
 
 dotenv.config();
 
@@ -227,10 +232,46 @@ async function runAlerts(
         }
         if (sendRegularAlert) {
             promises.push(sendSlackMsg("bot", message));
+            promises.push(
+                sendTextsAndEmails(
+                    {
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                    },
+                    bookableAppointmentsFound || 1,
+                    message
+                )
+            );
         }
     }
     // log any errors without failing.
     return Promise.all(promises).catch(console.error);
+}
+
+async function sendTextsAndEmails(loc, numberAppointments, message) {
+    //BIG TODO: throttling
+    if (process.env.NODE_ENV === "production") {
+        return lambda.invoke(
+            {
+                FunctionName: process.env.PINPOINTFUNCTIONNAME,
+                InvocationType: "Event",
+                Payload: JSON.stringify({
+                    location: loc,
+                    numberAppointmentsFound: numberAppointments,
+                    message,
+                }),
+            },
+            () => {}
+        );
+    } else {
+        console.log(
+            `would send text alerts with arguments: ${JSON.stringify({
+                location: loc,
+                numberAppointmentsFound: numberAppointments,
+                message,
+            })}`
+        );
+    }
 }
 
 async function publishGroupAlert(
@@ -283,6 +324,8 @@ async function publishGroupAlert(
     }
     if (sendRegularAlert) {
         promises.push(sendSlackMsg("bot", message));
+        // TODO: send texts & emails; need to add logic for multiple locs
+        // in one alert.
     }
     return Promise.all(promises).catch(console.err);
 }
