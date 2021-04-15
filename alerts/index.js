@@ -251,17 +251,31 @@ async function runAlerts(
 async function sendTextsAndEmails(loc, numberAppointments, message) {
     //BIG TODO: throttling
     if (process.env.NODE_ENV === "production") {
-        return lambda.invoke(
-            {
-                FunctionName: process.env.PINPOINTFUNCTIONNAME,
-                InvocationType: "Event",
-                Payload: JSON.stringify({
-                    location: loc,
-                    numberAppointmentsFound: numberAppointments,
-                    message,
-                }),
-            },
-            () => {}
+        return new Promise((resolve, reject) =>
+            lambda.invoke(
+                {
+                    FunctionName: process.env.PINPOINTFUNCTIONNAME,
+                    InvocationType: "Event",
+                    Payload: JSON.stringify({
+                        location: loc,
+                        numberAppointmentsFound: numberAppointments,
+                        message,
+                    }),
+                },
+                (err, data) => {
+                    if (err) {
+                        console.error(`Pinpoint error: ${err}`);
+                        reject(err);
+                    } else {
+                        console.log(
+                            `Pinpoint request successful. response: ${JSON.stringify(
+                                data
+                            )}`
+                        );
+                        resolve(data);
+                    }
+                }
+            )
         );
     } else {
         console.log(
@@ -619,10 +633,12 @@ async function handleIndividualAlert({
             console.log(`(1) Not doing anything for ${locationRefId}.`);
         }
     } else if (
-        (bookableAppointmentsFound && bookableAppointmentsFound > 0) ||
+        (bookableAppointmentsFound &&
+            bookableAppointmentsFound >
+                alert.SMALL_APPOINTMENT_NUMBER_THRESHOLD()) ||
         availabilityWithNoNumbers
     ) {
-        console.log(`appointments found for ${locationRefId}.`);
+        console.log(`enough appointments found for ${locationRefId}.`);
         const alertStartTime = await alerts.getLastAlertStartTime(
             locationRefId
         );
