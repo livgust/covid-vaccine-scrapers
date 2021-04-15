@@ -65,7 +65,8 @@ async function ScrapeWebsiteData(site, fetchService) {
                 };
             });
 
-            hasAvailability ||=
+            hasAvailability =
+                hasAvailability ||
                 Object.keys(availabilityContainer.availability).length > 0;
         }),
     ]);
