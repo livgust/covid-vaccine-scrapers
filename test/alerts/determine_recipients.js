@@ -10,11 +10,13 @@ async function addSubscription() {
     sinon
         .stub(pinpointWorkflow, "validateNumberAndAddSubscriber")
         .returns(Promise.resolve());
-    return signUp.addOrUpdateSubscription({
-        phoneNumber: "8578675309",
-        zip: "01880",
-        radius: 10,
-    });
+    return signUp
+        .addOrUpdateSubscription({
+            phoneNumber: "8578675309",
+            zip: "01880",
+            radius: 10,
+        })
+        .then(() => signUp.activateSubscription({ phoneNumber: "8578675309" }));
 }
 
 afterEach(() => {
@@ -31,7 +33,7 @@ describe("findSubscribersWithZips", () => {
                 phoneNumber: "8578675309",
                 zip: "01880",
                 radius: 10,
-                active: false,
+                active: true,
                 cancelled: false,
             },
         ]);
@@ -53,7 +55,7 @@ describe("determineRecipients", () => {
                 phoneNumber: "8578675309",
                 zip: "01880",
                 radius: 10,
-                active: false,
+                active: true,
                 cancelled: false,
             },
         ]);
