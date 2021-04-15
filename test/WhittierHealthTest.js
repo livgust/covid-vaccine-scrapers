@@ -5,18 +5,20 @@ const { expect } = require("chai");
 const moment = require("moment");
 const file = require("../lib/file");
 
-/** Generator to feed filenames sequentially to the "with availability" test. */
-function* filenames() {
-    yield "butlerOhio-withSlots-scripts-removed.html"; // 25 slots available
-    yield "whittier-one-slot-scripts-removed.html"; // 1 slot available
-}
-
 describe("WhittierHealth availability test using scraper and saved HTML", function () {
+    /** Generator to feed filenames sequentially to the "with availability" test. */
+    function* filenames() {
+        yield "butlerOhio-withSlots-scripts-removed.html"; // 25 slots available
+        yield "whittier-one-slot-scripts-removed.html"; // 1 slot available
+    }
+
     const filenameGenerator = filenames();
 
     const testFetchService = {
         /**
          * For mocking purposes, just feed a couple of HTML snippets containing hrefs.
+         * They aren't used when testing, but need to be present so that the scraper
+         * can proceed.
          *
          * @returns an array of meaningless <a href> snippets.
          */
@@ -69,6 +71,84 @@ describe("WhittierHealth availability test using scraper and saved HTML", functi
             );
             return count.reduce((acc, c) => (acc += c));
         }, []);
+
+        expect(expectedSlotCounts).is.deep.equal(slotCounts);
+
+        /*
+          The timestamp is expected to be between before
+            and after execution of the scraper in this test.
+         */
+        expect(moment(results.timestamp).isBetween(beforeTime, afterTime));
+    });
+});
+
+describe("WhittierHealth no availability test using scraper and saved HTML", function () {
+    /** Generator to feed filenames sequentially to the "with NO availability" test. */
+    function* filenames() {
+        yield "noSlotsAvailable4132021-scripts-removed.html"; // No slots available. Sign up is full.
+        yield "noSlotsAvailable4152021-scripts-removed.html"; // No slots available. Sign up is full.
+    }
+    const filenameGenerator = filenames();
+
+    const testFetchService = {
+        /**
+         * For mocking purposes, just feed a couple of HTML snippets containing hrefs.
+         *
+         * @returns an array of meaningless <a href> snippets.
+         */
+        async fetchFrontPage(/*frontPageUrl*/) {
+            return [
+                `<a href="https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413">
+            Tuesday April 13 at Whittier Rehabilitation Hospital Bradford, 145 Ward Hill Ave, Haverhill 01835&nbsp;
+            </a>`,
+                `<a href="https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413">
+            Tuesday April 13 at Whittier Rehabilitation Hospital Bradford, 145 Ward Hill Ave, Haverhill 01835&nbsp;
+            </a>`,
+            ];
+        },
+        async fetchCalendarPage(/*calendarUrl*/) {
+            return loadTestHtmlFromFile(
+                "WhittierHealth",
+                filenameGenerator.next().value
+            );
+        },
+    };
+    const beforeTime = moment();
+
+    it("should provide availability for one site, and the results objects structure should conform", async function () {
+        const results = await scraper(false, testFetchService);
+
+        if (process.env.DEVELOPMENT) {
+            file.write(
+                `${process.cwd()}/out_${site.name}.json`,
+                `${JSON.stringify(results, null, "   ")}`
+            );
+        }
+
+        const expectedHasAvailability = [false];
+
+        const hasAvailability = results.individualLocationData.map((result) => {
+            const avail = result.hasAvailability;
+            return avail;
+        }, []);
+
+        const afterTime = moment();
+
+        expect(hasAvailability).is.deep.equal(expectedHasAvailability);
+
+        // There is no availability.
+        const expectedSlotCounts = [0];
+
+        const slotCounts = results.individualLocationData.map((result) => {
+            const count = Object.values(result.availability).map(
+                (value) => value.numberAvailableAppointments
+            );
+            if (count.length == 0) {
+                return 0;
+            } else {
+                return count.reduce((acc, c) => (acc += c));
+            }
+        });
 
         expect(expectedSlotCounts).is.deep.equal(slotCounts);
 
