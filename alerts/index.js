@@ -282,7 +282,7 @@ async function sendTextsAndEmails(locs, numberAppointments, message) {
     } else {
         console.log(
             `would send text alerts with arguments: ${JSON.stringify({
-                location: loc,
+                locations: locs,
                 numberAppointmentsFound: numberAppointments,
                 message,
             })}`
