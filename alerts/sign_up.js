@@ -15,9 +15,18 @@ module.exports = signUp;
 
 async function handler(req) {
     console.log(JSON.stringify(req));
-    return signUp
+    let error = null;
+    const res = await signUp
         .addOrUpdateSubscription(JSON.parse(req.body))
-        .catch(console.error);
+        .catch((err) => {
+            console.error(err);
+            error = err;
+        });
+    return {
+        statusCode: error ? 500 : 200,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify(error ? error : res),
+    };
 }
 
 async function addOrUpdateSubscription({ phoneNumber, email, zip, radius }) {
