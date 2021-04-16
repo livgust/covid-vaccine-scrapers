@@ -32,11 +32,20 @@ async function determineRecipients({ locations, numberAvailable }) {
             // to the site. NOTE that for this simplification to work, we must
             // ensure that our radiusIncrements be a superset of the radii we allow
             // users to enter when they subscribe.
+            // Also filter out people that are already in our subscription list.
             console.log(`found ${subscribers.length} subscribers`);
             subscribers = subscribers.filter(
                 (subscriber) =>
                     !parseInt(radiusIndex) ||
-                    subscriber.radius >= radiusIncrements[radiusIndex - 1]
+                    subscriber.radius >= radiusIncrements[radiusIndex - 1] ||
+                    (subscriber.phoneNumber &&
+                        textRecipients.indexOf(
+                            (rec) => rec.phoneNumber === subscriber.phoneNumber
+                        ) > -1) ||
+                    (subscriber.email &&
+                        emailRecipients.indexOf(
+                            (rec) => rec.email === subscriber.email
+                        ) > -1)
             );
             console.log(`filtered down to ${subscribers.length} subscribers`);
             // Then, sort them out into text or email.
