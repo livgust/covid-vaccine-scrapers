@@ -37,7 +37,7 @@ async function sendTexts(phoneNumbers, message) {
             0,
             Math.min(SMS_PER_SECOND, phoneNumbersCopy.length)
         );
-        console.log(`sending texts to ${phoneNumbersCopy}`);
+        console.log(`sending texts to ${JSON.stringify(phoneNumbersCopy)}`);
         await new Promise((resolve, reject) =>
             pinpoint.sendMessages(
                 {
