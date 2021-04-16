@@ -1,3 +1,4 @@
+const { zip } = require("lodash");
 const dbUtils = require("../lib/db/utils");
 const faunadb = require("faunadb"),
     fq = faunadb.query;
@@ -69,6 +70,10 @@ async function determineRecipients({ locations, numberAvailable }) {
 }
 
 async function findSubscribersWithZips(zips) {
+    console.log(`finding subscribers with the following ZIP codes: ${zips}`);
+    if (!zips || !zips.length) {
+        return [];
+    }
     return dbUtils.faunaQuery(
         fq.Select(
             "data",

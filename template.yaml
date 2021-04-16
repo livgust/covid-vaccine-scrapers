@@ -254,7 +254,7 @@ Resources:
       Runtime: nodejs14.x
       CodeUri: .
       MemorySize: 256
-      Timeout: 5
+      Timeout: 180
       Policies:
         - AWSLambdaBasicExecutionRole
         - PinpointEndpointAccessPolicy:
