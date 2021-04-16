@@ -25,7 +25,7 @@ async function handler(req) {
     return {
         statusCode: error ? 500 : 200,
         headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify(error ? error : res),
+        body: JSON.stringify(error ? error : { success: 1 }),
     };
 }
 
