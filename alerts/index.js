@@ -234,10 +234,12 @@ async function runAlerts(
             promises.push(sendSlackMsg("bot", message));
             promises.push(
                 sendTextsAndEmails(
-                    {
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                    },
+                    [
+                        {
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                        },
+                    ],
                     bookableAppointmentsFound || 1,
                     message
                 )
@@ -248,7 +250,7 @@ async function runAlerts(
     return Promise.all(promises).catch(console.error);
 }
 
-async function sendTextsAndEmails(loc, numberAppointments, message) {
+async function sendTextsAndEmails(locs, numberAppointments, message) {
     //BIG TODO: throttling
     if (process.env.NODE_ENV === "production") {
         return new Promise((resolve, reject) =>
@@ -257,7 +259,7 @@ async function sendTextsAndEmails(loc, numberAppointments, message) {
                     FunctionName: process.env.PINPOINTFUNCTIONNAME,
                     InvocationType: "Event",
                     Payload: JSON.stringify({
-                        location: loc,
+                        locations: locs,
                         numberAppointmentsFound: numberAppointments,
                         message,
                     }),
@@ -291,6 +293,7 @@ async function sendTextsAndEmails(loc, numberAppointments, message) {
 async function publishGroupAlert(
     locationName,
     locationCities,
+    locationLatLongs,
     bookableAppointmentsFound,
     availabilityWithNoNumbers,
     sendMassAlert,
@@ -338,8 +341,13 @@ async function publishGroupAlert(
     }
     if (sendRegularAlert) {
         promises.push(sendSlackMsg("bot", message));
-        // TODO: send texts & emails; need to add logic for multiple locs
-        // in one alert.
+        promises.push(
+            sendTextsAndEmails(
+                locationLatLongs,
+                Math.max(bookableAppointmentsFound || 0, locationCities.length)
+            ),
+            message
+        );
     }
     return Promise.all(promises).catch(console.err);
 }
@@ -355,6 +363,7 @@ async function handleGroupAlerts({
         let bookableAppointmentsFound = 0;
         let availabilityWithNoNumbers = false;
         let locationCities = [];
+        let locationLatLongs = [];
         for (const location of locations) {
             let locationBookableAppointmentsFound = 0;
             let locationAvailabilityWithNoNumbers = false;
@@ -375,6 +384,10 @@ async function handleGroupAlerts({
                     )
                 ) {
                     locationCities.push(location.location.data?.address?.city);
+                    locationLatLongs.push({
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                    });
                 }
             }
             bookableAppointmentsFound += locationBookableAppointmentsFound;
@@ -418,6 +431,7 @@ async function handleGroupAlerts({
                 await alerts.publishGroupAlert(
                     parentLocation.data.name,
                     locationCities,
+                    locationLatLongs,
                     bookableAppointmentsFound,
                     availabilityWithNoNumbers,
                     // this counts as a "mass alert" if we have more than APPOINTMENT_NUMBER_THRESHOLD

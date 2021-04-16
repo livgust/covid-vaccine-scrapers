@@ -17,9 +17,9 @@ module.exports = {
     sendTexts,
 };
 
-async function handler({ location, numberAppointmentsFound, message }) {
+async function handler({ locations, numberAppointmentsFound, message }) {
     const subscribers = await determineRecipients.determineRecipients({
-        location,
+        locations,
         numberAvailable: numberAppointmentsFound,
     });
     return sendTexts(

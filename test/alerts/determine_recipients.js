@@ -6,17 +6,21 @@ const pinpointWorkflow = require("../../alerts/pinpoint/new_subscriber");
 const determineRecipients = require("../../alerts/determine_recipients");
 const maZips = require("../../data/ma-zips.json");
 
-async function addSubscription() {
-    sinon
-        .stub(pinpointWorkflow, "validateNumberAndAddSubscriber")
-        .returns(Promise.resolve());
+async function addSubscription(phone, zip) {
+    if (!pinpointWorkflow.validateNumberAndAddSubscriber.restore?.sinon) {
+        sinon
+            .stub(pinpointWorkflow, "validateNumberAndAddSubscriber")
+            .returns(Promise.resolve());
+    }
     return signUp
         .addOrUpdateSubscription({
-            phoneNumber: "8578675309",
-            zip: "01880",
+            phoneNumber: phone || "8578675309",
+            zip: zip || "01880",
             radius: 10,
         })
-        .then(() => signUp.activateSubscription({ phoneNumber: "8578675309" }));
+        .then(() =>
+            signUp.activateSubscription({ phoneNumber: phone || "8578675309" })
+        );
 }
 
 afterEach(() => {
@@ -41,12 +45,16 @@ describe("findSubscribersWithZips", () => {
 });
 
 describe("determineRecipients", () => {
+    afterEach(() => {
+        sinon.restore();
+    });
+
     it("finds easy recipient", async () => {
         await addSubscription();
         expect(
             (
                 await determineRecipients.determineRecipients({
-                    location: maZips["01880"],
+                    locations: [maZips["01880"]],
                     numberAvailable: 1,
                 })
             ).textRecipients
@@ -54,6 +62,34 @@ describe("determineRecipients", () => {
             {
                 phoneNumber: "8578675309",
                 zip: "01880",
+                radius: 10,
+                active: true,
+                cancelled: false,
+            },
+        ]);
+    });
+
+    it("works with multiple locations", async () => {
+        await addSubscription("1234567890", "01880");
+        await addSubscription("0123456789", "01238");
+        expect(
+            (
+                await determineRecipients.determineRecipients({
+                    locations: [maZips["01880"], maZips["01238"]],
+                    numberAvailable: 1,
+                })
+            ).textRecipients
+        ).to.include.deep.members([
+            {
+                phoneNumber: "1234567890",
+                zip: "01880",
+                radius: 10,
+                active: true,
+                cancelled: false,
+            },
+            {
+                phoneNumber: "0123456789",
+                zip: "01238",
                 radius: 10,
                 active: true,
                 cancelled: false,
