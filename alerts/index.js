@@ -216,9 +216,9 @@ async function runAlerts(
 
     let message;
     if (bookableAppointmentsFound) {
-        message = `${bookableAppointmentsFound} appointments available at ${location.name} in ${location.address.city}. Visit https://macovidvaccines.com to book.`;
+        message = `${bookableAppointmentsFound} appointments available at ${location.name} in ${location.address.city}. Visit https://macovidvaccines.com for more information and to book.`;
     } else if (availabilityWithNoNumbers) {
-        message = `Appointments available at ${location.name} in ${location.address.city}. Visit https://macovidvaccines.com to book.`;
+        message = `Appointments available at ${location.name} in ${location.address.city}. Visit https://macovidvaccines.com for more information and to book.`;
     } else {
         console.error(
             `runAlerts was called for location ref ${locationRefId} but no appointments were passed in`
