@@ -385,8 +385,8 @@ async function handleGroupAlerts({
                 ) {
                     locationCities.push(location.location.data?.address?.city);
                     locationLatLongs.push({
-                        latitude: location.latitude,
-                        longitude: location.longitude,
+                        latitude: location.location.data?.latitude,
+                        longitude: location.location.data?.longitude,
                     });
                 }
             }
