@@ -43,7 +43,7 @@ async function sendTexts(phoneNumbers, message) {
                 {
                     ApplicationId: process.env.PINPOINT_APPLICATION_ID,
                     MessageRequest: {
-                        Addresses: phoneNumbers.reduce((obj, curNum) => {
+                        Addresses: currentPhoneNumbers.reduce((obj, curNum) => {
                             obj[`+1${curNum}`] = { ChannelType: "SMS" };
                             return obj;
                         }, {}),
