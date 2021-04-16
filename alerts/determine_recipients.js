@@ -37,7 +37,7 @@ async function determineRecipients({ locations, numberAvailable }) {
             subscribers = subscribers.filter(
                 (subscriber) =>
                     !parseInt(radiusIndex) ||
-                    subscriber.radius >= radiusIncrements[radiusIndex - 1] ||
+                    subscriber.radius > radiusIncrements[radiusIndex - 1] ||
                     (subscriber.phoneNumber &&
                         textRecipients.indexOf(
                             (rec) => rec.phoneNumber === subscriber.phoneNumber
