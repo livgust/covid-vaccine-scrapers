@@ -43,7 +43,7 @@ const alerts = {
     // How many appointments we must find to consider alerting at all
     SMALL_APPOINTMENT_NUMBER_THRESHOLD: () => 3,
     // How many minutes must pass between new alerts for the same location
-    REPEAT_ALERT_TIME: () => 30,
+    REPEAT_ALERT_TIME: () => 60,
     // exported functions:
     activeAlertExists,
     aggregateAvailability,
