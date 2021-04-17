@@ -39,7 +39,10 @@ async function eventRouter(event) {
                                 },
                                 MessageConfiguration: {
                                     SMSMessage: {
-                                        Body: "You are now enrolled.",
+                                        Body:
+                                            "You are now enrolled. Reply STOP to stop at any time, " +
+                                            "HELP for more information, or visit macovidvaccines.com " +
+                                            "to update your subscription.",
                                         MessageType: "TRANSACTIONAL",
                                         OriginationNumber:
                                             process.env
