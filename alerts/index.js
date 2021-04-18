@@ -231,9 +231,10 @@ async function runAlerts(
             promises.push(sendTweet(message));
         }
         if (sendRegularAlert) {
-            if (!parentIsChain) {
-                promises.push(sendSlackMsg("bot", message));
-            }
+            // always send slack - this is just for monitoring/debugging temporarily
+            // if (!parentIsChain) {
+            promises.push(sendSlackMsg("bot", message));
+            // }
             // always send texts/emails on a per-location basis.
             promises.push(
                 sendTextsAndEmails(
