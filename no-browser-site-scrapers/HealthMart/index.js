@@ -63,7 +63,7 @@ async function ScrapeWebsiteData() {
         const url = [site.websiteRoot, zip].join("/") + "?state=MA";
         const getUrl = new Promise((resolve) => {
             let response = "";
-            https.get(url, (res) => {
+            https.get(url, { rejectUnauthorized: false }, (res) => {
                 let body = "";
                 res.on("data", (chunk) => (body += chunk));
                 res.on("end", () => {
