@@ -226,12 +226,15 @@ async function runAlerts(
     }
 
     const promises = [];
-    if (message && !parentIsChain) {
-        if (sendMassAlert) {
+    if (message) {
+        if (sendMassAlert && !parentIsChain) {
             promises.push(sendTweet(message));
         }
         if (sendRegularAlert) {
-            promises.push(sendSlackMsg("bot", message));
+            if (!parentIsChain) {
+                promises.push(sendSlackMsg("bot", message));
+            }
+            // always send texts/emails on a per-location basis.
             promises.push(
                 sendTextsAndEmails(
                     [
@@ -251,7 +254,6 @@ async function runAlerts(
 }
 
 async function sendTextsAndEmails(locs, numberAppointments, message) {
-    //BIG TODO: throttling
     if (process.env.NODE_ENV === "production") {
         return new Promise((resolve, reject) =>
             lambda.invoke(
@@ -341,13 +343,15 @@ async function publishGroupAlert(
     }
     if (sendRegularAlert) {
         promises.push(sendSlackMsg("bot", message));
-        promises.push(
+        // don't send out texts/emails for bundled-up locations. We always send these out individually.
+        // leaving this commented out for posterity/JIC.
+        /* promises.push(
             sendTextsAndEmails(
                 locationLatLongs,
                 Math.max(bookableAppointmentsFound || 0, locationCities.length)
             ),
             message
-        );
+        ); */
     }
     return Promise.all(promises).catch(console.err);
 }
