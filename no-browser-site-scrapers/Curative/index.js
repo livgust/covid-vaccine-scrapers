@@ -16,12 +16,20 @@ module.exports = async function GetAvailableAppointments() {
                     body += chunk;
                 });
                 res.on("end", () => {
-                    response = JSON.parse(body);
+                    try {
+                        response = JSON.parse(body);
+                    } catch (e) {
+                        console.error("JSON.parse failed: " + e);
+                    }
                     resolve(response);
                 });
             });
         });
-        rawData[id] = await p;
+        try {
+            rawData[id] = await p;
+        } catch (e) {
+            throw e;
+        }
     }
 
     const individualLocationData = site.locations.map((loc) => {
