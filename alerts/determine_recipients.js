@@ -64,7 +64,7 @@ async function determineRecipients({ locations, numberAvailable }) {
             });
             numberRecipients += subscribers.length;
         }
-        if (numberRecipients >= 2 * numberAvailable) {
+        if (numberRecipients >= 4 * numberAvailable) {
             console.log(`notifying ${numberRecipients} recipients.`);
             return {
                 emailRecipients,
