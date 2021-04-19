@@ -8,7 +8,7 @@ module.exports = async function GetAvailableAppointments() {
 
     const rawData = {};
     for (const id of locationIDs) {
-        const p = new Promise((resolve) => {
+        const p = new Promise((resolve, reject) => {
             let response = "";
             https.get(site.website + id, (res) => {
                 let body = "";
@@ -18,18 +18,15 @@ module.exports = async function GetAvailableAppointments() {
                 res.on("end", () => {
                     try {
                         response = JSON.parse(body);
+                        resolve(response);
                     } catch (e) {
                         console.error("JSON.parse failed: " + e);
+                        reject(response);
                     }
-                    resolve(response);
                 });
             });
         });
-        try {
-            rawData[id] = await p;
-        } catch (e) {
-            throw e;
-        }
+        rawData[id] = await p;
     }
 
     const individualLocationData = site.locations.map((loc) => {
