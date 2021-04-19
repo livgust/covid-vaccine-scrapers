@@ -688,7 +688,8 @@ async function handleIndividualAlert({
                 bookableAppointmentsFound >=
                     alerts.APPOINTMENT_NUMBER_THRESHOLD(),
                 bookableAppointmentsFound >=
-                    alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD()
+                    alerts.SMALL_APPOINTMENT_NUMBER_THRESHOLD() ||
+                    availabilityWithNoNumbers
             );
         }
     } else {
