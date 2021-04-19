@@ -74,7 +74,7 @@ async function eventRouter(event) {
                     })
             );
     } else if (response.includes("stop")) {
-        // CONFIRMATION
+        // UN-ENROLL
         return signUp
             .cancelSubscription({ phoneNumber: formattedOriginationNumber })
             .then(
@@ -107,6 +107,57 @@ async function eventRouter(event) {
                                 if (err) {
                                     console.error(
                                         `could not send opt-out message: ${err}`
+                                    );
+                                    reject(err);
+                                    // Otherwise, show the unique ID for the message.
+                                } else {
+                                    resolve(
+                                        "Message sent! " +
+                                            data["MessageResponse"]["Result"][
+                                                message.originationNumber
+                                            ]["StatusMessage"]
+                                    );
+                                }
+                            }
+                        );
+                    })
+            );
+    } else if (response.includes("help")) {
+        // HELP
+        return signUp
+            .cancelSubscription({ phoneNumber: formattedOriginationNumber })
+            .then(
+                () =>
+                    new Promise((resolve, reject) => {
+                        var params = {
+                            ApplicationId: process.env.PINPOINT_APPLICATION_ID,
+                            MessageRequest: {
+                                Addresses: {
+                                    [message.originationNumber]: {
+                                        ChannelType: "SMS",
+                                    },
+                                },
+                                MessageConfiguration: {
+                                    SMSMessage: {
+                                        Body:
+                                            "This number sends COVID vaccine appointment alerts from macovidvaccines.com. " +
+                                            "To enroll, visit our website. To stop enrollment, reply STOP. " +
+                                            "To update your subscription, create a new subscription on our website with your same phone number.",
+                                        MessageType: "TRANSACTIONAL",
+                                        OriginationNumber:
+                                            process.env
+                                                .PINPOINT_ORIGINATION_NUMBER,
+                                    },
+                                },
+                            },
+                        };
+                        return pinpoint.sendMessages(
+                            params,
+                            function (err, data) {
+                                // If something goes wrong, print an error message.
+                                if (err) {
+                                    console.error(
+                                        `could not send help message: ${err}`
                                     );
                                     reject(err);
                                     // Otherwise, show the unique ID for the message.
