@@ -21,7 +21,7 @@ module.exports = async function GetAvailableAppointments() {
                         resolve(response);
                     } catch (e) {
                         console.error("JSON.parse failed: " + e);
-                        reject(response);
+                        reject(e);
                     }
                 });
             });
