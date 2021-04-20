@@ -13,7 +13,7 @@ const pinpoint = new AWS.Pinpoint();
 module.exports = { handler: eventRouter };
 
 async function eventRouter(event) {
-    console.log(`Received event ${event}`);
+    console.log(`Received event ${JSON.stringify(event)}`);
     var timestamp = event.Records[0].Sns.Timestamp;
     var message = JSON.parse(event.Records[0].Sns.Message);
     var formattedOriginationNumber =
