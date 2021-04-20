@@ -57,10 +57,6 @@ const sites = [
             zip: "01840",
             restrictions:
                 "Lawrence Residents only / Residentes de Lawrence solamente",
-            extraData: {
-                "Vaccinations offered":
-                    "Johnson & Johnson (J & J) Vaccine / Vacuna Johnson & Johnson (J & J)",
-            },
             signUpLink:
                 "https://glfhccovid19iz.as.me/?location=45%20Franklin%20Street%2C%20Lawrence%20MA",
         },
