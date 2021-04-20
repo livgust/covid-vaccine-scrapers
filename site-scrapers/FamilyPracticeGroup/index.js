@@ -30,21 +30,22 @@ async function waitForLoadComplete(page, loaderSelector) {
 }
 
 async function ScrapeWebsiteData(browser) {
-    const page = await browser.newPage();
-    await page.goto(site.website);
-    await page.waitForSelector("#nextBtn", { visible: true });
-    await page.click("#nextBtn");
-    await page.waitForSelector("#serviceTitle", { visible: true });
-    await page.waitForSelector("#nextBtn", { visible: true });
-    await page.waitForTimeout(300);
-    await page.click("#nextBtn");
-    await page.waitForSelector("#screeningQuestionPassBtn", { visible: true });
-    await page.click("#screeningQuestionPassBtn");
-    await waitForLoadComplete(page, ".schedulerPanelLoading");
+    return { hasAvailability: false };
+    // const page = await browser.newPage();
+    // await page.goto(site.website);
+    // await page.waitForSelector("#nextBtn", { visible: true });
+    // await page.click("#nextBtn");
+    // await page.waitForSelector("#serviceTitle", { visible: true });
+    // await page.waitForSelector("#nextBtn", { visible: true });
+    // await page.waitForTimeout(300);
+    // await page.click("#nextBtn");
+    // await page.waitForSelector("#screeningQuestionPassBtn", { visible: true });
+    // await page.click("#screeningQuestionPassBtn");
+    // await waitForLoadComplete(page, ".schedulerPanelLoading");
 
-    const content = await (await page.$(".schedulerPanelBody")).evaluate(
-        (node) => node.innerText
-    );
-    const hasAvailability = content.indexOf(noAppointmentMatchString) === -1;
-    return { hasAvailability };
+    // const content = await (await page.$(".schedulerPanelBody")).evaluate(
+    //     (node) => node.innerText
+    // );
+    // const hasAvailability = content.indexOf(noAppointmentMatchString) === -1;
+    // return { hasAvailability };
 }
