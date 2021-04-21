@@ -16,7 +16,6 @@ describe(`${site.name}`, function () {
             "zip",
             "signUpLink",
             "hasAvailability",
-            "totalAvailability",
         ]);
     });
 });
