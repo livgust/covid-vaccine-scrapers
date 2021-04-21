@@ -5,7 +5,6 @@ const baystatehealth = require("./../site-scrapers/BaystateHealth");
 const { site } = require("./../site-scrapers/BaystateHealth/config");
 
 describe(`${site.name}`, function () {
-    this.timeout(5000);
     it("Test against live site", async function () {
         await expect(
             baystatehealth(browser).then((res) => res.individualLocationData[0])
