@@ -32,31 +32,35 @@ async function ScrapeWebsiteData() {
                 }
             )
             .on("error", (e) => {
-                console.error(`Error making token request for Costco: + ${e}`);
+                console.error(
+                    `Error making locations request for Costco: + ${e}`
+                );
             })
             .end();
     }).then((res) => {
-        return res.clientObjects.reduce((obj, loc) => {
-            obj[loc.id] = {
-                name: loc.locationName,
-                street: toTitleCase(loc.address1),
-                city: toTitleCase(loc.city),
-                zip: toTitleCase(loc.postalCode),
-                latitude: loc.latitude,
-                longitude: loc.longitude,
-                signUpLink: "https://book.appointment-plus.com/d133yng2/",
-            };
-            return obj;
-        }, {});
+        return res.clientObjects
+            .filter((obj) => obj.state == "MA")
+            .reduce((obj, loc) => {
+                obj[loc.id] = {
+                    name: loc.locationName,
+                    clientMasterId: loc.clientMasterId,
+                    street: toTitleCase(loc.address1),
+                    city: toTitleCase(loc.city),
+                    zip: toTitleCase(loc.postalCode),
+                    latitude: loc.latitude,
+                    longitude: loc.longitude,
+                    signUpLink: "https://book.appointment-plus.com/d133yng2/",
+                };
+                return obj;
+            }, {});
     });
 
     for (const [id, locationEntry] of Object.entries(locationsObject)) {
-        const availability = {};
         let hasAvailability = false;
         const employeeIds = await new Promise((resolve) => {
             https
                 .get(
-                    `https://book.appointment-plus.com/book-appointment/get-employees?clientMasterId=426651&clientId=${id}&pageNumber=1&itemsPerPage=10&keyword=&employeeId=&_=1618155975727`,
+                    `https://book.appointment-plus.com/book-appointment/get-employees?clientMasterId=${locationEntry.clientMasterId}&clientId=${id}&pageNumber=1&itemsPerPage=10&keyword=&employeeId=&_=1618155975727`,
                     (res) => {
                         let body = "";
                         res.on("data", (chunk) => {
@@ -74,98 +78,95 @@ async function ScrapeWebsiteData() {
         }).then((res) =>
             res.employeeObjects.map((employeeObject) => employeeObject.id)
         );
-        for (const employeeId of employeeIds) {
-            const serviceIds = await new Promise((resolve) => {
-                https
-                    .get(
-                        `https://book.appointment-plus.com/book-appointment/get-services/${employeeId}?clientMasterId=426651&clientId=${id}&pageNumber=1&itemsPerPage=10&keyword=&serviceId=&_=1618155975728`,
-                        (res) => {
-                            let body = "";
-                            res.on("data", (chunk) => {
-                                body += chunk;
-                            });
-                            res.on("end", () => {
-                                resolve(JSON.parse(body));
-                            });
-                        }
-                    )
-                    .on("error", (e) => {
-                        console.error(
-                            `Error making request for Costco: + ${e}`
-                        );
-                    })
-                    .end();
-            }).then((res) =>
-                res.serviceObjects.map((serviceObject) => serviceObject.id)
-            );
-            for (const serviceId of serviceIds) {
-                const availability = await new Promise((resolve) => {
-                    https
-                        .get(
-                            `https://book.appointment-plus.com/book-appointment/get-grid-hours?startTimestamp=${moment()
-                                .format("YYYY-MM-DDTHH:mm:ss")
-                                .replace(
-                                    /:/g,
-                                    "%3A"
-                                )}&endTimestamp=${moment()
-                                .add(1, "month")
-                                .startOf("day")
-                                .format("YYYY-MM-DD+HH:mm:ss")
-                                .replace(
-                                    /:/g,
-                                    "%3A"
-                                )}&limitNumberOfDaysWithOpenSlots=7&employeeId=${employeeId}&services%5B%5D=${serviceId}&numberOfSpotsNeeded=1&isStoreHours=true&clientMasterId=426651&toTimeZone=false&fromTimeZone=149&_=1618155975731`,
-                            (res) => {
-                                let body = "";
-                                res.on("data", (chunk) => {
-                                    body += chunk;
-                                });
-                                res.on("end", () => {
-                                    resolve(JSON.parse(body));
-                                });
-                            }
-                        )
-                        .on("error", (e) => {
-                            console.error(
-                                `Error making request for Costco: + ${e}`
-                            );
-                        })
-                        .end();
-                }).then((res) => {
-                    for (const [date, availabilityObject] of Object.entries(
-                        res.data.gridHours
-                    )) {
-                        const totalSpots = (
-                            availabilityObject?.timeslots?.numberOfSpots || [0]
-                        ).reduce((acc, cur) => acc + cur, 0);
-                        const spotsTaken = (
-                            availabilityObject?.timeslots
-                                ?.numberOfSpotsTaken || [0]
-                        ).reduce((acc, cur) => acc + cur, 0);
-                        const spotsAvailable = totalSpots - spotsTaken;
-                        const formattedDate = moment(date).format("M/D/YY");
-                        if (spotsAvailable) {
-                            hasAvailability = true;
-                            if (availability[formattedDate]) {
-                                availability[formattedDate] = {
-                                    hasAvailability: true,
-                                    numberAvailableAppointments:
-                                        (availability[formattedDate] || 0) +
-                                        spotsAvailable,
-                                };
-                            } else {
-                                availability[formattedDate] = {
-                                    hasAvailability: true,
-                                    numberAvailableAppointments: spotsAvailable,
-                                };
-                            }
-                        }
+        // employeeIds is an array of (seemingly) always length 1.
+        const serviceIds = await new Promise((resolve) => {
+            https
+                .get(
+                    `https://book.appointment-plus.com/book-appointment/get-services/${employeeIds[0]}?clientMasterId=${locationEntry.clientMasterId}&clientId=${id}&pageNumber=1&itemsPerPage=10&keyword=&serviceId=&_=1618155975728`,
+                    (res) => {
+                        let body = "";
+                        res.on("data", (chunk) => {
+                            body += chunk;
+                        });
+                        res.on("end", () => {
+                            resolve(JSON.parse(body));
+                        });
                     }
-                });
+                )
+                .on("error", (e) => {
+                    console.error(`Error making request for Costco: + ${e}`);
+                })
+                .end();
+        }).then((res) =>
+            res.serviceObjects.map((serviceObject) => serviceObject.id)
+        );
+        //serviceIds is an array but from what we see is always length 1.
+        const availability = await new Promise((resolve) => {
+            const path = `https://book.appointment-plus.com/book-appointment/get-grid-hours?startTimestamp=${moment()
+                .format("YYYY-MM-DD+HH:mm:ss")
+                .replace(/:/g, "%3A")}&endTimestamp=${moment()
+                .add(1, "month")
+                .startOf("day")
+                .format("YYYY-MM-DD+HH:mm:ss")
+                .replace(
+                    /:/g,
+                    "%3A"
+                )}&limitNumberOfDaysWithOpenSlots=7&employeeId=${
+                employeeIds[0]
+            }&services%5B%5D=${
+                serviceIds[0]
+            }&numberOfSpotsNeeded=1&isStoreHours=true&clientMasterId=${
+                locationEntry.clientMasterId
+            }&toTimeZone=false&fromTimeZone=149&_=1618155975731`;
+            https
+                .get(path, (res) => {
+                    let body = "";
+                    res.on("data", (chunk) => {
+                        body += chunk;
+                    });
+                    res.on("end", () => {
+                        resolve(JSON.parse(body));
+                    });
+                })
+                .on("error", (e) => {
+                    console.error(`Error making request for Costco: + ${e}`);
+                })
+                .end();
+        }).then((res) => {
+            let availability = {};
+            for (const [date, availabilityObject] of Object.entries(
+                res.data.gridHours
+            )) {
+                const totalSpots = (
+                    availabilityObject?.timeSlots?.numberOfSpots || [0]
+                ).reduce((acc, cur) => acc + cur, 0);
+                const spotsTaken = (
+                    availabilityObject?.timeSlots?.numberOfSpotsTaken || [0]
+                ).reduce((acc, cur) => acc + cur, 0);
+                const spotsAvailable = totalSpots - spotsTaken;
+                const formattedDate = moment(date).format("M/D/YY");
+                if (spotsAvailable) {
+                    hasAvailability = true;
+                    if (availability[formattedDate]) {
+                        availability[formattedDate] = {
+                            hasAvailability: true,
+                            numberAvailableAppointments:
+                                (availability[formattedDate] || 0) +
+                                spotsAvailable,
+                        };
+                    } else {
+                        availability[formattedDate] = {
+                            hasAvailability: true,
+                            numberAvailableAppointments: spotsAvailable,
+                        };
+                    }
+                }
             }
-        }
+            return availability;
+        });
+        const { clientMasterId, ...restLocation } = locationEntry;
         results.push({
-            ...locationEntry,
+            ...restLocation,
             availability,
             hasAvailability,
         });
