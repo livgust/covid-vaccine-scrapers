@@ -29,24 +29,19 @@ module.exports = async function GetAvailableAppointments(browser) {
 async function ScrapeWebsiteData(browser) {
     const page = await browser.newPage();
     await page.goto(site.signUpLink);
-    const alertElement = await page.waitForSelector(
-        "app-guest-covid-vaccine-register.ion-page > div.sky-bg > div.content-body > div.content-card > h3.text-align-center"
-    );
+    const alertElement = await Promise.race([
+        page.waitForTimeout(3000).then(null),
+        page.waitForSelector(
+            "app-guest-covid-vaccine-register.ion-page > div.sky-bg > div.content-body > div.content-card > h3.text-align-center"
+        ),
+    ]);
     // Is the clinic open?
     const alert = await (alertElement
         ? alertElement.evaluate((node) => node.innerText)
         : false);
-    let hasAvailability = false;
-    let totalAvailability = 0;
-    if (!alert) {
-        const msg = `${site.name} may have appointments...`;
-        console.log(msg);
-        await s3.savePageContent(site.name, page);
-        await sendSlackMsg("bot", msg);
-    }
+    let hasAvailability = !alert;
 
     return {
         hasAvailability,
-        totalAvailability,
     };
 }
