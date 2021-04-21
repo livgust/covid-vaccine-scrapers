@@ -15,7 +15,7 @@ const sites = [
             zip: "02557",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: {
             departmentID: "10110010104",
@@ -30,7 +30,7 @@ const sites = [
             zip: "02554",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: {
             departmentID: "10120040001",
