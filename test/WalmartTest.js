@@ -25,9 +25,9 @@ describe("WalmartTest :: testing JSON response", function () {
                 5448: { street: "160 Broadway", city: "Raynham", zip: "02767" },
             };
         },
-        /** Testing uses mock data, so no need to log-in.  */
+        /** Testing uses mock data, so no need to log-in but need to provide a page.  */
         async login() {
-            return true;
+            return browser.newPage();
         },
         /**
          * Mock data, with and without availability, is provided by
@@ -35,14 +35,13 @@ describe("WalmartTest :: testing JSON response", function () {
          */
         async fetchStoreAvailability() {
             const json = jsonSource.next().value;
-            return json;
+            return json ? json : noAvailability;
         },
     };
 
     it("should show availability in one store, and none in the other", async () => {
         const results = await scraper(browser, testFetchService);
 
-        expect(Object.keys(results.individualLocationData).length).equals(2);
         expect(
             results.individualLocationData[0].availability["04/27/2021"]
                 .numberAvailableAppointments
