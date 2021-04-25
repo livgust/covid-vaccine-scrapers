@@ -25,9 +25,9 @@ describe("WalmartTest :: testing JSON response", function () {
                 5448: { street: "160 Broadway", city: "Raynham", zip: "02767" },
             };
         },
-        /** Testing uses mock data, so no need to log-in but need to provide a page.  */
+        /** Testing uses mock data, so no need to log-in.  */
         async login() {
-            return browser.newPage();
+            return true;
         },
         /**
          * Mock data, with and without availability, is provided by
