@@ -18,16 +18,10 @@ module.exports = async function GetAvailableAppointments(
         individualLocationData: [],
     };
 
-    Promise.all([
-        // try {
-        (results.individualLocationData = await ScrapeWebsiteData(
-            browser,
-            fetchService
-        )),
-        // } catch (error) {
-        //     console.log(error);
-        // }
-    ]);
+    results.individualLocationData = await ScrapeWebsiteData(
+        browser,
+        fetchService
+    );
 
     console.log(`${entityName} done.`);
 
@@ -65,25 +59,19 @@ function liveFetchService() {
 }
 
 async function ScrapeWebsiteData(browser, fetchService) {
-    // page is mutable because we may need to close this one, and open a new one...
     const page = await browser.newPage();
 
+    // Set up data used by the scraper to login, and to fetch availability.
     const accountId = process.env.WALMART_CUSTOMER_ACCOUNT_ID;
-
     const stores = fetchService.getStores();
     const { startDate, endDate } = getStartEndDates();
 
     const results = [];
 
-    let successfulLogin = false;
     try {
-        successfulLogin = await fetchService.login(page);
-    } catch (e) {
-        savePageContent(entityName, page);
-        sendSlackMsg("bot", `${entityName} failed to login`);
-    }
+        await fetchService.login(page);
 
-    if (successfulLogin) {
+        // if (successfulLogin) {
         // Allows logging from page.evaluate(...)
         page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
         // Just try a limited number of storeIds until "Target closed" issue is resolved.
@@ -112,6 +100,10 @@ async function ScrapeWebsiteData(browser, fetchService) {
                 );
             }
         });
+        // }
+    } catch (error) {
+        savePageContent(entityName, page);
+        sendSlackMsg("bot", `${entityName} failed to login`);
     }
 
     return results;
@@ -239,10 +231,15 @@ function getStartEndDates() {
  * Fetch within the browser applies login credentials.
  *
  * @param {Page} page
- * @returns
+ * @returns true if successful
+ * @throws if the password field doesn't appear (it happens too often)
  */
 async function login(page) {
     await page.goto(loginUrl);
+
+    // page.waitForNavigation(config.navigationTimeout, {
+    //     waitUntil: "networkidle0",
+    // });
 
     try {
         await page.waitForSelector("input#password", { timeout: 5000 });
@@ -256,19 +253,11 @@ async function login(page) {
 
     await page.click("#sign-in-form > button[type='submit']");
 
-    const success = await page.waitForNavigation().then(
-        () => {
-            return true;
-        },
-        (err) => {
-            page.screenshot({ path: "walmart.png" }); // login failed
-            return false;
-        }
-    );
+    await page.waitForNavigation().catch((error) => {
+        page.screenshot({ path: "walmart.png" }); // login failed
+    });
 
     // Wait for the store list on the page
     await page.waitForSelector(".store-list-container");
     await page.waitForTimeout(500);
-
-    return success;
 }
