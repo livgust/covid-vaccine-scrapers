@@ -2,6 +2,8 @@ const { entityName, loginUrl } = require("./config");
 const storesList = require("./stores");
 
 const moment = require("moment");
+const { savePageContent } = require("../../lib/s3");
+const { sendSlackMsg } = require("../../lib/slack");
 
 module.exports = async function GetAvailableAppointments(
     browser,
@@ -16,14 +18,16 @@ module.exports = async function GetAvailableAppointments(
         individualLocationData: [],
     };
 
-    try {
-        results.individualLocationData = await ScrapeWebsiteData(
+    Promise.all([
+        // try {
+        (results.individualLocationData = await ScrapeWebsiteData(
             browser,
             fetchService
-        );
-    } catch (error) {
-        console.log(error);
-    }
+        )),
+        // } catch (error) {
+        //     console.log(error);
+        // }
+    ]);
 
     console.log(`${entityName} done.`);
 
@@ -61,6 +65,9 @@ function liveFetchService() {
 }
 
 async function ScrapeWebsiteData(browser, fetchService) {
+    // page is mutable because we may need to close this one, and open a new one...
+    const page = await browser.newPage();
+
     const accountId = process.env.WALMART_CUSTOMER_ACCOUNT_ID;
 
     const stores = fetchService.getStores();
@@ -68,9 +75,15 @@ async function ScrapeWebsiteData(browser, fetchService) {
 
     const results = [];
 
-    const page = await fetchService.login(browser);
+    let successfulLogin = false;
+    try {
+        successfulLogin = await fetchService.login(page);
+    } catch (e) {
+        savePageContent(entityName, page);
+        sendSlackMsg("bot", `${entityName} failed to login`);
+    }
 
-    if (page) {
+    if (successfulLogin) {
         // Allows logging from page.evaluate(...)
         page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
         // Just try a limited number of storeIds until "Target closed" issue is resolved.
@@ -118,6 +131,7 @@ async function fetchStoreAvailability(
     endDate,
     storeId
 ) {
+    await page.waitForTimeout(500);
     const response = await page
         .evaluate(
             async (accountId, startDate, endDate, storeId) => {
@@ -128,15 +142,15 @@ async function fetchStoreAvailability(
                         "accept-language": "en-US,en;q=0.9",
                         "content-type": "application/json",
                         "rx-electrode": "true",
-                        "sec-ch-ua":
-                            '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
-                        "sec-ch-ua-mobile": "?0",
-                        "sec-fetch-dest": "empty",
-                        "sec-fetch-mode": "cors",
-                        "sec-fetch-site": "same-origin",
-                        "wpharmacy-source": `web/chrome89.0.4389/OS X 11.2.3/${accountId}`,
-                        "wpharmacy-trackingid":
-                            "2d7f0aa0-009d-486b-b37d-30fe0ae9d5a3",
+                        // "sec-ch-ua":
+                        //     '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+                        // "sec-ch-ua-mobile": "?0",
+                        // "sec-fetch-dest": "empty",
+                        // "sec-fetch-mode": "cors",
+                        // "sec-fetch-site": "same-origin",
+                        // "wpharmacy-source": `web/chrome89.0.4389/OS X 11.2.3/${accountId}`,
+                        // "wpharmacy-trackingid":
+                        //     "2d7f0aa0-009d-486b-b37d-30fe0ae9d5a3",
                     },
                     referrer:
                         "https://www.walmart.com/pharmacy/clinical-services/immunization/scheduled?imzType=covid&action=SignIn&rm=true&r=yes",
@@ -157,6 +171,7 @@ async function fetchStoreAvailability(
                 // Error: Protocol error (Runtime.callFunctionOn): Target closed.
                 // Only once has a single fetch worked, so the requestInput and requestInit
                 // parts seem to be correct.
+
                 return await fetch(requestInput, requestInit)
                     .then((res) => res.json())
                     .then((json) => json)
@@ -226,49 +241,13 @@ function getStartEndDates() {
  * @param {Page} page
  * @returns
  */
-async function login(browser) {
-    // page is mutable because we may need to close this one, and open a new one...
-    let page = await browser.newPage();
-    await page.setCacheEnabled(false);
+async function login(page) {
+    await page.goto(loginUrl);
 
-    // Try to log-in:
-    // await page.goto(loginUrl);
-
-    // The user name input always shows up, so wait for the password field:
-    // await page.waitForSelector("input#password");
-
-    // Some 25% - 50% of the time, the password input fails to materialize!
-    // May need to loop, say 4 times, if this times out, breaking once it
-    // does show up.
-
-    // The only problem is, the following loop fails to solve the problem.
-    // It may be necessary to close the current page, get a new one, and if
-    // the password field shows up, pass the new page as the return value.
-
-    // But ... this still does not seem to solve the problem. Once the password
-    // field doesn't show up, it won't up in the newly created page either!
-    // It's as though some kind of caching is occurring.
-
-    let tryCount = 1;
-    for await (_ of [..."4321"]) {
-        await page.goto(loginUrl);
-        let inputElement = null;
-        try {
-            console.log(`login try count: ${tryCount}`);
-            tryCount += 1;
-            inputElement = await page.waitForSelector("input#password", {
-                timeout: 1000,
-            });
-        } catch (error) {
-            console.log(error);
-            await page.close();
-            page = await browser.newPage();
-            await page.setCacheEnabled(false);
-        }
-
-        if (inputElement) {
-            break;
-        }
+    try {
+        await page.waitForSelector("input#password", { timeout: 5000 });
+    } catch (error) {
+        throw error;
     }
 
     await page.type("input#email", process.env.WALMART_EMAIL);
@@ -277,45 +256,19 @@ async function login(browser) {
 
     await page.click("#sign-in-form > button[type='submit']");
 
-    await page.waitForNavigation().then(
-        () => {},
+    const success = await page.waitForNavigation().then(
+        () => {
+            return true;
+        },
         (err) => {
             page.screenshot({ path: "walmart.png" }); // login failed
             return false;
         }
     );
 
-    // Wait for the store list page
+    // Wait for the store list on the page
     await page.waitForSelector(".store-list-container");
+    await page.waitForTimeout(500);
 
-    // Code attempting to change the zip code setting.
-    // Probably not necessary. Keeping just in case.
-    /*
-    Promise.all([
-        await page.evaluate(() => {
-            document
-                .querySelector("button[data-automation-id='change-location']")
-                .click();
-        }),
-        await page.waitForSelector("div.zip-form-footer"),
-        await page.evaluate(() => {
-            return (document.querySelector(
-                "input[data-tl-id='store-finder-pickup-location']"
-            ).value = "02118");
-        }),
-        await page.evaluate(() => {
-            const button = document.querySelector(
-                "button[data-automation-id='find-stores']"
-            );
-            if (button) {
-                button.click();
-            }
-        }),
-        await page.waitForSelector(
-            "button[data-automation-id='change-location']"
-        ),
-    ]);
-    */
-
-    return page;
+    return success;
 }
