@@ -44,6 +44,7 @@ async function DoGetAvailableAppointments() {
             name: `${name} (${location.city})`,
             ...location,
             ...webData,
+            signUpLink: "https://bit.ly/2MyMFAJ",
         };
     });
 }
