@@ -9,5 +9,5 @@ const noAvailability = {
 };
 
 module.exports = {
-    noData: noAvailability,
+    noAvailability,
 };
