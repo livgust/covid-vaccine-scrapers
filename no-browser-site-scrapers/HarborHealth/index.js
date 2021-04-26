@@ -1,31 +1,31 @@
-const { site } = require("./config");
+const { sites } = require("./config");
 const mychart = require("../../lib/MyChartAPI");
 const moment = require("moment");
 
-const siteId = "3210339";
-const vt = "1089";
-const dept = "222004005";
-
 module.exports = async function GetAvailableAppointments() {
     console.log(`HarborHealth starting.`);
-    const webData = await ScrapeWebsiteData();
+    const originalSites = sites;
+    const finalSites = [];
+    for (const site of originalSites) {
+        const { siteId, vt, dept, ...restSite } = site;
+        const webData = await ScrapeWebsiteData(siteId, vt, dept);
+        finalSites.push({
+            ...webData[dept],
+            /* adding site last because myChart is returning address
+             * of the provider instead of the address of the clinic
+             */
+            ...restSite,
+        });
+    }
     console.log(`HarborHealth done.`);
     return {
         parentLocationName: "HarborHealth",
         timestamp: moment().format(),
-        individualLocationData: [
-            {
-                ...webData[dept],
-                /* adding site last because myChart is returning address
-                 * of the provider instead of the address of the clinic
-                 */
-                ...site,
-            },
-        ],
+        individualLocationData: finalSites,
     };
 };
 
-async function ScrapeWebsiteData() {
+async function ScrapeWebsiteData(siteId, vt, dept) {
     // We need to go through the flow and use a request verification token
     const [
         cookie,
