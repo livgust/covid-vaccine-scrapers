@@ -2,8 +2,6 @@ const { sites } = require("./config");
 const mychart = require("../../lib/MyChartAPI");
 const moment = require("moment");
 
-
-
 module.exports = async function GetAvailableAppointments() {
     console.log(`HarborHealth starting.`);
     const originalSites = sites;
