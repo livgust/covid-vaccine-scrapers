@@ -71,7 +71,6 @@ async function ScrapeWebsiteData(browser, fetchService) {
     try {
         await fetchService.login(page);
 
-        // if (successfulLogin) {
         // Allows logging from page.evaluate(...)
         page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
         // Just try a limited number of storeIds until "Target closed" issue is resolved.
@@ -100,7 +99,6 @@ async function ScrapeWebsiteData(browser, fetchService) {
                 );
             }
         });
-        // }
     } catch (error) {
         savePageContent(entityName, page);
         sendSlackMsg("bot", `${entityName} failed to login`);
