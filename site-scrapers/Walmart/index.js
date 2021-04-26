@@ -92,7 +92,7 @@ async function ScrapeWebsiteData(browser, fetchService) {
                         Object.keys(availability.availability).length > 0,
                 });
             } catch (error) {
-                console.log(`error trying to get data: ${error}`);
+                console.error(`error trying to get data: ${error}`);
                 throw new Error(
                     `${entityName} scraper has failed. Original ${error}`
                 );
@@ -163,10 +163,8 @@ async function fetchStoreAvailability(
             storeId
         )
         .catch((error) => {
-            console.log(`fetch availability error: ${error}`);
+            console.error(`fetch availability error: ${error}`);
         });
-
-    console.log(`response: ${JSON.stringify(response)}`);
 
     return response;
 }
