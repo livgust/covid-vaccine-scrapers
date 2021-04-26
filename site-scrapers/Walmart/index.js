@@ -73,9 +73,8 @@ async function ScrapeWebsiteData(browser, fetchService) {
 
         // Allows logging from page.evaluate(...)
         page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-        // Just try a limited number of storeIds until "Target closed" issue is resolved.
-        // Object.keys(stores)
-        ["2902", "3114", "2341"].forEach(async (storeId) => {
+
+        for (const storeId of Object.keys(stores)) {
             try {
                 let response = await fetchService.fetchStoreAvailability(
                     page,
@@ -98,7 +97,7 @@ async function ScrapeWebsiteData(browser, fetchService) {
                     `${entityName} scraper has failed. Original ${error}`
                 );
             }
-        });
+        }
     } catch (error) {
         savePageContent(entityName, page);
         sendSlackMsg("bot", `${entityName} failed to login`);
@@ -121,7 +120,7 @@ async function fetchStoreAvailability(
     endDate,
     storeId
 ) {
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(100);
     const response = await page
         .evaluate(
             async (accountId, startDate, endDate, storeId) => {
@@ -150,17 +149,6 @@ async function fetchStoreAvailability(
                     mode: "cors",
                     credentials: "include",
                 };
-
-                // This logging only occurs if -> page.on("console", ...). See above.
-                // This logging was added to debug an incorrect payload format -- an extra double-quote
-                // in the body value.
-                console.log(`${requestInput}`);
-                console.log(`${JSON.stringify(requestInit)}`);
-
-                // This is where we get
-                // Error: Protocol error (Runtime.callFunctionOn): Target closed.
-                // Only once has a single fetch worked, so the requestInput and requestInit
-                // parts seem to be correct.
 
                 return await fetch(requestInput, requestInit)
                     .then((res) => res.json())
@@ -235,17 +223,13 @@ function getStartEndDates() {
 async function login(page) {
     await page.goto(loginUrl);
 
-    // page.waitForNavigation(config.navigationTimeout, {
-    //     waitUntil: "networkidle0",
-    // });
-
-    try {
-        await page.waitForSelector("input#password", { timeout: 5000 });
-    } catch (error) {
-        throw error;
-    }
-
+    // try {
     await page.type("input#email", process.env.WALMART_EMAIL);
+    // } catch (error) {
+    //     throw error;
+    // }
+
+    await page.waitForSelector("input#password", { timeout: 5000 });
     await page.waitForTimeout(300);
     await page.type("input#password", process.env.WALMART_PASSWORD);
 
