@@ -69,10 +69,10 @@ async function ScrapeWebsiteData(browser, fetchService) {
     const results = [];
 
     try {
-        await fetchService.login(page);
-
         // Allows logging from page.evaluate(...)
         page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
+
+        await fetchService.login(page);
 
         for (const storeId of Object.keys(stores)) {
             try {
@@ -199,13 +199,9 @@ function parseAvailability(response) {
 function getStartEndDates() {
     const walmartFormat = "MMDDYYYY";
 
-    // TODO: Appointments end at 6 pm. Should scraping after closing time set the startDate to the
-    // next day? Caution: the fetch query is sensitive to the endDate being beyond their range of 6 days.
-
-    const addDay = 0; // moment().hour() > 18 ? 1 : 0;
     return {
-        startDate: moment().add(addDay, "days").format(walmartFormat),
-        endDate: moment().add(/* addDay + */ 6, "days").format(walmartFormat),
+        startDate: moment().format(walmartFormat),
+        endDate: moment().add(6, "days").format(walmartFormat),
     };
 }
 
@@ -219,19 +215,89 @@ function getStartEndDates() {
  * @throws if the password field doesn't appear (it happens too often)
  */
 async function login(page) {
+    const signInWithEmailValidationFormSelector =
+        "#sign-in-with-email-validation";
+    const signInWithPasswordFormSelector = "#sign-in-with-password-form";
+
+    const submitEmailButtonSelector =
+        "button[data-automation-id='signin-continue-submit-btn']";
+    const submitPasswordButtonSelector =
+        "#sign-in-with-password-form > button[type='submit']";
+
+    const emailInputSelector = "input#email";
+    const passwordInputSelector = "input#password";
+
     await page.goto(loginUrl);
 
-    // try {
-    await page.type("input#email", process.env.WALMART_EMAIL);
-    // } catch (error) {
-    //     throw error;
-    // }
+    await page.waitForSelector(emailInputSelector);
 
-    await page.waitForSelector("input#password", { timeout: 5000 });
-    await page.waitForTimeout(300);
-    await page.type("input#password", process.env.WALMART_PASSWORD);
+    const emailValidationForm = await page.$(
+        signInWithEmailValidationFormSelector
+    );
 
-    await page.click("#sign-in-form > button[type='submit']");
+    if (emailValidationForm) {
+        await page.type(emailInputSelector, process.env.WALMART_EMAIL);
+        const btn = await page.$(submitEmailButtonSelector);
+
+        await page.click(submitEmailButtonSelector);
+
+        await page.waitForSelector("#sign-in-password-no-otp");
+        await page.waitForTimeout(300);
+        await page.type(
+            "#sign-in-password-no-otp",
+            process.env.WALMART_PASSWORD
+        );
+
+        await page.waitForTimeout(300);
+
+        // The "remember me" checkbox appears again but with a different id!
+        await page.evaluate(() => {
+            const checkbox = document.querySelector("#remember-me-pwd");
+            console.log(`remember me checkbox exists: ${checkbox}`);
+            if (checkbox) {
+                console.log("unchecking remember me...");
+                checkbox.checked = false;
+            }
+        });
+
+        await page.waitForTimeout(300);
+
+        await page.evaluate(() => {
+            const button = document.querySelector(
+                "button[data-automation-id='sign-in-pwd']"
+            );
+            console.log(`sign-in-pwd button is: ${button}`);
+            if (button) {
+                console.log("clicking password submit button ...");
+                button.click();
+                console.log("clicked password submit button ...");
+            }
+        });
+    } else {
+        await page.waitForSelector(emailInputSelector);
+        await page.type(emailInputSelector, process.env.WALMART_EMAIL);
+
+        await page.waitForSelector(passwordInputSelector, { timeout: 5000 });
+        await page.waitForTimeout(300);
+        await page.type("input#password", process.env.WALMART_PASSWORD);
+
+        // Uncheck the "remember me" checkbox
+        await page.evaluate(() => {
+            const checkbox = document.querySelector("#remember-me");
+            console.log(`remember me checkbox exists: ${checkbox}`);
+            if (checkbox) {
+                console.log("unchecking remember me...");
+                checkbox.checked = false;
+            }
+        });
+
+        await page.waitForTimeout(300);
+
+        const submitButtonSelector =
+            "button[data-automation-id='signin-submit-btn']";
+        const submitBtn = await page.$(submitButtonSelector);
+        await page.click(submitButtonSelector);
+    }
 
     await page.waitForNavigation().catch((error) => {
         page.screenshot({ path: "walmart.png" }); // login failed
