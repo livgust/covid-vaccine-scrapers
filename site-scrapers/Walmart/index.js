@@ -287,40 +287,40 @@ async function login(page) {
                 );
             });
 
-        // The only way to solve this is to enter the password again, and then click again.
-        await page.type(
-            "#sign-in-password-no-otp",
-            process.env.WALMART_PASSWORD
-        );
+        const passwordField = await page.$("#sign-in-password-no-otp");
+        if (passwordField) {
+            // The only way to solve this is to enter the password again, and then click again.
+            await page.type(
+                "#sign-in-password-no-otp",
+                process.env.WALMART_PASSWORD
+            );
 
-        await page.waitForTimeout(300);
+            await page.waitForTimeout(300);
 
-        await page
-            .evaluate(() => {
-                const button = document.querySelector(
-                    '#sign-in-with-password-form > .buttons-container button[data-automation-id="sign-in-pwd"]'
-                );
-                console.log(
-                    `sign-in-pwd button form's HTML: ${button.form.outerHTML}`
-                );
-                // debugger; // This sets a breakpoint in the next line; go to Chrome to continue stepping.
-                if (button) {
-                    console.log("clicking password submit button ...");
-                    button.click();
-                    console.log("clicked password submit button ...");
-                } else {
-                    console.log("Didn't find the 'sign-in-pwd' button!");
-                }
-            })
-            .catch((error) => {
-                debugger; // This breakpoint doesn't get hit because there is no error!
-                console.log(
-                    `error just after clicking password submit button: ${error}`
-                );
-            });
-        //
-        //
-        //
+            await page
+                .evaluate(() => {
+                    const button = document.querySelector(
+                        '#sign-in-with-password-form > .buttons-container button[data-automation-id="sign-in-pwd"]'
+                    );
+                    console.log(
+                        `sign-in-pwd button form's HTML: ${button.form.outerHTML}`
+                    );
+                    // debugger; // This sets a breakpoint in the next line; go to Chrome to continue stepping.
+                    if (button) {
+                        console.log("clicking password submit button ...");
+                        button.click();
+                        console.log("clicked password submit button ...");
+                    } else {
+                        console.log("Didn't find the 'sign-in-pwd' button!");
+                    }
+                })
+                .catch((error) => {
+                    debugger; // This breakpoint doesn't get hit because there is no error!
+                    console.log(
+                        `error just after clicking password submit button: ${error}`
+                    );
+                });
+        }
     } else {
         await page.waitForSelector(emailInputSelector);
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
@@ -341,8 +341,8 @@ async function login(page) {
 
         await page.waitForTimeout(300);
 
-        // const submitButtonSelector =
-        //     "button[data-automation-id='signin-submit-btn']";
+        const submitButtonSelector =
+            "button[data-automation-id='signin-submit-btn']";
         // const submitBtn = await page.$(submitButtonSelector);
         await page.click(submitButtonSelector);
     }
