@@ -217,12 +217,9 @@ function getStartEndDates() {
 async function login(page) {
     const signInWithEmailValidationFormSelector =
         "#sign-in-with-email-validation";
-    const signInWithPasswordFormSelector = "#sign-in-with-password-form";
 
     const submitEmailButtonSelector =
         "button[data-automation-id='signin-continue-submit-btn']";
-    const submitPasswordButtonSelector =
-        "#sign-in-with-password-form > button[type='submit']";
 
     const emailInputSelector = "input#email";
     const passwordInputSelector = "input#password";
@@ -235,9 +232,12 @@ async function login(page) {
         signInWithEmailValidationFormSelector
     );
 
+    // There are two processes for logging.
+    // 1. the usual enter email -> enter password -> submit.
+    // 2. a sequential one: enter email -> submit -> enter password -> submit
+    // Case 2 (emailValidationForm) is treated first. Case 1 is in the "else" block.
     if (emailValidationForm) {
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
-        const btn = await page.$(submitEmailButtonSelector);
 
         await page.click(submitEmailButtonSelector);
 
@@ -262,17 +262,65 @@ async function login(page) {
 
         await page.waitForTimeout(300);
 
-        await page.evaluate(() => {
-            const button = document.querySelector(
-                "button[data-automation-id='sign-in-pwd']"
-            );
-            console.log(`sign-in-pwd button is: ${button}`);
-            if (button) {
-                console.log("clicking password submit button ...");
-                button.click();
-                console.log("clicked password submit button ...");
-            }
-        });
+        // The following will fail to submit. But see password entry and click retry below.
+        await page
+            .evaluate(() => {
+                const button = document.querySelector(
+                    '#sign-in-with-password-form > .buttons-container button[data-automation-id="sign-in-pwd"]'
+                );
+                console.log(
+                    `sign-in-pwd button form's HTML: ${button.form.outerHTML}`
+                );
+                // debugger; // This sets a breakpoint in the next line; go to Chrome to continue stepping.
+                if (button) {
+                    console.log("clicking password submit button ...");
+                    button.click();
+                    console.log("clicked password submit button ...");
+                } else {
+                    console.log("Didn't find the 'sign-in-pwd' button!");
+                }
+            })
+            .catch((error) => {
+                // debugger; // This breakpoint doesn't get hit because there is no error!
+                console.log(
+                    `error just after clicking password submit button: ${error}`
+                );
+            });
+
+        // The only way to solve this is to enter the password again, and then click again.
+        await page.type(
+            "#sign-in-password-no-otp",
+            process.env.WALMART_PASSWORD
+        );
+
+        await page.waitForTimeout(300);
+
+        await page
+            .evaluate(() => {
+                const button = document.querySelector(
+                    '#sign-in-with-password-form > .buttons-container button[data-automation-id="sign-in-pwd"]'
+                );
+                console.log(
+                    `sign-in-pwd button form's HTML: ${button.form.outerHTML}`
+                );
+                // debugger; // This sets a breakpoint in the next line; go to Chrome to continue stepping.
+                if (button) {
+                    console.log("clicking password submit button ...");
+                    button.click();
+                    console.log("clicked password submit button ...");
+                } else {
+                    console.log("Didn't find the 'sign-in-pwd' button!");
+                }
+            })
+            .catch((error) => {
+                debugger; // This breakpoint doesn't get hit because there is no error!
+                console.log(
+                    `error just after clicking password submit button: ${error}`
+                );
+            });
+        //
+        //
+        //
     } else {
         await page.waitForSelector(emailInputSelector);
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
@@ -293,17 +341,20 @@ async function login(page) {
 
         await page.waitForTimeout(300);
 
-        const submitButtonSelector =
-            "button[data-automation-id='signin-submit-btn']";
-        const submitBtn = await page.$(submitButtonSelector);
+        // const submitButtonSelector =
+        //     "button[data-automation-id='signin-submit-btn']";
+        // const submitBtn = await page.$(submitButtonSelector);
         await page.click(submitButtonSelector);
     }
 
-    await page.waitForNavigation().catch((error) => {
+    await page.waitForNavigation({ timeout: 30000 }).catch((error) => {
+        console.log(
+            `error waiting for navigation to store list page: ${error}`
+        );
         page.screenshot({ path: "walmart.png" }); // login failed
     });
 
     // Wait for the store list on the page
-    await page.waitForSelector(".store-list-container");
+    await page.waitForSelector(".store-list-container", { timeout: 5000 });
     await page.waitForTimeout(500);
 }
