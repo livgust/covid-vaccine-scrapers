@@ -306,7 +306,7 @@ async function login(page) {
                     }
                 })
                 .catch((error) => {
-                    debugger; // This breakpoint doesn't get hit because there is no error!
+                    // debugger; // This breakpoint doesn't get hit because there is no error!
                     console.log(
                         `error just after clicking password submit button: ${error}`
                     );
