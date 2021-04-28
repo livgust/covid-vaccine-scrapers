@@ -223,10 +223,13 @@ async function login(page) {
         signInWithEmailValidationFormSelector
     );
 
-    // There are two processes for logging.
+    // There are two processes for logging in.
     // 1. the usual enter email -> enter password -> submit.
     // 2. a sequential one: enter email -> submit -> enter password -> submit
     // Case 2 (emailValidationForm) is treated first. Case 1 is in the "else" block.
+
+    // Note that console.log() in page.evaluate() only occurs if "page.on(...)" is uncommented above.
+
     if (emailValidationForm) {
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
 
@@ -241,7 +244,7 @@ async function login(page) {
 
         await page.waitForTimeout(300);
 
-        // The "remember me" checkbox appears again but with a different id!
+        // The "remember me" checkbox appears, but with a different id!
         await page.evaluate(() => {
             const checkbox = document.querySelector("#remember-me-pwd");
             console.log(`remember me checkbox exists: ${checkbox}`);
