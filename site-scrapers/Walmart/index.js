@@ -69,8 +69,8 @@ async function ScrapeWebsiteData(browser, fetchService) {
     const results = [];
 
     try {
-        // Allows logging from page.evaluate(...)
-        page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
+        // Uncomment if logging from page.evaluate(...) is needed for debugging.
+        // page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
         await fetchService.login(page);
 
