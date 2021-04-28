@@ -131,20 +131,11 @@ async function fetchStoreAvailability(
                         "accept-language": "en-US,en;q=0.9",
                         "content-type": "application/json",
                         "rx-electrode": "true",
-                        // "sec-ch-ua":
-                        //     '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
-                        // "sec-ch-ua-mobile": "?0",
-                        // "sec-fetch-dest": "empty",
-                        // "sec-fetch-mode": "cors",
-                        // "sec-fetch-site": "same-origin",
-                        // "wpharmacy-source": `web/chrome89.0.4389/OS X 11.2.3/${accountId}`,
-                        // "wpharmacy-trackingid":
-                        //     "2d7f0aa0-009d-486b-b37d-30fe0ae9d5a3",
                     },
                     referrer:
                         "https://www.walmart.com/pharmacy/clinical-services/immunization/scheduled?imzType=covid&action=SignIn&rm=true&r=yes",
                     referrerPolicy: "strict-origin-when-cross-origin",
-                    body: `{\"startDate\":\"${startDate}\",\"endDate\":\"${endDate}\",\"imzStoreNumber\":{\"USStoreId\":\"${storeId}\"}}`,
+                    body: `{"startDate":"${startDate}","endDate":"${endDate}","imzStoreNumber":{"USStoreId":"${storeId}"}}`,
                     method: "POST",
                     mode: "cors",
                     credentials: "include",
@@ -287,40 +278,40 @@ async function login(page) {
                 );
             });
 
-        // The only way to solve this is to enter the password again, and then click again.
-        await page.type(
-            "#sign-in-password-no-otp",
-            process.env.WALMART_PASSWORD
-        );
+        const passwordField = await page.$("#sign-in-password-no-otp");
+        if (passwordField) {
+            // The only way to solve this is to enter the password again, and then click again.
+            await page.type(
+                "#sign-in-password-no-otp",
+                process.env.WALMART_PASSWORD
+            );
 
-        await page.waitForTimeout(300);
+            await page.waitForTimeout(300);
 
-        await page
-            .evaluate(() => {
-                const button = document.querySelector(
-                    '#sign-in-with-password-form > .buttons-container button[data-automation-id="sign-in-pwd"]'
-                );
-                console.log(
-                    `sign-in-pwd button form's HTML: ${button.form.outerHTML}`
-                );
-                // debugger; // This sets a breakpoint in the next line; go to Chrome to continue stepping.
-                if (button) {
-                    console.log("clicking password submit button ...");
-                    button.click();
-                    console.log("clicked password submit button ...");
-                } else {
-                    console.log("Didn't find the 'sign-in-pwd' button!");
-                }
-            })
-            .catch((error) => {
-                debugger; // This breakpoint doesn't get hit because there is no error!
-                console.log(
-                    `error just after clicking password submit button: ${error}`
-                );
-            });
-        //
-        //
-        //
+            await page
+                .evaluate(() => {
+                    const button = document.querySelector(
+                        '#sign-in-with-password-form > .buttons-container button[data-automation-id="sign-in-pwd"]'
+                    );
+                    console.log(
+                        `sign-in-pwd button form's HTML: ${button.form.outerHTML}`
+                    );
+                    // debugger; // This sets a breakpoint in the next line; go to Chrome to continue stepping.
+                    if (button) {
+                        console.log("clicking password submit button ...");
+                        button.click();
+                        console.log("clicked password submit button ...");
+                    } else {
+                        console.log("Didn't find the 'sign-in-pwd' button!");
+                    }
+                })
+                .catch((error) => {
+                    // debugger; // This breakpoint doesn't get hit because there is no error!
+                    console.log(
+                        `error just after clicking password submit button: ${error}`
+                    );
+                });
+        }
     } else {
         await page.waitForSelector(emailInputSelector);
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
@@ -341,9 +332,8 @@ async function login(page) {
 
         await page.waitForTimeout(300);
 
-        // const submitButtonSelector =
-        //     "button[data-automation-id='signin-submit-btn']";
-        // const submitBtn = await page.$(submitButtonSelector);
+        const submitButtonSelector =
+            "button[data-automation-id='signin-submit-btn']";
         await page.click(submitButtonSelector);
     }
 
