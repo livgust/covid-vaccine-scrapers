@@ -191,11 +191,11 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
     try {
         /*
             <tr>
-				<td valign="top" width="48%" style="padding-top:10px;">
+                <td valign="top" width="48%" style="padding-top:10px;">
                     <p class="SUGbigbold hrow">Vaccine Appointment (4)</p>
                     <p class="SUGsmall hrow">
                     </p>
-				</td>
+                </td>
                 <td width="4%" valign="top">
                     &nbsp;
                 </td>
@@ -209,8 +209,8 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
                             <input name="siid" type="checkbox" value="921218557" id="checkbox921218557" style="vertical-align: middle;position:relative;bottom:3px;" onclick="checkLIST(921218557);">
                         </span>
                     </div>
-					</td>
-			</tr>
+                    </td>
+            </tr>
         */
         let rows = root.querySelectorAll(".SUGbigbold.hrow");
 
