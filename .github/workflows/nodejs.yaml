@@ -35,7 +35,7 @@ jobs:
           if [ -z "${{ secrets.FAUNA_DB_DEV }}" ] || [ -z "${{ secrets.GOOGLE_API_KEY }}" ]
           then
             echo "\$FAUNA_DB_DEV or \$GOOGLE_API_KEY secret does not exist, skipping Fauna tests"
-            npm test --  --exclude **/db*
+            npm test -- --exclude **/db/utils_test.js --exclude **/db/scraper_test.js
           else
             echo "Necessary secrets exist, running all tests"
             npm test
