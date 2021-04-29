@@ -86,6 +86,7 @@ async function ScrapeWebsiteData(browser, fetchService) {
 
                 const availability = parseAvailability(response);
                 results.push({
+                    name: `Walmart ${stores[storeId].city}, Store #${storeId}`,
                     ...stores[storeId],
                     ...availability,
                     hasAvailability:
