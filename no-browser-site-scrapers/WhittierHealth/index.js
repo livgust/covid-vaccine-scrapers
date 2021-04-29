@@ -45,31 +45,21 @@ async function ScrapeWebsiteData(site, fetchService) {
 
     const linksArray = await getCalendarLinks(fetchService, site.signUpLink);
 
-    let hasAvailability = false;
+    for (const link of linksArray) {
+        // console.log(`calendarPageLink: ${link}`);
 
-    // Advance the calendar of each site until no availability is found.
-    await Promise.all([
-        linksArray.forEach(async (link) => {
-            // console.log(`calendarPageLink: ${link}`);
+        const monthAvailabilityMap = await getSlotsFromPage(fetchService, link);
 
-            const monthAvailabilityMap = await getSlotsFromPage(
-                fetchService,
-                link
-            );
-
-            // Add all day objects to results.availability
-            monthAvailabilityMap.forEach((value, key) => {
-                availabilityContainer.availability[key] = {
-                    numberAvailableAppointments: value,
-                    hasAvailability: !!value,
-                };
-            });
-
-            hasAvailability =
-                hasAvailability ||
-                Object.keys(availabilityContainer.availability).length > 0;
-        }),
-    ]);
+        // Add all day objects to results.availability
+        monthAvailabilityMap.forEach((value, key) => {
+            availabilityContainer.availability[key] = {
+                numberAvailableAppointments: value,
+                hasAvailability: !!value,
+            };
+        });
+    }
+    const hasAvailability =
+        Object.keys(availabilityContainer.availability).length > 0;
 
     const results = {
         ...site,
