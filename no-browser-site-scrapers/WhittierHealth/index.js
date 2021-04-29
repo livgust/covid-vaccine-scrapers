@@ -50,7 +50,7 @@ async function ScrapeWebsiteData(site, fetchService) {
     // Advance the calendar of each site until no availability is found.
     await Promise.all([
         linksArray.forEach(async (link) => {
-            console.log(`calendarPageLink: ${link}`);
+            // console.log(`calendarPageLink: ${link}`);
 
             const monthAvailabilityMap = await getSlotsFromPage(
                 fetchService,
@@ -131,6 +131,7 @@ async function fetchFrontPage(link) {
  * Get the HTML containing a calendar by fetchings the link.
  * The link should look like this:
  * 'https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413'
+ * where the "413" is April 3.
  *
  * @param {String} link to the calendar page
  * @returns HTML containing a SignupGenius calendar
@@ -162,19 +163,6 @@ async function fetchCalendarPage(calendarUrl) {
 async function getSlotsFromPage(fetchService, link) {
     const calendarHtml = await fetchService.fetchCalendarPage(link);
 
-    /*
-        <div class="col-md-12 col-body-100 SUGmain">
-            <strong>Date: </strong>04/15/2021 (Thu.)<p></p>
-            ...
-        </div>
-
-        Note:
-
-            const text = root.querySelector(".col-md-12.col-body-100.SUGmain").innerText;
-
-        does not retrieve the date.
-    */
-
     const date = calendarHtml.match(/\d{1,2}\/\d{1,2}\/\d{4}/)[0];
 
     const root = htmlParser.parse(calendarHtml);
@@ -201,47 +189,49 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
     let dailySlotCountsMap; // keyed by date, value accumulates slot counts per date.
 
     try {
-        const times = root
-            .querySelectorAll("span.SUGbigbold")
-            .filter((t) => t.innerText.includes("slots filled"));
-
         /*
-            From Butler County General Health District, Ohio site:
-                http://health.bcohio.us/news_detail_T6_R141.php
-            one can find signup links.
-
-            *** That page has been saved for provided a test sample of availability. ***
-
-            It looks like "span.SUGbigbold" nets the # of slots, filtered by innerText containing
-            "slots filled"!
-
-            <div style="padding-top:5px !important;">
-                <span class="SUGbigbold" style="line-height: 18px;">129 of 139 slots filled</span>
-            </div>
-            <div class="SUGbuttonContainer link_cursor" data-toggle="popover"
-                data-trigger="hover" data-placement="top"
-                data-content="Sign Up is Locked"
-                style="margin-top:10px;"
-                data-original-title="" title="">
-                <span class="SUGbutton rounded" data-toggle="modal" data-target="#addLockModal">
-                    <span>Sign Up&nbsp;</span>
-                    <img src="/images/icons/lock-icon-14x14.png">
-                </span>
-            </div>
-
-            Parse the two number, subtract the first from the second, and we have # of slots available.
+            <tr>
+				<td valign="top" width="48%" style="padding-top:10px;">
+                    <p class="SUGbigbold hrow">Vaccine Appointment (4)</p>
+                    <p class="SUGsmall hrow">
+                    </p>
+				</td>
+                <td width="4%" valign="top">
+                    &nbsp;
+                </td>
+                <td valign="top" width="48%">
+                    <div style="padding-top:5px !important;">
+                    <span class="SUGbigbold" style="line-height: 18px;">1 of 4 slots filled</span>
+                    </div>
+                    <div class="SUGbuttonContainer link_cursor" style="margin-top:10px;">
+                        <span class="SUGbutton rounded">
+                            <span onclick="checkTheBox(921218557);checkLIST(921218557);">Sign Up&nbsp;</span>
+                            <input name="siid" type="checkbox" value="921218557" id="checkbox921218557" style="vertical-align: middle;position:relative;bottom:3px;" onclick="checkLIST(921218557);">
+                        </span>
+                    </div>
+					</td>
+			</tr>
         */
+        let rows = root.querySelectorAll(".SUGbigbold.hrow");
 
-        dailySlotCountsMap = times
-            .map((time) => {
-                const values = time.innerText.match(/\d+/g);
-                const slotCount = values[1] - values[0];
-                return slotCount;
-            })
-            .reduce((acc, slotCount) => {
-                acc.set(date, (acc.get(date) || 0) + slotCount);
-                return acc;
-            }, new Map());
+        dailySlotCountsMap = rows.reduce((acc, row) => {
+            let slotCount = 0;
+            const outerRow = row.parentNode.parentNode;
+            const alreadyFilled = outerRow.querySelector(".SUGsignups");
+            if (!alreadyFilled) {
+                slotCount = outerRow
+                    .querySelector(".SUGbigbold.hrow")
+                    .innerText.match(/\((\d+)\)/)[1];
+
+                const xOfyFilled = outerRow.querySelector("span.SUGbigbold");
+                if (xOfyFilled) {
+                    const xOfYMatches = xOfyFilled.innerText.match(/\d+/g);
+                    slotCount = xOfYMatches[1] - xOfYMatches[0];
+                }
+            }
+            acc.set(date, (acc.get(date) || 0) + parseInt(slotCount));
+            return acc;
+        }, new Map());
     } catch (error) {
         console.error(`error trying to get day numbers: ${error}`);
     }
