@@ -178,10 +178,6 @@ async function getSlotsFromPage(fetchService, link) {
  * @returns
  */
 function getDailyAvailabilityCountsInCalendar(root, date) {
-    function reformatDate(dateStr) {
-        return moment(`${dateStr}T00:00:00`).format("M/D/YYYY");
-    }
-
     if (signUpIsFull(root)) {
         return new Map();
     }
@@ -209,7 +205,7 @@ function getDailyAvailabilityCountsInCalendar(root, date) {
                             <input name="siid" type="checkbox" value="921218557" id="checkbox921218557" style="vertical-align: middle;position:relative;bottom:3px;" onclick="checkLIST(921218557);">
                         </span>
                     </div>
-                    </td>
+                </td>
             </tr>
         */
         let rows = root.querySelectorAll(".SUGbigbold.hrow");
