@@ -58,13 +58,12 @@ async function ScrapeWebsiteData(site, fetchService) {
             };
         });
     }
-    const hasAvailability =
-        Object.keys(availabilityContainer.availability).length > 0;
 
     const results = {
         ...site,
         ...availabilityContainer,
-        hasAvailability: hasAvailability,
+        hasAvailability:
+            Object.keys(availabilityContainer.availability).length > 0,
     };
     return results;
 }
