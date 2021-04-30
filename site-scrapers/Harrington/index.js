@@ -59,8 +59,8 @@ module.exports = async function GetAvailableAppointments(
 /**
  availabilityContentSavedToS3
 
- Unused at the moment. If notificationService is activated, use this flag to
- limit saving to s3 to only once.
+ Unused at the moment. If notificationService is activated, use the
+ `availabilityContentSavedToS3` flag to limit saving to s3 to only once.
 
  Suggested usage:
 
@@ -78,8 +78,8 @@ module.exports = async function GetAvailableAppointments(
     ...
 ```
  */
-let availabilityContentSavedToS3 = false; // becomes true upon first save to s3
 /* eslint-disable no-unused-vars */
+let availabilityContentSavedToS3 = false; // becomes true upon first save to s3
 /* eslint-enable no-unused-vars */
 
 /**
@@ -102,6 +102,9 @@ let notificationService = function defaultNotificationService() {
 async function ScrapeWebsiteData(browser, pageService, site) {
     console.log(`${site.name} starting to scrape`);
     const page = await pageService.getHomePage(browser, site);
+
+    // Uncomment if logging from page.evaluate(...) is needed for debugging.
+    // page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
     // Initialize results to no availability
     const results = {
@@ -179,9 +182,15 @@ async function getDailyAvailabilityCountsForMonth(page) {
     let dailySlotCountsMap; // keyed by date, value accumulates slot counts per date.
 
     try {
-        const dates = await page.$$eval(".time-selection", (slots) =>
-            slots.map((slot) => slot.getAttribute("data-readable-date"))
-        );
+        await page.waitForTimeout(300);
+        const dates = await page.$$eval(".time-selection", (slots) => {
+            // eslint-disable-next-line no-debugger
+            // debugger;
+            const d = slots.map((slot) =>
+                slot.getAttribute("data-readable-date")
+            );
+            return d;
+        });
 
         dailySlotCountsMap = dates
             .map((date) => reformatDate(date))
@@ -190,7 +199,7 @@ async function getDailyAvailabilityCountsForMonth(page) {
                 return acc;
             }, new Map());
     } catch (error) {
-        console.error(`error trying to get day numbers: ${error}`);
+        console.error(`error trying to get date: ${error}`);
     }
 
     return dailySlotCountsMap ? dailySlotCountsMap : new Map();
@@ -211,6 +220,8 @@ async function advanceMonth(page, site) {
                 be quite flaky. This one seems to work for the moment,
                 without having to waitForSelector().
             */
+            // await page.waitForTimeout(300),
+            await page.waitForSelector(".calendar-next"),
             await page.evaluate(() =>
                 document.querySelector(".calendar-next").click()
             ),
