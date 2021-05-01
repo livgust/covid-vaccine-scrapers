@@ -142,12 +142,14 @@ async function fetchStoreAvailability(
                     credentials: "include",
                 };
 
-                return await fetch(requestInput, requestInit)
+                const response = await fetch(requestInput, requestInit)
                     .then((res) => res.json())
                     .then((json) => json)
                     .catch((error) =>
                         console.error(`fetch availability error: ${error}`)
                     );
+
+                return response;
             },
             accountId,
             startDate,
@@ -317,6 +319,7 @@ async function login(page) {
                 });
         }
     } else {
+        // Normal log-in with both email and password input fields.
         await page.waitForSelector(emailInputSelector);
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
 
@@ -340,6 +343,9 @@ async function login(page) {
             "button[data-automation-id='signin-submit-btn']";
         await page.click(submitButtonSelector);
     }
+
+    // Solve the reCaptcha if it occurs.
+    await page.solveRecaptchas();
 
     await page.waitForNavigation({ timeout: 30000 }).catch((error) => {
         console.log(
