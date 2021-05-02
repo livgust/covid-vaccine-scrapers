@@ -92,6 +92,14 @@ async function ScrapeWebsiteData(browser, fetchService) {
                     hasAvailability:
                         Object.keys(availability.availability).length > 0,
                 });
+
+                if (
+                    process.env.DEVELOPMENT &&
+                    (results.length % 5 == 0 ||
+                        results.length == storesList.length)
+                ) {
+                    console.log(`    ${results.length} stores done.`);
+                }
             } catch (error) {
                 console.error(`error trying to get data: ${error}`);
                 throw new Error(
