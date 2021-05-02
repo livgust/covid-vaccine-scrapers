@@ -23,7 +23,7 @@ const moment = require("moment");
 const AWS = require("aws-sdk");
 const { Lambda } = require("faunadb");
 const alertsLambda = new AWS.Lambda();
-
+const { scrapersToSkip } = require("./scraper_config");
 const WRITE_TO_FAUNA = true;
 
 async function execute(usePuppeteer, scrapers) {
@@ -56,6 +56,13 @@ async function execute(usePuppeteer, scrapers) {
     const gatherData = async () => {
         const results = [];
         for (const scraper of scrapers) {
+            if (scrapersToSkip.indexOf(scraper.name) !== -1) {
+                console.log(
+                    "Skipping... " + scraper.name + " (see scraper_config.js)"
+                );
+                continue;
+            }
+
             const startTime = new Date();
             let isSuccess = true;
             const returnValue = await scraper.run(browser).catch((error) => {
