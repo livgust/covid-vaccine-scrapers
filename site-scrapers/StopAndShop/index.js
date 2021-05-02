@@ -6,10 +6,11 @@ function TitleCase(str) {
     if (!str) return str;
 
     return str
+        .trim()
         .toLowerCase()
         .split(" ")
         .map(function (word) {
-            return word.replace(word[0], word[0].toUpperCase());
+            return !word ? word : word.replace(word[0], word[0].toUpperCase());
         })
         .join(" ");
 }
