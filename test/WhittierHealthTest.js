@@ -8,8 +8,8 @@ const file = require("../lib/file");
 describe("WhittierHealth availability test using scraper and saved HTML", function () {
     /** Generator to feed filenames sequentially to the "with availability" test. */
     function* filenames() {
-        yield "butlerOhio-withSlots-scripts-removed.html"; // 25 slots available
-        yield "whittier-one-slot-scripts-removed.html"; // 1 slot available
+        yield "slotsAvailable-4292021-49slots-scripts-removed.html"; // 49 slots available
+        yield "slotsAvailable-4302021-53slots-scripts-removed.html"; // 53 slots available
     }
 
     const filenameGenerator = filenames();
@@ -27,7 +27,8 @@ describe("WhittierHealth availability test using scraper and saved HTML", functi
                 `<a href="https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413">
             Tuesday April 13 at Whittier Rehabilitation Hospital Bradford, 145 Ward Hill Ave, Haverhill 01835&nbsp;
             </a>`,
-                `<a href="https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413">
+                `
+            <a href="https://www.signupgenius.com/go/409054CA9AB2CA2FA7-413">
             Tuesday April 13 at Whittier Rehabilitation Hospital Bradford, 145 Ward Hill Ave, Haverhill 01835&nbsp;
             </a>`,
             ];
@@ -62,8 +63,8 @@ describe("WhittierHealth availability test using scraper and saved HTML", functi
 
         expect(hasAvailability).is.deep.equal(expected);
 
-        // The total of available slots in the two sample HTML files is 25 + 1 = 26
-        const expectedSlotCounts = [26];
+        // The total of available slots in the two sample HTML files is 49 and 53
+        const expectedSlotCounts = [49 + 53];
 
         const slotCounts = results.individualLocationData.map((result) => {
             const count = Object.values(result.availability).map(

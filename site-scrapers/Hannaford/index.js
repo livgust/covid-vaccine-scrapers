@@ -4,10 +4,10 @@ const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
     console.log(`${site.name} starting.`);
-    const webData = await rxTouch.ScrapeRxTouch(browser, site, site.name);
+    const webData = await rxTouch.ScrapeRxTouch(browser, site, site.name, 5954);
     const individualLocationData = Object.values(webData).map((loc) => {
         return {
-            name: `${site.name} (${loc.city})`,
+            name: `${site.name}`,
             street: loc.street,
             city: loc.city,
             zip: loc.zip,
