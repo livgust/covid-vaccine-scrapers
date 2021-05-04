@@ -112,6 +112,8 @@ async function ScrapeWebsiteData(browser, fetchService) {
         sendSlackMsg("bot", `${entityName} failed to login`);
     }
 
+    page.close();
+
     return results;
 }
 
