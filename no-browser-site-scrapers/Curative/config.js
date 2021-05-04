@@ -15,6 +15,15 @@ const site = {
             id: 25336,
             massVax: true, // This is a MassVax site that only allows preregistration
         },
+        {
+            id: 28418, // DoubleTree Hotel - Danvers (Public)
+        },
+        {
+            id: 28417, // Circuit City - Dartmouth (Public)
+        },
+        {
+            id: 28419, // Eastfield Mall - Springfield (Public
+        },
     ],
 };
 

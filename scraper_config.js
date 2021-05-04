@@ -1,7 +1,6 @@
 /* The following scrapers will be skipped */
 const scrapersToSkip = [
     "Atrius",
-    "Curative",
     "FamilyPracticeGroup",
     "LowellGeneral",
     "PediatricAssociatesOfGreaterSalem",
