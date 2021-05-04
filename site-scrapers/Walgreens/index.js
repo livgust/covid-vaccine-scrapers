@@ -114,5 +114,6 @@ async function ScrapeWebsiteData(browser) {
             });
         }
     }
+    page.close();
     return Object.values(availableLocations);
 }

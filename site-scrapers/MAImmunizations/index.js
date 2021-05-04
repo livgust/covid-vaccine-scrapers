@@ -24,11 +24,13 @@ async function ScrapeWebsiteData(browser) {
 
     if ((await page.title()) === "Application Error") {
         console.log("Got the Mass. Heroku error page, giving up.");
+        page.close();
         return {};
     } else if (pages.length < 1) {
         console.log(
             "No content matching our CSS selector (looking for nav.pagination)!"
         );
+        page.close();
         return {};
     } else {
         const maxPage = await pages[pages.length - 1].evaluate(
@@ -156,6 +158,8 @@ async function ScrapeWebsiteData(browser) {
                 }
             }
         }
+        clinicPage.close();
+        page.close();
         return results;
     }
 }
