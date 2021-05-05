@@ -201,6 +201,14 @@ const sites = [
         zip: "02536",
         signUpLink: "https://home.color.com/vaccine/register/barnstable",
     },
+    {
+        name: "Converse Middle School",
+        siteUrl: "Converse%20Middle%20School",
+        street: "24 Converse Street",
+        city: "Palmer",
+        zip: "01069",
+        signUpLink: "https://home.color.com/vaccine/register/palmer",
+    },
 ];
 
 module.exports = sites;
