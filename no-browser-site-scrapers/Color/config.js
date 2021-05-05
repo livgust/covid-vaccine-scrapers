@@ -177,6 +177,30 @@ const sites = [
         zip: "02143",
         signUpLink: "https://home.color.com/vaccine/register/metronorth",
     },
+    {
+        name: "Cape Cod Community College",
+        siteUrl: "Cape%20Cod%20Community%20College",
+        street: "2240 Iyannough Rd",
+        city: "West Barnstable",
+        zip: "02668",
+        signUpLink: "https://home.color.com/vaccine/register/barnstable",
+    },
+    {
+        name: "Orleans DPW",
+        siteUrl: "Orleans%20DPW",
+        street: "40 Giddiah Hill Rd",
+        city: "Orleans",
+        zip: "02653",
+        signUpLink: "https://home.color.com/vaccine/register/barnstable",
+    },
+    {
+        name: "Barnstable County Fairgrounds",
+        siteUrl: "Barnstable%20County%20Fairgrounds",
+        street: "1220 Nathan Ellis Hwy",
+        city: "East Falmouth",
+        zip: "02536",
+        signUpLink: "https://home.color.com/vaccine/register/barnstable",
+    },
 ];
 
 module.exports = sites;
