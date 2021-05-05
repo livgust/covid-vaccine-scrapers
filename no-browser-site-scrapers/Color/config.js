@@ -209,6 +209,14 @@ const sites = [
         zip: "01069",
         signUpLink: "https://home.color.com/vaccine/register/palmer",
     },
+    {
+        name: "Somerset Fire Department",
+        siteUrl: "Somerset%20Fire%20Department",
+        street: "475 County St",
+        city: "Somerset",
+        zip: "02726",
+        signUpLink: "https://home.color.com/vaccine/register/somersetswansea",
+    },
 ];
 
 module.exports = sites;
