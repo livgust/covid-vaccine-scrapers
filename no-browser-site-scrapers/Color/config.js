@@ -169,6 +169,14 @@ const sites = [
         zip: "02149",
         signUpLink: "https://home.color.com/vaccine/register/metronorth",
     },
+    {
+        name: "CHA Somerville",
+        siteUrl: "CHA%20Somerville",
+        street: "176 Somerville Ave",
+        city: "Somerville",
+        zip: "02143",
+        signUpLink: "https://home.color.com/vaccine/register/metronorth",
+    },
 ];
 
 module.exports = sites;
