@@ -153,6 +153,22 @@ const sites = [
         zip: "02128",
         signUpLink: "https://www.cic-health.com/boston/veronica",
     },
+    {
+        name: "Tufts University",
+        siteUrl: "Tufts%20University",
+        street: "161 College Ave",
+        city: "Medford",
+        zip: "02144",
+        signUpLink: "https://home.color.com/vaccine/register/metronorth",
+    },
+    {
+        name: "Encore Boston Harbor",
+        siteUrl: "Encore%20Boston%20Harbor",
+        street: "1 Broadway Center",
+        city: "Everett",
+        zip: "02149",
+        signUpLink: "https://home.color.com/vaccine/register/metronorth",
+    },
 ];
 
 module.exports = sites;
