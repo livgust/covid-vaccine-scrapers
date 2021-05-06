@@ -39,5 +39,6 @@ async function ScrapeWebsiteData(browser) {
             ) == -1,
     };
 
+    page.close();
     return result;
 }
