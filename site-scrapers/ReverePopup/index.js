@@ -48,6 +48,7 @@ async function ScrapeWebsiteData(browser) {
             }, 0)
         );
 
+        page.close();
         if (appointments) {
             results["hasAvailability"] = true;
             results["availability"][date] = {

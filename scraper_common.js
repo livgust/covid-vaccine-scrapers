@@ -139,6 +139,14 @@ async function execute(usePuppeteer, scrapers) {
             }
         }
         if (usePuppeteer) {
+            const pages = await browser.pages();
+            if (pages.length > 1) {
+                console.log(
+                    "Did you forget to call page.close()? The following pages were left open... " +
+                        pages.map((page) => page.url())
+                );
+            }
+
             await browser.close();
         }
         let scrapedResultsArray = [];

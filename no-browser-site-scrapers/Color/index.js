@@ -8,10 +8,11 @@ async function GetAvailableAppointments() {
     const originalSites = sites;
     const finalSites = [];
     for (const site of originalSites) {
-        const { siteUrl, ...rest } = site;
+        const { siteUrl, calendarUrl, ...rest } = site;
         const webData = await ScrapeWebsiteData(
             rest.name,
             siteUrl,
+            calendarUrl,
             rest.massVax
         );
         finalSites.push({
@@ -27,8 +28,10 @@ async function GetAvailableAppointments() {
     };
 }
 
-async function ScrapeWebsiteData(siteName, siteUrl, massVax) {
-    const availabilityUrl = `https://home.color.com/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=${siteUrl}`;
+async function ScrapeWebsiteData(siteName, siteUrl, calendarUrl, massVax) {
+    const availabilityUrl =
+        `https://home.color.com/api/v1/vaccination_appointments/availability?claim_token=${token}&collection_site=${siteUrl}` +
+        (calendarUrl ? `&calendar=${calendarUrl}` : "");
     const availabilityPromise = new Promise((resolve) => {
         https
             .get(availabilityUrl, (res) => {
@@ -49,19 +52,24 @@ async function ScrapeWebsiteData(siteName, siteUrl, massVax) {
     });
 
     const availabilityResponse = await availabilityPromise;
-    return formatResponse(availabilityResponse, massVax);
+    return formatResponse(siteName, availabilityResponse, massVax);
 }
 
-function formatResponse(availabilityResponse, massVax) {
+function formatResponse(siteName, availabilityResponse, massVax) {
     const availability = JSON.parse(availabilityResponse).results;
     const results = {
         hasAvailability: false,
         availability: {},
     };
 
+    if (!availability) {
+        console.log("COLOR invalid availability for " + siteName + ". ");
+        console.log(availabilityResponse);
+    }
+
     // If this is a massVax site that is invite-only, then we don't
     // need availability data.
-    if (!massVax) {
+    if (!massVax && !!availability) {
         // Collect availability count by date
         availability.reduce((memo, currentValue) => {
             /* The availability returns an array of appointments like this:

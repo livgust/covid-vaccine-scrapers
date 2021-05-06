@@ -41,6 +41,7 @@ async function ScrapeWebsiteData(browser) {
         : false);
     let hasAvailability = !alert;
 
+    page.close();
     return {
         hasAvailability,
     };
