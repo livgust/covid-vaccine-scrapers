@@ -12,7 +12,7 @@ describe("Color Transformations", () => {
             "capacity": 1,
             "remaining_spaces":-1
         }]}`;
-        expect(formatResponse(response))
+        expect(formatResponse("TestSiteName", response, false))
             .to.deep.include({
                 hasAvailability: false,
             })
@@ -20,7 +20,7 @@ describe("Color Transformations", () => {
             .deep.equal({});
     });
     // Skipping this test as we're hard-coding no availability due to mandatory pre-registration
-    it.skip("should return one availabilitiy when there is one", () => {
+    it("should return one availability when there is one", () => {
         // mock out the http request that returns the token
         const response = `{"results":[{
             "start": "2021-02-22T14:00:00+00:00",
@@ -41,18 +41,20 @@ describe("Color Transformations", () => {
          *   }
          * }
          */
-        expect(formatResponse(response)).to.deep.include({
-            hasAvailability: true,
-            availability: {
-                "2/22/2021": {
-                    hasAvailability: true,
-                    numberAvailableAppointments: 1,
+        expect(formatResponse("TestSiteName", response, false)).to.deep.include(
+            {
+                hasAvailability: true,
+                availability: {
+                    "2/22/2021": {
+                        hasAvailability: true,
+                        numberAvailableAppointments: 1,
+                    },
                 },
-            },
-        });
+            }
+        );
     });
     // Skipping this test as we're hard-coding no availability due to mandatory pre-registration
-    it.skip("should return multiple date availabilities", () => {
+    it("should return multiple date availabilities", () => {
         // mock out the http request that returns the token
         const response = `{"results":[{
             "start": "2021-02-22T14:00:00+00:00",
@@ -88,18 +90,20 @@ describe("Color Transformations", () => {
          *      },
          * }
          */
-        expect(formatResponse(response)).to.deep.include({
-            hasAvailability: true,
-            availability: {
-                "2/22/2021": {
-                    hasAvailability: true,
-                    numberAvailableAppointments: 2,
+        expect(formatResponse("TestSiteName", response, false)).to.deep.include(
+            {
+                hasAvailability: true,
+                availability: {
+                    "2/22/2021": {
+                        hasAvailability: true,
+                        numberAvailableAppointments: 2,
+                    },
+                    "2/23/2021": {
+                        hasAvailability: true,
+                        numberAvailableAppointments: 1,
+                    },
                 },
-                "2/23/2021": {
-                    hasAvailability: true,
-                    numberAvailableAppointments: 1,
-                },
-            },
-        });
+            }
+        );
     });
 });
