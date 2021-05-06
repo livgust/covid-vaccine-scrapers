@@ -137,7 +137,7 @@ async function ScrapeWebsiteData(browser, pageService, site) {
     results.hasAvailability = !!Object.keys(results.availability).length;
 
     console.log(`${site.name} scrape ending`);
-
+    page.close();
     return results;
 }
 

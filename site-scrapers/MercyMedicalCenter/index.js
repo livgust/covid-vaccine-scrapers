@@ -94,6 +94,7 @@ async function ScrapeWebsiteData(browser) {
         }
     }
 
+    page.close();
     return {
         hasAvailability,
         availability,
