@@ -68,13 +68,25 @@ async function ScrapeWebsiteData(browser, fetchService) {
 
     const results = [];
 
+    const DEBUG = true;
     try {
         // Uncomment if logging from page.evaluate(...) is needed for debugging.
         // page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
-        await fetchService.login(page);
+        const loginSucceeded = await fetchService.login(page);
 
+        if (!loginSucceeded) {
+            console.log("login failed");
+            return results;
+        }
+
+        let count = 0;
         for (const storeId of Object.keys(stores)) {
+            count += 1;
+
+            if (DEBUG && count == 3) {
+                break;
+            }
             try {
                 let response = await fetchService.fetchStoreAvailability(
                     page,
@@ -244,6 +256,9 @@ async function login(page) {
     // Note that console.log() in page.evaluate() only occurs if "page.on(...)" is uncommented above.
 
     if (emailValidationForm) {
+        console.log(
+            "email validation form: login process will confront 2 password inputs"
+        );
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
 
         await page.click(submitEmailButtonSelector);
@@ -330,6 +345,7 @@ async function login(page) {
         }
     } else {
         // Normal log-in with both email and password input fields.
+        console.log("email and password fields presented at the same time");
         await page.waitForSelector(emailInputSelector);
         await page.type(emailInputSelector, process.env.WALMART_EMAIL);
 
@@ -354,17 +370,66 @@ async function login(page) {
         await page.click(submitButtonSelector);
     }
 
-    // Solve the reCaptcha if it occurs.
-    await page.solveRecaptchas();
+    page.waitForTimeout(2000);
 
-    await page.waitForNavigation({ timeout: 30000 }).catch((error) => {
-        console.log(
-            `error waiting for navigation to store list page: ${error}`
-        );
-        page.screenshot({ path: "walmart.png" }); // login failed
-    });
+    const { captchas, solutions, solved, error } = await page.solveRecaptchas();
+
+    console.log(
+        `page :: captchas: ${JSON.stringify(
+            captchas
+        )}, solutions: ${JSON.stringify(solutions)}, solved? '${JSON.stringify(
+            solved
+        )}', error: ${error}`
+    );
+
+    if (solved.length) {
+        await page
+            .waitForNavigation({ timeout: 10000 })
+            .catch((error) =>
+                console.log(`waiting for page-solved navigations ${error}`)
+            );
+    } else {
+        const childFrames = page.mainFrame().childFrames();
+        // Solve the reCaptcha if it occurs.
+        // Loop over all potential frames on that page
+        console.log(`childFrame count: ${childFrames.length}`);
+        for (const frame of page.mainFrame().childFrames()) {
+            // Attempt to solve any potential reCAPTCHAs in child frames
+            const {
+                captchas,
+                solutions,
+                solved,
+                error,
+            } = await frame.solveRecaptchas();
+            console.log(
+                `frame title: '${frame.title}' :: captchas: ${captchas}, solutions: ${solutions}, solved? '${solved}', error: ${error}`
+            );
+
+            if (solved.length) {
+                await page
+                    .waitForNavigation({ timeout: 10000 })
+                    .catch((error) =>
+                        console.log(
+                            `waiting for frome-solved navigations ${error}`
+                        )
+                    );
+                break;
+            }
+        }
+    }
 
     // Wait for the store list on the page
-    await page.waitForSelector(".store-list-container", { timeout: 5000 });
+    let loginSucceeded = true;
+
+    await page
+        .waitForSelector(".store-list-container", { timeout: 10000 })
+        .catch((error) => {
+            loginSucceeded = false;
+            console.log(
+                `timed out waiting for 'store-list-container': ${error}`
+            );
+        });
     await page.waitForTimeout(500);
+
+    return loginSucceeded;
 }
