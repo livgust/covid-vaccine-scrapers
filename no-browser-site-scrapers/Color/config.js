@@ -499,11 +499,15 @@ const sites = [
         signUpLink: "https://home.color.com/vaccine/register/townofamherst",
     },
     {
-        name: "SSU- OKeefe Center",
+        name: "SSU- O'Keefe Center",
         siteUrl: "SSU- OKeefe Center",
         street: "225 Canal St",
         city: "Salem",
         zip: "01970",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/salem",
     },
 ];
