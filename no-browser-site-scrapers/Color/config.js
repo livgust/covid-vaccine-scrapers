@@ -4,6 +4,13 @@ const sites = [
         street: "1235 Worcester St.",
         city: "Natick",
         zip: "01760",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+            "Walk-ins": "Accepted 7 days a week",
+            Accessibility:
+                "American Sign Language (ASL) interpretation is provided via Video Remote Interpreting (VRI). There are tablets available for VRI. Foreign language interpretation is provided via Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/natickmall",
         siteUrl: "Natick%20Mall",
     },
@@ -12,6 +19,12 @@ const sites = [
         street: "1 Patriot Pl.",
         city: "Foxborough",
         zip: "02035",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+            Accessibility:
+                "American Sign Language (ASL) interpretation is provided via two ways: (1) Video Remote Interpreting (VRI). There are tablets available for VRI. (2) An on-site ASL interpreter is on Saturdays at Gillette. Foreign language interpretation is provided via Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance. Only individuals with an appointment may be vaccinated.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/gillettestadium",
         siteUrl: "Gillette%20Stadium%20-%20East",
     },
@@ -20,6 +33,12 @@ const sites = [
         street: "1 Patriot Pl.",
         city: "Foxborough",
         zip: "02035",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+            Accessibility:
+                "American Sign Language (ASL) interpretation is provided via two ways: (1) Video Remote Interpreting (VRI). There are tablets available for VRI. (2) An on-site ASL interpreter is on Saturdays at Gillette. Foreign language interpretation is provided via Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance. Only individuals with an appointment may be vaccinated.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/gillettestadium",
         siteUrl: "Gillette%20Stadium%20-%20West",
     },
@@ -28,6 +47,12 @@ const sites = [
         street: "1350 Tremont St.",
         city: "Roxbury",
         zip: "02120",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Walk-ins": "Accepted 7 days a week",
+            Accessibility:
+                "American Sign Language (ASL) interpretation is provided via Video Remote Interpreting (VRI). There are tablets available for VRI. Foreign language interpretation is provided via two ways: (1) Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. (2) On-site interpreters speaking Spanish, Mandarin Chinese, and Haitian-Creole are available all days. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/reggielewis",
         siteUrl: "Reggie%20Lewis%20Center",
     },
@@ -37,6 +62,13 @@ const sites = [
         street: "900 Boylston St.",
         city: "Boston",
         zip: "02115",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Walk-ins": "Accepted 7 days a week",
+            Accessibility:
+                "Accessible to those in wheelchairs or with mobility impairments. We use interpreter iPads for ASL and foreign language interpretation during vaccine appointments." +
+                "American Sign Language (ASL) Interpretation is available through Video Remote Interpreting (VRI) every day, and, on Sundays, ASL interpreters are present. Foreign language interpretation is provided via two ways: (1) Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. (2) On-site interpreters speaking Spanish, Mandarin Chinese, and Haitian-Creole are available all days. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/fenway-hynes",
     },
     {
@@ -45,6 +77,10 @@ const sites = [
         street: "165 Crawford St.",
         city: "Lawrence",
         zip: "01843",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/lawrencegeneral",
     },
     {
@@ -61,6 +97,10 @@ const sites = [
         street: "10 Riley Way",
         city: "Chelsea",
         zip: "02150",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/chelsea/seniorcenter",
     },
     {
@@ -70,6 +110,10 @@ const sites = [
         street: "40 Hervey Tichon Ave",
         city: "New Bedford",
         zip: "02740",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/newbedford/herveytichon",
     },
     {
@@ -79,6 +123,10 @@ const sites = [
         street: "550 Tucker Street",
         city: "Fall River",
         zip: "02723",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/fallriver/niagara",
     },
     {
@@ -88,6 +136,10 @@ const sites = [
         street: "160 Wall Street",
         city: "Fall River",
         zip: "02723",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/fallriver/niagara",
     },
     {
@@ -97,6 +149,10 @@ const sites = [
         street: "140 American Legion Hwy",
         city: "Revere",
         zip: "02151",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/revere/rumneymarsh",
     },
     {
@@ -106,6 +162,10 @@ const sites = [
         street: "450 Walnut Ave",
         city: "Boston",
         zip: "02130",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/boston/whitestadium",
     },
     {
@@ -115,6 +175,10 @@ const sites = [
         street: "500 Cambridge St",
         city: "Allston",
         zip: "02134",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/boston/jacksonmann",
     },
     {
@@ -124,6 +188,10 @@ const sites = [
         street: "8 Oak St W",
         city: "Boston",
         zip: "02116",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/boston/wang",
     },
     {
@@ -133,6 +201,10 @@ const sites = [
         street: "1240 Massachusetts Ave",
         city: "Dorchester",
         zip: "02125",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/boston/plumbers",
     },
     {
@@ -142,6 +214,10 @@ const sites = [
         street: "195 Old Colony Ave",
         city: "Boston",
         zip: "02127",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/boston/iron",
     },
     {
@@ -151,6 +227,10 @@ const sites = [
         street: "282 Meridian St",
         city: "Boston",
         zip: "02128",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://www.cic-health.com/boston/veronica",
     },
     {
@@ -159,6 +239,10 @@ const sites = [
         street: "161 College Ave",
         city: "Medford",
         zip: "02144",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/metronorth",
     },
     {
@@ -167,6 +251,10 @@ const sites = [
         street: "1 Broadway Center",
         city: "Everett",
         zip: "02149",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/metronorth",
     },
     {
@@ -183,6 +271,12 @@ const sites = [
         street: "2240 Iyannough Rd",
         city: "West Barnstable",
         zip: "02668",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+            Accessibility:
+                "Wheelchair accessible with staff available to provide assistance if necessary.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/barnstable",
     },
     {
@@ -191,6 +285,10 @@ const sites = [
         street: "40 Giddiah Hill Rd",
         city: "Orleans",
         zip: "02653",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Drive-Thru",
+        },
         signUpLink: "https://home.color.com/vaccine/register/barnstable",
     },
     {
@@ -199,6 +297,10 @@ const sites = [
         street: "1220 Nathan Ellis Hwy",
         city: "East Falmouth",
         zip: "02536",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Drive-Thru",
+        },
         signUpLink: "https://home.color.com/vaccine/register/barnstable",
     },
     {
@@ -207,6 +309,10 @@ const sites = [
         street: "24 Converse Street",
         city: "Palmer",
         zip: "01069",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/palmer",
     },
     {
@@ -215,6 +321,10 @@ const sites = [
         street: "475 County St",
         city: "Somerset",
         zip: "02726",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/somersetswansea",
     },
     {
@@ -223,6 +333,10 @@ const sites = [
         street: "947 Park Street",
         city: "Attleboro",
         zip: "02703",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/attleboro",
     },
     {
@@ -231,6 +345,11 @@ const sites = [
         street: "34 Park Ave",
         city: "Bridgewater",
         zip: "02325",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            Accessibility:
+                "We have an accessible entrance and vaccination area, with wheelchair and assistance provided on site. We have accessible parking and drop off locations.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/bridgewater",
     },
     {
@@ -239,6 +358,10 @@ const sites = [
         street: "1599 Memorial Drive",
         city: "Chicopee",
         zip: "01020",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            Accessibility: "Accessible parking, Wheelchair accessible",
+        },
         signUpLink: "https://home.color.com/vaccine/register/chicopee",
     },
     {
@@ -247,6 +370,10 @@ const sites = [
         street: "777 Elsbree Street",
         city: "Fall River",
         zip: "02720",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/bristol",
     },
     {
@@ -255,6 +382,10 @@ const sites = [
         street: "61 South River St",
         city: "Marshfield",
         zip: "02050",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Drive-Thru",
+        },
         signUpLink: "https://home.color.com/vaccine/register/marshfield",
     },
     {
@@ -263,6 +394,10 @@ const sites = [
         street: "67 Conz Street",
         city: "Northampton",
         zip: "01060",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/northampton",
     },
     {
@@ -271,6 +406,12 @@ const sites = [
         street: "700 Myles Standish Blvd",
         city: "Taunton",
         zip: "02780",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+            Accessibility:
+                "1st floor, at door drop off, wheelchair entrance, wheelchairs provided on-site, handicap accessible parking, public transportation accessible, highway access, suitable access for busses/commercial vehicles.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/taunton",
     },
     {
@@ -279,6 +420,11 @@ const sites = [
         street: "5400 Computer Dr",
         city: "Westborough",
         zip: "01581",
+        extraData: {
+            "Vaccines Offered": "Pfizer, Moderna",
+            "Site Type": "Indoor",
+            Accessibility: "Handicap Accessible, free/easy parking",
+        },
         signUpLink: "https://home.color.com/vaccine/register/northborough",
     },
     {
@@ -287,6 +433,12 @@ const sites = [
         street: "1761 Memorial Avenue",
         city: "West Springfield",
         zip: "01089",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            "Site Type": "Indoor",
+            Accessibility:
+                "Site is accessible, drop off / pick up lane provided,",
+        },
         signUpLink: "https://home.color.com/vaccine/register/westspringfield",
     },
     {
@@ -295,6 +447,10 @@ const sites = [
         street: "90 Pleasant St",
         city: "Upton",
         zip: "01568",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/southernworcester",
     },
     {
@@ -303,6 +459,10 @@ const sites = [
         street: "62 Capron St",
         city: "Uxbridge",
         zip: "01569",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
         signUpLink: "https://home.color.com/vaccine/register/southernworcester",
     },
     {
@@ -319,7 +479,24 @@ const sites = [
         street: "84 Antietam Street",
         city: "Devens",
         zip: "01434",
+        extraData: {
+            "Vaccines Offered": "Moderna",
+            Accessibility:
+                "The site is accessible and we have a wheelchair on-site.",
+        },
         signUpLink: "https://home.color.com/vaccine/register/nashoba",
+    },
+    {
+        name: "Bangs Community Center",
+        siteUrl: "Bangs Community Center",
+        street: "70 Boltwood Walk",
+        city: "Amherst",
+        zip: "01002",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://home.color.com/vaccine/register/townofamherst",
     },
 ];
 
