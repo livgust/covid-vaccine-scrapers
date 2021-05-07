@@ -313,6 +313,14 @@ const sites = [
         zip: "01757",
         signUpLink: "https://home.color.com/vaccine/register/southernworcester",
     },
+    {
+        name: "Clear Path for Veterans New England",
+        siteUrl: "Clear Path for Veterans New England",
+        street: "84 Antietam Street",
+        city: "Devens",
+        zip: "01434",
+        signUpLink: "https://home.color.com/vaccine/register/nashoba",
+    },
 ];
 
 module.exports = sites;
