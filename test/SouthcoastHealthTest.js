@@ -5,7 +5,7 @@ const {
 
 const file = require("../lib/file");
 
-describe("SouthCoastHealth :: test Fall River sample JSON", () => {
+describe.skip("SouthcoastHealth :: test availability sample JSON", () => {
     const fallRiverJson = require("./SouthcoastHealth/sampleFallRiver.json");
 
     it("the number of dates and total slots should match expectations", () => {
@@ -28,6 +28,23 @@ describe("SouthCoastHealth :: test Fall River sample JSON", () => {
             file.write(
                 `${process.cwd()}/out_FallRiver-SouthcoastHealth.json`,
                 `${JSON.stringify(fallRiverResults, null, "   ")}`
+            );
+        }
+    });
+});
+
+describe("SouthcoastHealth :: test no availability sample JSON", () => {
+    const noAvailabilityJson = require("./SouthcoastHealth/sampleNoAvailability.json");
+
+    it("the number of dates and total slots should match expectations", () => {
+        const results = parseJson(noAvailabilityJson);
+
+        expect(Object.keys(results).length).equals(0);
+
+        if (process.env.DEVELOPMENT) {
+            file.write(
+                `${process.cwd()}/out_SouthcoastHealth-no-availibility.json`,
+                `${JSON.stringify(results, null, "   ")}`
             );
         }
     });
