@@ -22,8 +22,8 @@ describe("SouthCoastHealth :: test Fall River sample JSON", () => {
             0
         );
 
-        const timeStrMatch = JSON.stringify(fallRiverJson).match(/time/g);
-        expect(totalSlots).equals(timeStrMatch.length);
+        const timeStrMatchCount = JSON.stringify(fallRiverJson).match(/time/g);
+        expect(totalSlots).equals(timeStrMatchCount.length);
 
         if (process.env.DEVELOPMENT) {
             file.write(
