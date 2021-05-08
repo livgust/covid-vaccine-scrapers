@@ -61,7 +61,7 @@ async function getAvailabilityForSite(page, site) {
 }
 
 async function fetchDataForSite(page, site) {
-    const location = site.location;
+    const location = site.city;
 
     // 2021-05-08T02:34:12.058Z
     const startDateStr = moment().toISOString();
