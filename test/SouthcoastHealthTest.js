@@ -26,7 +26,7 @@ describe("SouthCoastHealth :: test Fall River sample JSON", () => {
 
         if (process.env.DEVELOPMENT) {
             file.write(
-                `${process.cwd()}/out_FallRiver-SouthCoastHealth.json`,
+                `${process.cwd()}/out_FallRiver-SouthcoastHealth.json`,
                 `${JSON.stringify(fallRiverResults, null, "   ")}`
             );
         }
