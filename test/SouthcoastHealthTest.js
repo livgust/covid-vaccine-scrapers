@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const {
     parseJson,
-} = require("../site-scrapers/SouthcoastHealth/dataFormatter");
+} = require("../site-scrapers/SouthcoastHealth/responseParser");
 
 const file = require("../lib/file");
 

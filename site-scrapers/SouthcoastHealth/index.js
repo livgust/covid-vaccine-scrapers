@@ -1,5 +1,5 @@
 const { siteUrl, sites, entityName } = require("./config");
-const { parseJson } = require("./dataFormatter.js");
+const { parseJson } = require("./responseParser.js");
 const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments(browser) {
