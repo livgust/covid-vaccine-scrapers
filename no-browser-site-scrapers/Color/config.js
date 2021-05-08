@@ -289,22 +289,38 @@ const sites = [
         zip: "01089",
         signUpLink: "https://home.color.com/vaccine/register/westspringfield",
     },
-    // {
-    //     name: "Nipmuc Regional High School",
-    //     siteUrl: "Upton%20Nipmuc%20Regional%20High%20School",    // <--- unknown SITE URL
-    //     street: "90 Pleasant St",
-    //     city: "Upton",
-    //     zip: "01568",
-    //     signUpLink: "https://home.color.com/vaccine/register/southernworcester",
-    // },
-    // {
-    //     name: "McCloskey Middle School",
-    //     siteUrl: "McCloskey Middle School", // <--- unknown SITE URL
-    //     street: "62 Capron St",
-    //     city: "Uxbridge",
-    //     zip: "01569",
-    //     signUpLink: "https://home.color.com/vaccine/register/southernworcester",
-    // },
+    {
+        name: "Nipmuc Regional High School",
+        siteUrl: "Nipmuc School",
+        street: "90 Pleasant St",
+        city: "Upton",
+        zip: "01568",
+        signUpLink: "https://home.color.com/vaccine/register/southernworcester",
+    },
+    {
+        name: "McCloskey Middle School",
+        siteUrl: "McCloskey School",
+        street: "62 Capron St",
+        city: "Uxbridge",
+        zip: "01569",
+        signUpLink: "https://home.color.com/vaccine/register/southernworcester",
+    },
+    {
+        name: "Milford Senior Center",
+        siteUrl: "Milford Senior Center",
+        street: "60 North Bow St",
+        city: "Milford",
+        zip: "01757",
+        signUpLink: "https://home.color.com/vaccine/register/southernworcester",
+    },
+    {
+        name: "Clear Path for Veterans New England",
+        siteUrl: "Clear Path for Veterans New England",
+        street: "84 Antietam Street",
+        city: "Devens",
+        zip: "01434",
+        signUpLink: "https://home.color.com/vaccine/register/nashoba",
+    },
 ];
 
 module.exports = sites;
