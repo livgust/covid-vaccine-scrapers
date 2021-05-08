@@ -1,7 +1,7 @@
 const moment = require("moment");
 
 /**
- * Just get the length of dateToSlots keys containing non-empty object
+ * Sample data format:
     {...
         "dateToSlots": {
             "2021-05-08": {},
@@ -10,9 +10,10 @@ const moment = require("moment");
                 "e01e1f56-0029-4256-be54-a8f2a33d6011": {
                     "slots": [...]
                 }
-            }
+            }, ...
+ *
  * @param {JSON} json
- * @returns
+ * @returns if no slots -> {}; otherwise { MM-DD-YYYY: { numberAvailableAppointments: x, hasAvailability: y}, ... }
  */
 function parseJson(json) {
     const dateToSlots = json.dateToSlots;
