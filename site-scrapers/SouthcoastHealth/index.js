@@ -38,21 +38,11 @@ async function ScrapeWebsiteData(browser, sites) {
 
     await page.waitForSelector("#oas-scheduler");
 
-    // Uncomment if logging from page.evaluate(...) is needed for debugging.
-    // page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-
-    // Initialize results to no availability
     const siteData = [];
 
-    /*
-     monthCount is set in config.js; limit it to only a few months because this style
-     of Acuity Scheduling calendar is endless going forward in time. There is
-     no month chooser drop-down to grab a list of months.
-     */
     for (const site of sites) {
         const availabilityContainer = await getAvailabilityForSite(page, site);
 
-        // Add all day objects to results.availability
         siteData.push({
             ...site,
             availability: availabilityContainer,
