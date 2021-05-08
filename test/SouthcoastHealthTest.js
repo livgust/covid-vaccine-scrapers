@@ -8,8 +8,7 @@ const file = require("../lib/file");
 describe("SouthCoastHealth :: test Fall River sample JSON", () => {
     const fallRiverJson = require("./SouthcoastHealth/sampleFallRiver.json");
 
-    it("should show availability", () => {
-        //
+    it("the number of dates and total slots should match expectations", () => {
         const fallRiverResults = parseJson(fallRiverJson);
 
         expect(Object.keys(fallRiverResults).length).equals(3);
