@@ -1,5 +1,6 @@
-const moment = require("moment");
-
+/*
+    Functionality here is unit testable.
+*/
 /**
  * Sample data format:
     {...
