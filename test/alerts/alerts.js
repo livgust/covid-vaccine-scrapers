@@ -48,113 +48,121 @@ async function cleanup() {
     return;
 }
 
-afterEach(async () => {
-    sinon.restore();
-    await cleanup();
-});
-
-describe("handleIndividualAlert behavior", () => {
-    afterEach(async () => {
-        sinon.restore();
-        await cleanup();
-    });
-
-    it("does not make a new alert if an active alert exists", async () => {
-        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(true));
-        sinon
-            .stub(alerts, "massAlertAlreadySent")
-            .returns(Promise.resolve(true));
-        sinon.stub(alerts, "setInactiveAlert");
-        const setUpNewAlertStub = sinon.stub(alerts, "setUpNewAlert");
-
-        await alerts.handleIndividualAlert({
-            locationRef: "123",
-            scraperRunRef: "456",
-            bookableAppointmentsFound: 100,
-        });
-        expect(setUpNewAlertStub.notCalled).to.be.true;
-    });
-
-    it("ends an alert if 0 appointments found and there's an active alert", async () => {
-        sinon.stub(alerts, "activeAlertExists").returns(true);
-        const setInactiveAlertStub = sinon.stub(alerts, "setInactiveAlert");
-
-        await alerts.handleIndividualAlert({
-            locationRefId: "123",
-            scraperRunRefId: "456",
-            bookableAppointmentsFound: 0,
-        });
-        expect(setInactiveAlertStub.called).to.be.true;
-    });
-
-    it("starts a new alert if we see appointments and no alert is active", async () => {
-        sinon.stub(alerts, "activeAlertExists").returns(false);
-        sinon.stub(alerts, "REPEAT_ALERT_TIME").returns(0);
-        sinon.stub(alerts, "APPOINTMENT_NUMBER_THRESHOLD").returns(0);
-        sinon.stub(alerts, "runAlerts").returns(Promise.resolve());
-        sinon
-            .stub(alerts, "getLastAlertStartTime")
-            .returns(moment().subtract(1, "minute"));
-        const setUpNewAlertStub = sinon.stub(alerts, "setUpNewAlert");
-
-        await alerts.handleIndividualAlert({
-            locationRefId: "123",
-            scraperRunRefId: "456",
-            bookableAppointmentsFound: 100,
+(process.env.FAUNA_DB ? describe : describe.skip)(
+    "handleIndividualAlert behavior",
+    () => {
+        afterEach(async () => {
+            sinon.restore();
+            await cleanup();
         });
 
-        expect(setUpNewAlertStub.called).to.be.true;
-    });
+        it("does not make a new alert if an active alert exists", async () => {
+            sinon
+                .stub(alerts, "activeAlertExists")
+                .returns(Promise.resolve(true));
+            sinon
+                .stub(alerts, "massAlertAlreadySent")
+                .returns(Promise.resolve(true));
+            sinon.stub(alerts, "setInactiveAlert");
+            const setUpNewAlertStub = sinon.stub(alerts, "setUpNewAlert");
 
-    it("does nothing if no appts found and no active alert", async () => {
-        sinon.stub(alerts, "activeAlertExists").returns(false);
-        const actionStubs = [
-            sinon.stub(alerts, "setMassAlert"),
-            sinon.stub(alerts, "setInactiveAlert"),
-            sinon.stub(alerts, "setUpNewAlert"),
-        ];
-
-        await alerts.handleIndividualAlert({
-            locationRefId: "123",
-            scraperRunRefId: "456",
-            bookableAppointmentsFound: 0,
+            await alerts.handleIndividualAlert({
+                locationRef: "123",
+                scraperRunRef: "456",
+                bookableAppointmentsFound: 100,
+            });
+            expect(setUpNewAlertStub.notCalled).to.be.true;
         });
-        for (const stub of actionStubs) {
-            expect(stub.notCalled).to.be.true;
-        }
-    });
 
-    it("sends a mass alert if an active alert hasn't sent one already", async () => {
-        sinon.stub(alerts, "activeAlertExists").returns(Promise.resolve(true));
-        sinon
-            .stub(alerts, "massAlertAlreadySent")
-            .returns(Promise.resolve(false));
-        const setMassAlertStub = sinon
-            .stub(alerts, "setMassAlert")
-            .returns(Promise.resolve());
-        const runAlertsStub = sinon
-            .stub(alerts, "runAlerts")
-            .returns(Promise.resolve());
+        it("ends an alert if 0 appointments found and there's an active alert", async () => {
+            sinon.stub(alerts, "activeAlertExists").returns(true);
+            const setInactiveAlertStub = sinon.stub(alerts, "setInactiveAlert");
 
-        await alerts.handleIndividualAlert({
-            locationRefId: "123",
-            scraperRunRefId: "456",
-            bookableAppointmentsFound: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+            await alerts.handleIndividualAlert({
+                locationRefId: "123",
+                scraperRunRefId: "456",
+                bookableAppointmentsFound: 0,
+            });
+            expect(setInactiveAlertStub.called).to.be.true;
         });
-        expect(setMassAlertStub.lastCall?.args).to.deep.equal(["123", "456"]);
-        const [
-            one,
-            two,
-            three,
-            four,
-            sendMassAlert,
-            sendRegularAlert,
-        ] = runAlertsStub.lastCall?.args;
-        expect([sendMassAlert, sendRegularAlert]).to.deep.equal([true, false]);
-    });
-});
 
-describe("setUpNewAlert", () => {
+        it("starts a new alert if we see appointments and no alert is active", async () => {
+            sinon.stub(alerts, "activeAlertExists").returns(false);
+            sinon.stub(alerts, "REPEAT_ALERT_TIME").returns(0);
+            sinon.stub(alerts, "APPOINTMENT_NUMBER_THRESHOLD").returns(0);
+            sinon.stub(alerts, "runAlerts").returns(Promise.resolve());
+            sinon
+                .stub(alerts, "getLastAlertStartTime")
+                .returns(moment().subtract(1, "minute"));
+            const setUpNewAlertStub = sinon.stub(alerts, "setUpNewAlert");
+
+            await alerts.handleIndividualAlert({
+                locationRefId: "123",
+                scraperRunRefId: "456",
+                bookableAppointmentsFound: 100,
+            });
+
+            expect(setUpNewAlertStub.called).to.be.true;
+        });
+
+        it("does nothing if no appts found and no active alert", async () => {
+            sinon.stub(alerts, "activeAlertExists").returns(false);
+            const actionStubs = [
+                sinon.stub(alerts, "setMassAlert"),
+                sinon.stub(alerts, "setInactiveAlert"),
+                sinon.stub(alerts, "setUpNewAlert"),
+            ];
+
+            await alerts.handleIndividualAlert({
+                locationRefId: "123",
+                scraperRunRefId: "456",
+                bookableAppointmentsFound: 0,
+            });
+            for (const stub of actionStubs) {
+                expect(stub.notCalled).to.be.true;
+            }
+        });
+
+        it("sends a mass alert if an active alert hasn't sent one already", async () => {
+            sinon
+                .stub(alerts, "activeAlertExists")
+                .returns(Promise.resolve(true));
+            sinon
+                .stub(alerts, "massAlertAlreadySent")
+                .returns(Promise.resolve(false));
+            const setMassAlertStub = sinon
+                .stub(alerts, "setMassAlert")
+                .returns(Promise.resolve());
+            const runAlertsStub = sinon
+                .stub(alerts, "runAlerts")
+                .returns(Promise.resolve());
+
+            await alerts.handleIndividualAlert({
+                locationRefId: "123",
+                scraperRunRefId: "456",
+                bookableAppointmentsFound: alerts.APPOINTMENT_NUMBER_THRESHOLD(),
+            });
+            expect(setMassAlertStub.lastCall?.args).to.deep.equal([
+                "123",
+                "456",
+            ]);
+            const [
+                one,
+                two,
+                three,
+                four,
+                sendMassAlert,
+                sendRegularAlert,
+            ] = runAlertsStub.lastCall?.args;
+            expect([sendMassAlert, sendRegularAlert]).to.deep.equal([
+                true,
+                false,
+            ]);
+        });
+    }
+);
+
+(process.env.FAUNA_DB ? describe : describe.skip)("setUpNewAlert", () => {
     it("creates a new alert", async () => {
         const locationRefId = await createTestLocation();
         const scraperRunRefId = await createTestScraperRun(locationRefId);
@@ -179,7 +187,7 @@ describe("setUpNewAlert", () => {
     });
 });
 
-describe("getActiveAlertRefId", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("getActiveAlertRefId", () => {
     it("retrieves the active alert for a given location when it exists", async () => {
         const locationRefId = await createTestLocation();
         const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
@@ -191,7 +199,7 @@ describe("getActiveAlertRefId", () => {
     });
 });
 
-describe("activeAlertExists", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("activeAlertExists", () => {
     it("returns false if no alert is active", async () => {
         const nonExistentId = await dbUtils.generateId();
 
@@ -209,7 +217,7 @@ describe("activeAlertExists", () => {
     });
 });
 
-describe("setInactiveAlert", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("setInactiveAlert", () => {
     it("throws error if no alert is active", async () => {
         const nonExistentId = await dbUtils.generateId();
         let error;
@@ -246,34 +254,39 @@ describe("setInactiveAlert", () => {
     });
 });
 
-describe("getLastAlertStartTime", () => {
-    it("returns something more than a day old if there is no alert", async () => {
-        expect(
-            (
-                await alerts.getLastAlertStartTime(await dbUtils.generateId())
-            ).valueOf()
-        ).to.be.lessThan(moment().subtract(1, "day").valueOf());
-    });
+(process.env.FAUNA_DB ? describe : describe.skip)(
+    "getLastAlertStartTime",
+    () => {
+        it("returns something more than a day old if there is no alert", async () => {
+            expect(
+                (
+                    await alerts.getLastAlertStartTime(
+                        await dbUtils.generateId()
+                    )
+                ).valueOf()
+            ).to.be.lessThan(moment().subtract(1, "day").valueOf());
+        });
 
-    it("returns the latest timestamp if it exists", async () => {
-        const locationRefId = await createTestLocation();
-        const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
+        it("returns the latest timestamp if it exists", async () => {
+            const locationRefId = await createTestLocation();
+            const alertId = await alerts.setUpNewAlert(locationRefId, "12345");
 
-        const expectedTimestamp = await dbUtils
-            .retrieveItemByRefId("appointmentAlerts", alertId)
-            .then((res) => res.data.startTime.value);
+            const expectedTimestamp = await dbUtils
+                .retrieveItemByRefId("appointmentAlerts", alertId)
+                .then((res) => res.data.startTime.value);
 
-        await expect(
-            alerts
-                .getLastAlertStartTime(locationRefId)
-                .then((ts) => ts.format())
-        ).to.eventually.equal(moment(expectedTimestamp).format());
+            await expect(
+                alerts
+                    .getLastAlertStartTime(locationRefId)
+                    .then((ts) => ts.format())
+            ).to.eventually.equal(moment(expectedTimestamp).format());
 
-        await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
-    });
-});
+            await dbUtils.deleteItemByRefId("appointmentAlerts", alertId);
+        });
+    }
+);
 
-describe("mergeData", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("mergeData", () => {
     it("links locations with scraperRuns", () => {
         expect(
             alerts.mergeData({
@@ -352,38 +365,41 @@ describe("mergeData", () => {
     });
 });
 
-describe("aggregateAvailability", () => {
-    it("returns generic availability if we have one entry with no listed appts available", () => {
-        expect(
-            alerts.aggregateAvailability([
-                { data: { availabilityWithNoNumbers: true } },
-            ])
-        ).to.deep.equal({
-            bookableAppointmentsFound: 0,
-            availabilityWithNoNumbers: true,
+(process.env.FAUNA_DB ? describe : describe.skip)(
+    "aggregateAvailability",
+    () => {
+        it("returns generic availability if we have one entry with no listed appts available", () => {
+            expect(
+                alerts.aggregateAvailability([
+                    { data: { availabilityWithNoNumbers: true } },
+                ])
+            ).to.deep.equal({
+                bookableAppointmentsFound: 0,
+                availabilityWithNoNumbers: true,
+            });
         });
-    });
-    it("returns no availability if no appointments are present", () => {
-        expect(alerts.aggregateAvailability([])).to.deep.equal({
-            bookableAppointmentsFound: 0,
-            availabilityWithNoNumbers: false,
+        it("returns no availability if no appointments are present", () => {
+            expect(alerts.aggregateAvailability([])).to.deep.equal({
+                bookableAppointmentsFound: 0,
+                availabilityWithNoNumbers: false,
+            });
         });
-    });
-    it("accumulates availability otherwise", () => {
-        expect(
-            alerts.aggregateAvailability([
-                { data: { numberAvailable: 1 } },
-                { data: { numberAvailable: 9 } },
-                { data: { numberAvailable: 3 } },
-            ])
-        ).to.deep.equal({
-            bookableAppointmentsFound: 13,
-            availabilityWithNoNumbers: false,
+        it("accumulates availability otherwise", () => {
+            expect(
+                alerts.aggregateAvailability([
+                    { data: { numberAvailable: 1 } },
+                    { data: { numberAvailable: 9 } },
+                    { data: { numberAvailable: 3 } },
+                ])
+            ).to.deep.equal({
+                bookableAppointmentsFound: 13,
+                availabilityWithNoNumbers: false,
+            });
         });
-    });
-});
+    }
+);
 
-describe("handleGroupAlerts", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("handleGroupAlerts", () => {
     afterEach(async () => {
         sinon.restore();
         await cleanup();
@@ -394,7 +410,10 @@ describe("handleGroupAlerts", () => {
             .stub(alerts, "setUpNewAlert")
             .returns(Promise.resolve());
         await alerts.handleGroupAlerts({
-            parentLocation: { ref: { id: "123" }, data: { isChain: false } },
+            parentLocation: {
+                ref: { id: "123" },
+                data: { isChain: false },
+            },
             parentScraperRunRefId: "doesntmatter",
             locations: [],
         });
