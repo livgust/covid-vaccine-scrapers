@@ -6,7 +6,7 @@ const expect = chai.expect;
 const moment = require("moment");
 const { faunaQuery } = require("../../lib/db/utils");
 
-describe("getSubscription", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("getSubscription", () => {
     it("errors if you send both phone and email", async () => {
         let e;
         try {
@@ -20,7 +20,7 @@ describe("getSubscription", () => {
         expect(e).to.be.instanceOf(Error);
     });
 });
-describe("addSubscription", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("addSubscription", () => {
     it("sets and retrieves a phone number subscription", async () => {
         sinon
             .stub(pinpointWorkflow, "validateNumberAndAddSubscriber")
@@ -58,27 +58,30 @@ describe("addSubscription", () => {
     });
 });
 
-describe("activateSubscripition", () => {
-    it("sets active to true", async () => {
-        await signUp.addOrUpdateSubscription({
-            email: "test@example.com",
-            zip: "12345",
-            radius: 100,
+(process.env.FAUNA_DB ? describe : describe.skip)(
+    "activateSubscripition",
+    () => {
+        it("sets active to true", async () => {
+            await signUp.addOrUpdateSubscription({
+                email: "test@example.com",
+                zip: "12345",
+                radius: 100,
+            });
+            await signUp.activateSubscription({ email: "test@example.com" });
+            expect(
+                await signUp.getSubscription({ email: "test@example.com" })
+            ).to.deep.equal({
+                email: "test@example.com",
+                zip: "12345",
+                radius: 100,
+                active: true,
+                cancelled: false,
+            });
         });
-        await signUp.activateSubscription({ email: "test@example.com" });
-        expect(
-            await signUp.getSubscription({ email: "test@example.com" })
-        ).to.deep.equal({
-            email: "test@example.com",
-            zip: "12345",
-            radius: 100,
-            active: true,
-            cancelled: false,
-        });
-    });
-});
+    }
+);
 
-describe("cancelSubscripition", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("cancelSubscripition", () => {
     it("sets cancelled to true", async () => {
         await signUp.addOrUpdateSubscription({
             email: "test@example.com",
