@@ -4,7 +4,7 @@ chai.use(require("chai-shallow-deep-equal"));
 chai.use(require("deep-equal-in-any-order"));
 const expect = chai.expect;
 
-describe("FaunaDB Utils", function () {
+(process.env.FAUNA_DB ? describe : describe.skip)("FaunaDB Utils", function () {
     const dbUtils = require("../../lib/db/utils");
     const scraperTransactions = require("../../lib/db/scraper_data");
     it("can create, retrieve, and delete docs from Locations collection (once doc at a time)", async () => {

@@ -27,24 +27,27 @@ afterEach(() => {
     sinon.restore();
 });
 
-describe("findSubscribersWithZips", () => {
-    it("finds a recipient with a given zip", async () => {
-        await addSubscription();
-        expect(
-            await determineRecipients.findSubscribersWithZips(["01880"])
-        ).to.include.deep.members([
-            {
-                phoneNumber: "8578675309",
-                zip: "01880",
-                radius: 10,
-                active: true,
-                cancelled: false,
-            },
-        ]);
-    });
-});
+(process.env.FAUNA_DB ? describe : describe.skip)(
+    "findSubscribersWithZips",
+    () => {
+        it("finds a recipient with a given zip", async () => {
+            await addSubscription();
+            expect(
+                await determineRecipients.findSubscribersWithZips(["01880"])
+            ).to.include.deep.members([
+                {
+                    phoneNumber: "8578675309",
+                    zip: "01880",
+                    radius: 10,
+                    active: true,
+                    cancelled: false,
+                },
+            ]);
+        });
+    }
+);
 
-describe("determineRecipients", () => {
+(process.env.FAUNA_DB ? describe : describe.skip)("determineRecipients", () => {
     afterEach(() => {
         sinon.restore();
     });
