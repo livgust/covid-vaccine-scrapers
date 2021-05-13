@@ -20,7 +20,8 @@ const sites = [
         city: "Foxborough",
         zip: "02035",
         extraData: {
-            "Vaccines Offered": "Moderna",
+            "Vaccines Offered":
+                "Moderna. Beginning May 18: J&J for 1st shots; Moderna for 2nd shots.",
             "Site Type": "Indoor",
             Accessibility:
                 "American Sign Language (ASL) interpretation is provided via two ways: (1) Video Remote Interpreting (VRI). There are tablets available for VRI. (2) An on-site ASL interpreter is on Saturdays at Gillette. Foreign language interpretation is provided via Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance. Only individuals with an appointment may be vaccinated.",
@@ -34,7 +35,8 @@ const sites = [
         city: "Foxborough",
         zip: "02035",
         extraData: {
-            "Vaccines Offered": "Moderna",
+            "Vaccines Offered":
+                "Moderna. Beginning May 18: J&J for 1st shots; Moderna for 2nd shots.",
             "Site Type": "Indoor",
             Accessibility:
                 "American Sign Language (ASL) interpretation is provided via two ways: (1) Video Remote Interpreting (VRI). There are tablets available for VRI. (2) An on-site ASL interpreter is on Saturdays at Gillette. Foreign language interpretation is provided via Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance. Only individuals with an appointment may be vaccinated.",
