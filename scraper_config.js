@@ -7,6 +7,7 @@ const scrapersToSkip = [
     "ReverePopup",
     "SouthLawrence",
     "TrinityEMS",
+    "Walgreens",
     "Wegmans",
 ];
 
