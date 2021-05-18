@@ -16,7 +16,7 @@ const sites = [
             zip: "02557",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: {
             departmentID: "10110010104",
@@ -31,7 +31,7 @@ const sites = [
             zip: "02554",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: {
             departmentID: "10120040001",
@@ -46,7 +46,7 @@ const sites = [
             zip: "02130",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10030030022", providerId: "501309" },
     },
@@ -58,7 +58,7 @@ const sites = [
             zip: "02115",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10030011259", providerId: "501298" },
     },
@@ -70,7 +70,7 @@ const sites = [
             zip: "01060",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10150060027", providerId: "401795" },
     },
@@ -83,7 +83,7 @@ const sites = [
             zip: "02145",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10022740003", providerId: "401800" },
     },
@@ -95,7 +95,7 @@ const sites = [
             zip: "02150",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10020030085", providerId: "401810" },
     },
@@ -107,7 +107,7 @@ const sites = [
             zip: "02151",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10020050058", providerId: "401811" },
     },
@@ -119,7 +119,7 @@ const sites = [
             zip: "02494",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10010690001", providerId: "300354" },
     },
@@ -131,7 +131,7 @@ const sites = [
             zip: "01904",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: { departmentID: "10050240001", providerId: "701233" },
     },
@@ -143,7 +143,7 @@ const sites = [
             zip: "01830",
             extraData:
                 "Online signup is limited to the first dose of the Pfizer or Moderna vaccine",
-            website: "https://covidvaccine.massgeneralbrigham.org",
+            signUpLink: "https://covidvaccine.massgeneralbrigham.org",
         },
         private: {
             departmentID: "10180090005",
