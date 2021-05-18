@@ -42,8 +42,8 @@ module.exports = async function GetAvailableAppointments() {
 
             const retval = {
                 name: storeName,
-                city: city,
                 street: street,
+                city: city,
                 state: state,
                 zip: zip,
                 hasAvailability: location.availability === "yes",
