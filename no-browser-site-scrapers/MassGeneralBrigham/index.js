@@ -4,17 +4,18 @@ const moment = require("moment");
 
 module.exports = async function GetAvailableAppointments() {
     console.log(`${entityName} starting.`);
-    const webData = await ScrapeWebsiteData();
+    const webData = await ScrapeWebsiteData(sites);
     console.log(`${entityName} done.`);
     const results = [];
     const timestamp = moment().format();
 
     for (const site of sites) {
         results.push({
-            ...webData[site.private.departmentID],
             ...site.public,
+            ...webData[site.private.departmentID],
         });
     }
+
     return {
         parentLocationName: `${entityName}`,
         isChain: true,
@@ -23,7 +24,7 @@ module.exports = async function GetAvailableAppointments() {
     };
 };
 
-async function ScrapeWebsiteData() {
+async function ScrapeWebsiteData(sites) {
     const providerIDs = sites.flatMap((item) => item.private.providerId);
     const departmentIDs = sites.flatMap((item) => item.private.departmentID);
 
