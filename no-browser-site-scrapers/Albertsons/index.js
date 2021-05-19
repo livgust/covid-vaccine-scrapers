@@ -21,23 +21,33 @@ module.exports = async function GetAvailableAppointments() {
         isChain: true,
         timestamp: moment().format(),
         individualLocationData: massLocations.map((location) => {
-            // Raw address is like: (Star Market 4587 - 45 William T Morrissey Blvd, Dorchester, MA, 02125)
+            // Raw address is like: (Star Market 4587 - Pfizer and Moderna Availability||45 William T Morrissey Blvd, Dorchester, MA, 02125)
             // The format seems to be very consistent nationally, not to mention locally in MA. So we
             // pull the specific parts out of the string.
             const rawAddress = location.address;
             const trimmedAddress = rawAddress.replace(/^\(|\)$/, ""); // Trim parens
-            const [name, longAddress] = trimmedAddress.split(" - ");
+            let [name, addressRest] = trimmedAddress.split(" - ");
+            let [vaccine, longAddress] = addressRest.split("||");
+            if (addressRest.indexOf("||") === -1) {
+                longAddress = vaccine;
+                vaccine = undefined;
+            }
             const [street, city, state, zip] = longAddress.split(", ");
             const storeName = name.match(/([^\d]*) /g)[0].trim();
             // const storeNumber = name.substring(storeName.length).trim();
 
+            const extraData = vaccine
+                ? { extraData: { "Vaccinations offered": vaccine } }
+                : undefined;
+
             const retval = {
                 name: storeName,
-                city: city,
                 street: street,
+                city: city,
                 state: state,
                 zip: zip,
                 hasAvailability: location.availability === "yes",
+                ...extraData,
                 signUpLink: location.coach_url,
                 latitude: location.lat,
                 longitude: location.long,
