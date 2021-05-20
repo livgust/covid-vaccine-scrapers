@@ -60,7 +60,7 @@ function md5HashString(string) {
 async function ScrapeWebsiteData() {
     const rawData = {};
     for (const zip of site.zips) {
-        const url = [site.websiteRoot, zip].join("/") + "?state=MA";
+        const url = [site.websiteRoot, zip].join("/") + "?state=MA&userAge=21";
         const getUrl = new Promise((resolve) => {
             let response = "";
             https.get(url, { rejectUnauthorized: false }, (res) => {
