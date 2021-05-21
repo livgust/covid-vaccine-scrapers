@@ -6,7 +6,7 @@ const moment = require("moment");
 const DEBUG = false;
 
 // Total days to search in the schedule.
-const DAYSTOSEARCH = 16;
+const DAYSTOSEARCH = 7;
 
 module.exports = async function GetAvailableAppointments() {
     console.log("Pediatric Associates of Greater Salem starting.");

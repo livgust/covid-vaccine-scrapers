@@ -3,7 +3,6 @@ const scrapersToSkip = [
     "Atrius",
     "FamilyPracticeGroup",
     "LowellGeneral",
-    "PediatricAssociatesOfGreaterSalem",
     "ReverePopup",
     "SouthLawrence",
     "TrinityEMS",
