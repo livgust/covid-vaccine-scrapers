@@ -8,16 +8,24 @@ const DEBUG = false;
 // Total days to search in the schedule.
 const DAYSTOSEARCH = 7;
 
+const searchAvailabilityDatesQuery = `query SearchAvailabilityDates($locationIds: [String!], $practitionerIds: [String!], $specialty: String, $serviceTypeTokens: [String!]!, $startAfter: String!, $startBefore: String!, $visitType: VisitType) {
+    searchAvailabilityDates(locationIds: $locationIds, practitionerIds: $practitionerIds, specialty: $specialty, serviceTypeTokens: $serviceTypeTokens, startAfter: $startAfter, startBefore: $startBefore, visitType: $visitType) {
+        date
+        availability
+        __typename
+    }}`;
+
 module.exports = async function GetAvailableAppointments() {
     console.log("Pediatric Associates of Greater Salem starting.");
     try {
         return {
-            parentLocationName: "Pediatric Associates of Greater Salem",
+            parentLocationName:
+                "Pediatric Associates of Greater Salem and Beverly",
             timestamp: moment().format(),
             individualLocationData: await DoGetAvailableAppointments(),
         };
     } finally {
-        console.log("Pediatric Associates of Greater Salem done.");
+        console.log("Pediatric Associates of Greater Salem and Beverly done.");
     }
 };
 
@@ -72,7 +80,11 @@ async function QuerySchedule(
     );
     Debug("responseData", responseData);
 
-    return ParseAvailabilityDates(responseData.data.searchAvailabilityDates);
+    return {
+        availability: {},
+        hasAvailability:
+            Object.keys(responseData?.data?.searchAvailabilityDates).length > 0,
+    };
 }
 
 function Debug(...args) {
@@ -116,10 +128,17 @@ async function SearchAvailabilityDates(
             startAfter: Today(),
             startBefore: DaysLater(days - 1),
         },
-        query: SearchAvailabilityDatesQuery(),
+        query: searchAvailabilityDatesQuery,
     });
 
-    const options = {
+    const options = getOptions(bearerToken, postData, schedulingToken);
+
+    const responseData = await fetchAvailabilityDates(url, postData, options);
+    return JSON.parse(responseData);
+}
+
+function getOptions(bearerToken, postData, schedulingToken) {
+    return {
         method: "POST",
         headers: {
             authorization: `Bearer ${bearerToken}`,
@@ -128,9 +147,6 @@ async function SearchAvailabilityDates(
             "x-scheduling-jwt": schedulingToken,
         },
     };
-
-    const responseData = await Post(url, postData, options);
-    return JSON.parse(responseData);
 }
 
 function Today() {
@@ -143,16 +159,7 @@ function DaysLater(days) {
     return moment().add(days, "days").endOf("day").format();
 }
 
-function SearchAvailabilityDatesQuery() {
-    return `query SearchAvailabilityDates($locationIds: [String!], $practitionerIds: [String!], $specialty: String, $serviceTypeTokens: [String!]!, $startAfter: String!, $startBefore: String!, $visitType: VisitType) {
-        searchAvailabilityDates(locationIds: $locationIds, practitionerIds: $practitionerIds, specialty: $specialty, serviceTypeTokens: $serviceTypeTokens, startAfter: $startAfter, startBefore: $startBefore, visitType: $visitType) {
-            date
-            availability
-            __typename
-        }}`;
-}
-
-function Post(url, postData, options) {
+function fetchAvailabilityDates(url, postData, options) {
     return new Promise((resolve) => {
         const req = https.request(url, options, (res) => {
             let body = "";
@@ -176,26 +183,4 @@ function Post(url, postData, options) {
         });
         req.end();
     });
-}
-
-function ParseAvailabilityDates(availabilityDates) {
-    // Expected response like
-    // [
-    //     {"date":"2021-02-26","availability":false,"__typename":"Availability"},
-    //     ...
-    // ]
-    const availability = {};
-    let hasAvailability = false;
-    availabilityDates.forEach((availabilityDate) => {
-        if (availabilityDate.availability) {
-            availability[ReformatDate(availabilityDate.date)] = true;
-            hasAvailability = true;
-        }
-    });
-
-    return { availability: availability, hasAvailability: hasAvailability };
-}
-
-function ReformatDate(dateString) {
-    return moment(dateString).format("YYYY/MM/DD");
 }
