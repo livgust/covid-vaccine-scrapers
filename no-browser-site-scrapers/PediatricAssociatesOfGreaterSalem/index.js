@@ -83,6 +83,7 @@ async function QuerySchedule(
     return {
         availability: {},
         hasAvailability:
+            responseData?.data?.searchAvailabilityDates &&
             Object.keys(responseData?.data?.searchAvailabilityDates).length > 0,
     };
 }
