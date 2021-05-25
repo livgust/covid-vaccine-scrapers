@@ -20,8 +20,7 @@ const sites = [
         city: "Foxborough",
         zip: "02035",
         extraData: {
-            "Vaccines Offered":
-                "Moderna. Beginning May 18: J&J for 1st shots; Moderna for 2nd shots.",
+            "Vaccines Offered": "J&J for 1st shots; Moderna for 2nd shots.",
             "Site Type": "Indoor",
             Accessibility:
                 "American Sign Language (ASL) interpretation is provided via two ways: (1) Video Remote Interpreting (VRI). There are tablets available for VRI. (2) An on-site ASL interpreter is on Saturdays at Gillette. Foreign language interpretation is provided via Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance. Only individuals with an appointment may be vaccinated.",
@@ -35,8 +34,7 @@ const sites = [
         city: "Foxborough",
         zip: "02035",
         extraData: {
-            "Vaccines Offered":
-                "Moderna. Beginning May 18: J&J for 1st shots; Moderna for 2nd shots.",
+            "Vaccines Offered": "J&J for 1st shots; Moderna for 2nd shots.",
             "Site Type": "Indoor",
             Accessibility:
                 "American Sign Language (ASL) interpretation is provided via two ways: (1) Video Remote Interpreting (VRI). There are tablets available for VRI. (2) An on-site ASL interpreter is on Saturdays at Gillette. Foreign language interpretation is provided via Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance. Only individuals with an appointment may be vaccinated.",
@@ -50,7 +48,8 @@ const sites = [
         city: "Roxbury",
         zip: "02120",
         extraData: {
-            "Vaccines Offered": "Pfizer",
+            "Vaccines Offered":
+                "Pfizer. Beginning June 7, J&J for 1st shots; Pfizer for 2nd shots.",
             "Walk-ins": "Accepted 7 days a week",
             Accessibility:
                 "American Sign Language (ASL) interpretation is provided via Video Remote Interpreting (VRI). There are tablets available for VRI. Foreign language interpretation is provided via two ways: (1) Remote Interpreting Visual Language Support Line. There are tablets available for remote interpreting. (2) On-site interpreters speaking Spanish, Mandarin Chinese, and Haitian-Creole are available all days. There are wheelchairs available (standard and large) upon arrival for anyone who needs a wheelchair and includes a wheelchair escort. Service animals are welcome. You may bring one companion if you require special assistance.",
@@ -65,7 +64,8 @@ const sites = [
         city: "Boston",
         zip: "02115",
         extraData: {
-            "Vaccines Offered": "Pfizer",
+            "Vaccines Offered":
+                "Pfizer. Beginning June 2, J&J for 1st shots; Pfizer for 2nd shots.",
             "Walk-ins": "Accepted 7 days a week",
             Accessibility:
                 "Accessible to those in wheelchairs or with mobility impairments. We use interpreter iPads for ASL and foreign language interpretation during vaccine appointments." +
