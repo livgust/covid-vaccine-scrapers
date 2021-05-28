@@ -145,6 +145,32 @@ const sites = [
         signUpLink: "https://www.cic-health.com/fallriver/niagara",
     },
     {
+        name: "Kennedy Park",
+        siteUrl: "Fall%20River",
+        calendarUrl: "cfabc51b-6fc1-4a48-9684-7d337cef656f",
+        street: "S Main St",
+        city: "Fall River",
+        zip: "02724",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://www.cic-health.com/fallriver/kennedy",
+    },
+    {
+        name: "Lafayette Park",
+        siteUrl: "Fall%20River",
+        calendarUrl: "0a25b147-b917-46c7-b3fe-843f599554ec",
+        street: "Eastern Avenue",
+        city: "Fall River",
+        zip: "02724",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://www.cic-health.com/fallriver/lafayette",
+    },
+    {
         name: "Rumney Marsh Academy",
         siteUrl: "Revere",
         calendarUrl: "7f6e2ddb-08b1-4471-8e15-8ef27897e1ed",
@@ -234,6 +260,33 @@ const sites = [
             "Site Type": "Indoor",
         },
         signUpLink: "https://www.cic-health.com/boston/veronica",
+    },
+    {
+        name: "Museum Of Science",
+        siteUrl: "The Museum of Science - Boston",
+        street: "1 Museum of Science Dr",
+        city: "Boston",
+        zip: "02114",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+            Incentive:
+                "There will be no cost for parking for those attending the clinic and each person vaccinated will receive two free Museum Exhibit Hall passes good for a return visit!",
+        },
+        signUpLink: "https://www.cic-health.com/mos",
+    },
+    {
+        name: "Bunker Hill Community College",
+        calendarUrl: "94f0e880-f115-4150-94df-751c6da2c65d",
+        siteUrl: "Boston",
+        street: "250 New Rutherford Ave",
+        city: "Boston",
+        zip: "02129",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://www.cic-health.com/boston/bunkerhillcc",
     },
     {
         name: "Tufts University",
