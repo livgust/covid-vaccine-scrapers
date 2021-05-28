@@ -236,6 +236,33 @@ const sites = [
         signUpLink: "https://www.cic-health.com/boston/veronica",
     },
     {
+        name: "Museum Of Science",
+        siteUrl: "The Museum of Science - Boston",
+        street: "1 Museum of Science Dr",
+        city: "Boston",
+        zip: "02114",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+            Incentive:
+                "There will be no cost for parking for those attending the clinic and each person vaccinated will receive two free Museum Exhibit Hall passes good for a return visit!",
+        },
+        signUpLink: "https://www.cic-health.com/mos",
+    },
+    {
+        name: "Bunker Hill Community College",
+        calendarUrl: "94f0e880-f115-4150-94df-751c6da2c65d",
+        siteUrl: "Boston",
+        street: "250 New Rutherford Ave",
+        city: "Boston",
+        zip: "02129",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://www.cic-health.com/boston/bunkerhillcc",
+    },
+    {
         name: "Tufts University",
         siteUrl: "Tufts%20University",
         street: "161 College Ave",
