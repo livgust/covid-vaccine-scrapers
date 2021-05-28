@@ -145,6 +145,32 @@ const sites = [
         signUpLink: "https://www.cic-health.com/fallriver/niagara",
     },
     {
+        name: "Kennedy Park",
+        siteUrl: "Fall%20River",
+        calendarUrl: "cfabc51b-6fc1-4a48-9684-7d337cef656f",
+        street: "S Main St",
+        city: "Fall River",
+        zip: "02724",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://www.cic-health.com/fallriver/kennedy",
+    },
+    {
+        name: "Lafayette Park",
+        siteUrl: "Fall%20River",
+        calendarUrl: "0a25b147-b917-46c7-b3fe-843f599554ec",
+        street: "Eastern Avenue",
+        city: "Fall River",
+        zip: "02724",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://www.cic-health.com/fallriver/lafayette",
+    },
+    {
         name: "Rumney Marsh Academy",
         siteUrl: "Revere",
         calendarUrl: "7f6e2ddb-08b1-4471-8e15-8ef27897e1ed",
