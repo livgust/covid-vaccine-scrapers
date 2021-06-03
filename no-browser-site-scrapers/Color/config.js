@@ -565,6 +565,81 @@ const sites = [
         },
         signUpLink: "https://home.color.com/vaccine/register/salem",
     },
+    {
+        name: "Market Basket",
+        siteUrl: "Market Basket",
+        calendarUrl: "e5501449-9338-4c17-94aa-b92be176afd2",
+        street: "700 Essex St",
+        city: "Lawrence",
+        zip: "01841",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Outdoor",
+            Incentive:
+                "$25 Gift Cards to Market Basket will be provided during your first appointment.",
+        },
+        signUpLink: "https://www.cic-health.com/marketbasket",
+    },
+    {
+        name: "Market Basket",
+        siteUrl: "Market Basket",
+        calendarUrl: "b3684ee2-2dc5-42e6-91a1-e9ffa331cd25",
+        street: "40 Federal St",
+        city: "Lynn",
+        zip: "01905",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Outdoor",
+            Incentive:
+                "$25 Gift Cards to Market Basket will be provided during your first appointment.",
+        },
+        signUpLink: "https://www.cic-health.com/marketbasket",
+    },
+    {
+        name: "Market Basket",
+        siteUrl: "Market Basket",
+        calendarUrl: "a7ca137a-e4be-4dcd-ba36-46ecbdd206a6",
+        street: "275 Squire Rd",
+        city: "Revere",
+        zip: "02151 ",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Outdoor",
+            Incentive:
+                "$25 Gift Cards to Market Basket will be provided during your first appointment.",
+        },
+        signUpLink: "https://www.cic-health.com/marketbasket",
+    },
+    {
+        name: "Market Basket",
+        siteUrl: "Market Basket",
+        calendarUrl: "a8616e43-1b28-44b4-81d5-7771a9b2537b",
+        street: "170 Everett Ave",
+        city: "Chelsea",
+        zip: "02150",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Outdoor",
+            Incentive:
+                "$25 Gift Cards to Market Basket will be provided during your first appointment.",
+        },
+        signUpLink: "https://www.cic-health.com/marketbasket",
+    },
+    {
+        name: "Market Basket",
+        siteUrl: "Market Basket",
+        calendarUrl: "14458260-f5ff-4d7c-a032-4ef8c6873a0f",
+        street: "600 William S Canning Blvd",
+        city: "Fall River",
+        zip: "02721",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Outdoor",
+            Incentive:
+                "$25 Gift Cards to Market Basket will be provided during your first appointment.",
+        },
+        signUpLink: "https://www.cic-health.com/marketbasket",
+    },
 ];
 
 module.exports = sites;
