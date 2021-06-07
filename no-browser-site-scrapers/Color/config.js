@@ -566,6 +566,18 @@ const sites = [
         signUpLink: "https://home.color.com/vaccine/register/salem",
     },
     {
+        name: "St. Michael the Archangel Gymnasium",
+        siteUrl: "Winthrop Middle School",
+        street: "320 Lincoln Street",
+        city: "Winthrop",
+        zip: "02152",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+        },
+        signUpLink: "https://home.color.com/vaccine/register/winthrop",
+    },
+    {
         name: "Market Basket",
         siteUrl: "Market Basket",
         calendarUrl: "e5501449-9338-4c17-94aa-b92be176afd2",
