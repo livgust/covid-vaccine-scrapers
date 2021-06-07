@@ -54,7 +54,7 @@ async function ScrapeWebsiteData(browser) {
                 //each p has label: information
                 //TODO: add "special instructions" inside div.w-6/12
                 //UPDATE: ignoring "special instructions" since they all just say to get the same brand vaccine for both doses
-                const rawDataElements = await entry.$$("p:not(.my-3)");
+                const rawDataElements = await entry.$$("h2,p:not(.my-3)");
                 const rawData = [];
                 for (const element of rawDataElements) {
                     const text = await element.evaluate(
