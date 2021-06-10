@@ -718,6 +718,22 @@ const sites = [
         zip: "01966",
         signUpLink: "https://home.color.com/vaccine/register/capeann",
     },
+    {
+        name: "Kingston Collection",
+        siteUrl: "Kingston Collection",
+        street: "101 Kingston Collection Way",
+        city: "Kingston",
+        zip: "02364",
+        extraData: {
+            "Vaccines Offered": "Pfizer, Moderna",
+            "Site Type": "Indoor",
+            Directions:
+                "Park in the rear of the mall between Pinz and Target to access the clinic entrance.",
+            Accessibility:
+                "Accessible entrance, Wheelchair entrance, Accessible parking, Accessible drop off & pick up.",
+        },
+        signUpLink: "https://home.color.com/vaccine/register/kingstonplymouth",
+    },
 ];
 
 module.exports = sites;
