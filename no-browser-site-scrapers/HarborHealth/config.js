@@ -3,8 +3,8 @@ const sites = [
         siteId: "3210339",
         vt: "1089",
         dept: "222004005",
-        name: "Barnstable Adult Community Center",
-        street: "825 Falmouth Road",
+        name: "Zion Union Church",
+        street: "805 Attucks Lane",
         city: "Hyannis",
         zip: "02601",
         signUpLink: "https://bit.ly/HHTHVax",
@@ -18,6 +18,16 @@ const sites = [
         city: "Dorchester",
         zip: "02124",
         signUpLink: "https://bit.ly/HHTFVax",
+    },
+    {
+        siteId: "3210243",
+        vt: "1089",
+        dept: "222003005",
+        name: "Quincy College",
+        street: "36 Cordage Park Circle",
+        city: "Plymouth",
+        zip: "02360",
+        signUpLink: "https://bit.ly/HHTPVax",
     },
 ];
 

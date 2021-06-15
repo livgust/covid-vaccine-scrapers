@@ -31,7 +31,7 @@ async function ScrapeWebsiteData(siteId, vt, dept) {
         cookie,
         verificationToken,
     ] = await mychart.GetCookieAndVerificationToken(
-        `https://mychartos.ochin.org/mychart/SignupAndSchedule/EmbeddedSchedule?id=${siteId}&vt=${vt}&dept=${dept}&view=plain&public=1&payor=-1,-2,-3,4655,4660,1292,4661,5369,5257,1624,4883&lang=english1089`
+        `https://mychartos.ochin.org/mychart/SignupAndSchedule/EmbeddedSchedule?id=${siteId}&vt=${vt}&dept=${dept}&view=plain&public=1&payor=-1,-2,-3,4655,4660,1292,4661,5369,5257,1624,4883&lang=english`
     );
 
     return mychart.AddFutureWeeks(
