@@ -652,6 +652,88 @@ const sites = [
         },
         signUpLink: "https://www.cic-health.com/marketbasket",
     },
+    {
+        name: "Our Lady of Hope Parish Church",
+        siteUrl: "Our Lady of Hope Parish Church",
+        street: "1 Pineswamp Road",
+        city: "Ipswich",
+        zip: "01938",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+            Accessibility:
+                "Accessible Parking, drop off/pick up. In-car vaccination is available for those with mobility issues.",
+        },
+        signUpLink: "https://home.color.com/vaccine/register/capeann",
+    },
+    {
+        name: "Topsfield Fairgrounds, Coolidge Hall",
+        siteUrl: "Topsfield Fairgrounds, Coolidge Hall",
+        street: "207 Boston St",
+        city: "Topsfield",
+        zip: "01983",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Indoor",
+            Directions:
+                "Enter at main gate. Follow Signs to Bee Building or Coolidge Hall.",
+            Accessibility:
+                "Accessible clinic including parking, drop off, pick up. In-car vaccination is available for those with mobility issues or are medically fragile.",
+        },
+        signUpLink: "https://home.color.com/vaccine/register/capeann",
+    },
+    {
+        name: "Rockport Elementary School",
+        siteUrl: "Rockport Elementary School",
+        street: "34 Jerdens Lane",
+        city: "Rockport",
+        zip: "01966",
+        extraData: {
+            "Vaccines Offered": "Pfizer",
+            "Site Type": "Drive-Thru",
+        },
+        signUpLink: "https://home.color.com/vaccine/register/capeann",
+    },
+    {
+        name: "Greater Cape Ann Community Collaborative - Mobile Clinic",
+        siteUrl: "Greater Cape Ann Community Collaborative - Mobile Clinic",
+        street: "265 Bay Road",
+        city: "Hamilton",
+        zip: "01982",
+        signUpLink: "https://home.color.com/vaccine/register/capeann",
+    },
+    {
+        name: "Ipswich Town Hall",
+        siteUrl: "Ipswich Town Hall",
+        street: "25 Green Street",
+        city: "Ipswich",
+        zip: "01938",
+        signUpLink: "https://home.color.com/vaccine/register/capeann",
+    },
+    {
+        name: "Rockport Community Center",
+        siteUrl: "Rockport Community Center",
+        street: "58 Broadway",
+        city: "Rockport",
+        zip: "01966",
+        signUpLink: "https://home.color.com/vaccine/register/capeann",
+    },
+    {
+        name: "Kingston Collection",
+        siteUrl: "Kingston Collection",
+        street: "101 Kingston Collection Way",
+        city: "Kingston",
+        zip: "02364",
+        extraData: {
+            "Vaccines Offered": "Pfizer, Moderna",
+            "Site Type": "Indoor",
+            Directions:
+                "Park in the rear of the mall between Pinz and Target to access the clinic entrance.",
+            Accessibility:
+                "Accessible entrance, Wheelchair entrance, Accessible parking, Accessible drop off & pick up.",
+        },
+        signUpLink: "https://home.color.com/vaccine/register/kingstonplymouth",
+    },
 ];
 
 module.exports = sites;
